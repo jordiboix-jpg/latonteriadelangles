@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<!-- v40 build:20260928-1530 -->
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>La Tonteria de l'Anglès</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a1209">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tonteria">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1209;--paper:#f5f0e8;--cream:#ede7d6;--rust:#b8390e;
+  --gold:#c9850a;--gold-text:#7a4f00;--muted:#6b5e4a;--rule:#c4b89a;--green:#2d6a3f;
+  --red:#cc2200;--border:1px solid var(--rule);
+}
+[data-theme="dark"]{
+  --ink:#f0e8d8;--paper:#1a1410;--cream:#231d16;--rust:#d4562a;
+  --gold:#d4960f;--gold-text:#d4960f;--muted:#9a8a70;--rule:#4a3a28;--green:#4a9a5a;
+  --red:#e04030;--border:1px solid var(--rule);
+}
+body{background:var(--paper);color:var(--ink);font-family:'Source Serif 4',Georgia,serif;font-size:17px;line-height:1.65;min-height:100vh;transition:background .25s,color .25s}
+
+.masthead{border-top:6px solid var(--ink);text-align:center;background:var(--paper)}
+.mast-kicker{font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:10px 0 7px;border-bottom:var(--border)}
+.mast-title{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,88px);font-weight:900;line-height:.9;letter-spacing:-.02em;padding:26px 20px 20px;color:var(--ink)}
+.mast-title em{font-style:italic;color:var(--rust)}
+.mast-sub{font-family:'Source Serif 4',serif;font-style:italic;font-size:17px;color:var(--muted);padding:0 20px 16px;max-width:620px;margin:0 auto}
+.mast-meta{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--muted);padding:8px 0 11px;border-top:var(--border);display:flex;justify-content:center;gap:24px;flex-wrap:wrap}
+.mast-meta span{white-space:nowrap}
+
+.lang-bar{display:flex;justify-content:center;gap:0;border-bottom:3px solid var(--ink);background:var(--ink)}
+.lang-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#a09070;background:transparent;border:none;padding:10px 22px;cursor:pointer;border-right:1px solid #3a2e1e;transition:all .15s}
+.lang-btn:last-child{border-right:none}
+.lang-btn.active{color:var(--paper);background:var(--rust)}
+.lang-btn:hover:not(.active){color:var(--paper)}
+#darkBtn{font-family:'DM Mono',monospace;font-size:14px;background:transparent;border:none;cursor:pointer;padding:8px 14px;color:#a09070;border-left:1px solid #3a2e1e;transition:color .15s}
+#darkBtn:hover{color:var(--paper)}
+#pwaNavBtn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;background:transparent;border:none;border-left:1px solid #3a2e1e;cursor:pointer;padding:8px 13px;color:#a09070;display:none;transition:color .15s;white-space:nowrap}
+#pwaNavBtn:hover{color:var(--paper)}
+
+.container{max-width:1100px;margin:0 auto;padding:0 22px}
+hr.rule{border:none;border-top:3px double var(--rule);margin:50px 0 36px}
+
+/* ── PWA INSTALL BANNER ─────────────────────────────────────────────────── */
+#pwaBanner{position:fixed;bottom:60px;left:0;right:0;z-index:9999;background:var(--ink);color:var(--paper);padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 -3px 16px rgba(0,0,0,.35);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.05em;border-top:3px solid var(--rust)}
+#pwaBanner.hidden{display:none}
+#pwaBanner .pwa-icon{font-size:22px;flex-shrink:0}
+#pwaBanner .pwa-text{flex:1;line-height:1.4}
+#pwaBanner .pwa-text strong{display:block;font-size:13px;color:var(--paper);margin-bottom:2px}
+#pwaBanner .pwa-text span{color:#a09070;font-size:11px}
+#pwaBanner .pwa-ios-steps{color:#a09070;font-size:11px;line-height:1.6;margin-top:4px}
+#pwaBanner .pwa-ios-steps b{color:var(--paper)}
+.pwa-install-btn{background:var(--rust);color:var(--paper);border:none;padding:8px 16px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .15s}
+.pwa-install-btn:hover{background:#d4562a}
+.pwa-close-btn{background:transparent;border:none;color:#a09070;font-size:18px;cursor:pointer;padding:4px 6px;flex-shrink:0;line-height:1}
+.pwa-close-btn:hover{color:var(--paper)}
+
+.admin-bar{background:var(--ink);color:var(--paper);padding:10px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em}
+.admin-bar.hidden{display:none}
+.admin-bar span{color:#a09070}
+.admin-badge{background:var(--gold);color:var(--ink);padding:2px 8px;font-size:10px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px}
+.admin-tab{background:transparent;border:1px solid #4a3a28;color:#a09070;padding:5px 12px;cursor:pointer;font-family:inherit;font-size:11px;letter-spacing:.1em;transition:all .15s}
+.admin-tab.active,.admin-tab:hover{background:var(--rust);color:var(--paper);border-color:var(--rust)}
+
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);margin:40px 0}
+.stat{padding:22px 16px;border-right:var(--border);text-align:center}
+.stat:last-child{border-right:none}
+.stat-n{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:var(--rust);line-height:1;display:block}
+.stat-l{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+
+.filter-bar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 28px;align-items:center}
+.filter-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.cas-search{font-family:'DM Mono',monospace;font-size:11px;padding:5px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);width:220px;transition:border-color .15s}
+.cas-search:focus{border-color:var(--rust);outline:none}
+@media(max-width:640px){.cas-search{width:100%;flex:1 1 100%}}
+.filter-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:5px 11px;cursor:pointer;transition:all .15s;border-radius:2px}
+.filter-btn:hover{border-color:var(--rust);color:var(--rust)}
+.filter-btn.active{background:var(--rust);border-color:var(--rust);color:var(--paper)}
+.filter-sep{width:1px;height:20px;background:var(--rule);margin:0 4px}
+
+/* CAROUSEL */
+.carousel-wrap{position:relative;border-top:var(--border);padding:0 52px}
+.carousel-arrow-side{position:absolute;top:0;bottom:0;width:52px;display:flex;align-items:center;justify-content:center;z-index:10;background:transparent;border:none;cursor:pointer;transition:background .15s;padding:0;margin:0}
+.carousel-arrow-side.left{left:0}
+.carousel-arrow-side.right{right:0}
+.carousel-arrow-side:disabled{opacity:.18;cursor:default;pointer-events:none}
+.carousel-arrow-side:not(:disabled):hover{background:rgba(184,57,14,.06)}
+.carousel-arrow-inner{font-size:40px;color:var(--muted);line-height:1;transition:color .15s,transform .15s;user-select:none;font-family:'Playfair Display',serif}
+.carousel-arrow-side:not(:disabled):hover .carousel-arrow-inner{color:var(--rust);transform:scale(1.2)}
+.carousel-track-outer{overflow:hidden;width:100%}
+.entries-grid{display:flex;width:100%;transition:transform .38s cubic-bezier(.4,0,.2,1);will-change:transform}
+.entry{flex:0 0 calc(100% / 3);min-width:0;border-bottom:var(--border);border-right:var(--border);padding:26px 22px;position:relative;transition:background .12s;cursor:pointer;box-sizing:border-box}
+.entry:hover{background:var(--cream)}
+.carousel-nav{display:flex;align-items:center;justify-content:center;padding:14px 0 2px;gap:12px}
+.carousel-dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.carousel-dot{width:8px;height:8px;border-radius:2px;background:var(--rule);border:none;cursor:pointer;transition:background .15s,transform .15s;padding:0}
+.carousel-dot.active{background:var(--rust);transform:scaleX(1.8)}
+.entry-highlight{animation:highlightPulse 2.2s ease-out}
+@keyframes highlightPulse{0%{background:rgba(184,57,14,.18);box-shadow:0 0 0 3px var(--rust) inset}60%{background:rgba(184,57,14,.07)}100%{background:transparent;box-shadow:none}}
+.entry-num{font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:var(--rule);line-height:1;margin-bottom:6px}
+.entry-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;background:var(--rust);color:var(--paper);padding:3px 8px;display:inline-block;margin-bottom:10px}
+.entry-tag.pending{background:var(--gold);color:var(--ink)}
+.entry-name{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;line-height:1.2;margin-bottom:3px}
+.entry-transl{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:11px}
+.entry-addr{font-size:13px;color:var(--muted);margin-bottom:12px}
+.entry-desc{font-size:15px;line-height:1.65;margin-bottom:12px}
+.entry-comment{border-left:3px solid var(--gold);padding:9px 13px;background:rgba(201,133,10,.07);font-style:italic;font-size:14px;margin-bottom:12px}
+.entry-comment strong{display:block;font-style:normal;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.comment-edit-btn{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:rgba(201,133,10,.12);border:1px solid var(--gold);color:var(--gold);padding:3px 8px;cursor:pointer;margin-top:8px;transition:background .15s}
+.comment-edit-btn:hover{background:var(--gold);color:var(--ink)}
+.comment-edit-panel{display:none;margin-top:10px;border-top:1px solid rgba(201,133,10,.3);padding-top:10px}
+.comment-edit-panel.open{display:block}
+.comment-lang-tabs{display:flex;gap:4px;margin-bottom:8px}
+.comment-lang-tab{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:3px 8px;cursor:pointer;transition:all .12s}
+.comment-lang-tab.active{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.comment-textarea{width:100%;background:var(--cream);border:1px solid var(--rule);color:var(--ink);padding:8px 10px;font-family:'Source Serif 4',serif;font-size:13px;font-style:italic;line-height:1.55;resize:vertical;min-height:72px;outline:none;transition:border-color .15s;border-radius:0}
+.comment-textarea:focus{border-color:var(--gold)}
+.comment-save-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:var(--gold);color:var(--ink);border:none;padding:5px 12px;cursor:pointer;margin-top:6px;transition:opacity .15s}
+.comment-save-btn:hover{opacity:.8}
+.comment-cancel-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:transparent;color:var(--muted);border:1px solid var(--rule);padding:5px 10px;cursor:pointer;margin-top:6px;margin-left:6px}
+.comment-cancel-btn:hover{color:var(--ink);border-color:var(--ink)}
+/* ── DICT CONTROLS ── */
+.dict-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.dict-search{flex:1 1 180px;min-width:140px;font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+.dict-search:focus{border-color:var(--rust);outline:none}
+.dict-sort-group,.dict-page-group{display:flex;gap:2px}
+.dict-sort-btn,.dict-pg-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:5px 9px;cursor:pointer;transition:all .15s}
+.dict-sort-btn.active,.dict-pg-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.dict-sort-btn:not(.active):hover,.dict-pg-btn:not(.active):hover{border-color:var(--ink);color:var(--ink)}
+.dict-add-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--rust);color:var(--paper);border:none;padding:6px 12px;cursor:pointer;margin-left:auto;transition:opacity .15s}
+.dict-add-btn:hover{opacity:.8}
+.dict-propose-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--gold);border:1px solid var(--gold);padding:5px 11px;cursor:pointer;margin-left:auto;transition:all .15s}
+.dict-propose-btn:hover{background:var(--gold);color:var(--ink)}
+.dict-proposal-row{border:1px solid var(--rule);background:var(--paper);padding:16px 20px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.dict-proposal-terms{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;font-style:italic}
+.dict-proposal-transl{font-size:14px;color:var(--muted);margin-top:3px}
+.dict-proposal-actions{display:flex;gap:6px;flex-shrink:0}
+.dict-prop-approve{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--green);color:#fff;border:none;padding:5px 10px;cursor:pointer;transition:opacity .15s}
+.dict-prop-approve:hover{opacity:.8}
+.dict-prop-reject{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--rust);border:1px solid var(--rust);padding:4px 9px;cursor:pointer;transition:all .15s}
+.dict-prop-reject:hover{background:var(--rust);color:#fff}
+.dict-row-actions{display:flex;gap:4px;align-items:center;justify-content:flex-end;padding-right:8px}
+.dict-row-edit,.dict-row-del{font-family:'DM Mono',monospace;font-size:9px;border:none;cursor:pointer;padding:2px 6px;transition:all .15s}
+.dict-row-edit{background:rgba(201,133,10,.12);color:var(--gold);border:1px solid var(--gold)}
+.dict-row-edit:hover{background:var(--gold);color:var(--ink)}
+.dict-row-del{background:rgba(184,57,14,.1);color:var(--rust);border:1px solid var(--rust)}
+.dict-row-del:hover{background:var(--rust);color:var(--paper)}
+.dict-header-row{display:grid;grid-template-columns:1fr 1fr 1.4fr;background:var(--ink);color:var(--paper)}
+.dict-header-row.admin-mode{grid-template-columns:1fr 1fr 1.4fr 70px}
+.dict-hcol{padding:12px 20px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+@media(max-width:640px){
+  .dict-header-row{grid-template-columns:1fr 1fr}
+  .dict-hcol-comment-desktop{display:none}
+}
+.dict-pagination{display:flex;gap:4px;align-items:center;justify-content:center;margin:4px 0 8px;flex-wrap:wrap}
+.dict-pag-btn{font-family:'DM Mono',monospace;font-size:10px;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:4px 9px;cursor:pointer;transition:all .15s}
+.dict-pag-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.dict-pag-btn:not(.active):hover{border-color:var(--ink);color:var(--ink)}
+.dict-pag-info{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:0 8px}
+.dict-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center}
+.dict-modal-bg.hidden{display:none}
+.dict-modal{background:var(--paper);border:var(--border);padding:28px;width:min(480px,92vw);max-height:90vh;overflow-y:auto}
+.dict-modal-label{display:block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:10px 0 3px}
+.dict-modal-input{width:100%;box-sizing:border-box;font-family:'Source Serif 4',serif;font-size:14px;padding:6px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+.dict-modal-input:focus{border-color:var(--gold);outline:none}
+/* ── ENUNCIAT EDIT ── */
+.enunciat-edit-btn{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:rgba(184,57,14,.1);border:1px solid var(--rust);color:var(--rust);padding:3px 8px;cursor:pointer;margin-top:8px;transition:background .15s}
+.enunciat-edit-btn:hover{background:var(--rust);color:var(--paper)}
+.enunciat-edit-panel{display:none;margin-top:10px;border-top:1px solid rgba(184,57,14,.3);padding-top:10px}
+.enunciat-edit-panel.open{display:block}
+.enunciat-edit-panel label{display:block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);margin:8px 0 3px}
+.enunciat-edit-panel input[type=text]{width:100%;box-sizing:border-box;font-family:'Source Serif 4',serif;font-size:13px;padding:5px 8px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+.enunciat-edit-panel input[type=text]:focus{border-color:var(--rust);outline:none}
+.enunciat-lang-tabs{display:flex;gap:4px;margin:8px 0 4px}
+.enunciat-lang-tab{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:3px 8px;cursor:pointer;transition:all .15s}
+.enunciat-lang-tab.active{background:var(--rust);color:var(--paper);border-color:var(--rust)}
+.enunciat-save-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:var(--rust);color:var(--paper);border:none;padding:5px 12px;cursor:pointer;margin-top:6px;transition:opacity .15s}
+.enunciat-save-btn:hover{opacity:.8}
+.enunciat-cancel-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:transparent;color:var(--muted);border:1px solid var(--rule);padding:5px 10px;cursor:pointer;margin-top:6px;margin-left:6px}
+.enunciat-cancel-btn:hover{color:var(--ink);border-color:var(--ink)}
+.map-btn{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);text-decoration:none;border:1px solid var(--rust);padding:5px 11px;transition:all .15s;margin-top:2px}
+.map-btn:hover{background:var(--rust);color:var(--paper)}
+.entry-photo{width:100%;height:180px;object-fit:cover;border-radius:2px;margin-bottom:12px;display:block}
+.visit-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:4px 0 10px}
+
+.share-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.share-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--rule);background:transparent;color:var(--muted);padding:5px 9px;cursor:pointer;transition:all .15s;border-radius:2px}
+.share-btn:hover{border-color:var(--ink);color:var(--ink)}
+.share-btn.wa:hover{background:#25d366;border-color:#25d366;color:#fff}
+.share-btn.tw:hover{background:#000;border-color:#000;color:#fff}
+.share-btn.ms:hover{background:#6364ff;border-color:#6364ff;color:#fff}
+.share-btn.cp:hover{background:var(--rust);border-color:var(--rust);color:#fff}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;padding:10px 20px;border-radius:3px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:200}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.tonteria-index{margin:12px 0 14px;padding:10px 13px;background:rgba(0,0,0,.04);border:1px solid var(--rule)}
+.ti-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ti-stars{display:flex;gap:3px;margin-bottom:5px}
+.ti-star{width:18px;height:18px;border-radius:2px;flex-shrink:0}
+.ti-star.filled{transform:scale(1.05)}
+.ti-verdesc{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em;line-height:1.4}
+.ti-0 .ti-star.filled{background:#4caf50}.ti-0 .ti-verdesc{color:#2d6a3f}
+.ti-1 .ti-star.filled{background:#a8c61b}.ti-1 .ti-verdesc{color:#5a6e00}
+.ti-2 .ti-star.filled{background:#f0a500}.ti-2 .ti-verdesc{color:#7a5200}
+.ti-3 .ti-star.filled{background:#e07000}.ti-3 .ti-verdesc{color:#7a3a00}
+.ti-4 .ti-star.filled{background:#d03020}.ti-4 .ti-verdesc{color:#8a1a0a}
+.ti-5 .ti-star.filled{background:#8b0000}.ti-5 .ti-verdesc{color:#6a0000}
+.ti-star.empty{background:var(--rule);opacity:.4}
+.ti-admin-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.ti-admin-row label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#a09070}
+.ti-admin-sel{background:#2a1f12;border:1px solid #4a3a28;color:var(--paper);padding:4px 8px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;outline:none}
+.ti-save-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--gold);color:var(--ink);border:none;padding:5px 10px;cursor:pointer}
+
+.admin-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.act-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;border:none;padding:6px 12px;cursor:pointer;transition:all .15s}
+.act-approve{background:var(--green);color:#fff}.act-approve:hover{opacity:.85}
+.act-reject{background:#888;color:#fff}.act-reject:hover{background:var(--red)}
+.act-translate{background:var(--gold);color:var(--ink)}.act-translate:hover{opacity:.85}
+.act-delete{background:var(--red);color:#fff}.act-delete:hover{opacity:.85}
+
+.admin-photo-row{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.admin-photo-row label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#a09070;cursor:pointer;display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--rule);padding:5px 10px;width:fit-content}
+.admin-photo-row label:hover{border-color:var(--gold);color:var(--gold)}
+.admin-photo-row input[type=file]{display:none}
+.admin-photo-preview{width:100%;max-height:120px;object-fit:cover;border-radius:2px;display:none;margin-top:4px}
+.act-photo-save{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--green);color:#fff;border:none;padding:5px 10px;cursor:pointer;display:none}
+.act-photo-remove{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:#888;color:#fff;border:none;padding:5px 10px;cursor:pointer}
+.act-photo-remove:hover{background:var(--red)}
+
+.map-wrap{border:var(--border);overflow:hidden;margin:40px 0}
+.map-header{background:var(--ink);color:var(--paper);padding:13px 18px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700}
+#mapa{width:100%;height:440px;border:none;display:block}
+.leaflet-popup-content-wrapper{border-radius:2px;font-family:'Source Serif 4',Georgia,serif;border-top:3px solid var(--rust,#b8390e)}
+.leaflet-popup-content{margin:12px 14px;font-size:14px;line-height:1.5}
+.map-popup-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:3px}
+.map-popup-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:#b8390e;color:#fff;padding:2px 6px;display:inline-block;margin-bottom:6px}
+.map-popup-addr{font-size:12px;color:#6b5e4a;margin-bottom:6px}
+.map-popup-stars{font-size:12px}
+
+.submit-section{background:var(--ink);color:var(--paper);padding:44px 40px;margin:50px 0}
+.submit-section h2{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:8px}
+.submit-section p{color:#a09070;font-size:15px;margin-bottom:28px;max-width:560px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-full{grid-column:1/-1}
+.field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#a09070;margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;background:#2a1f12;border:1px solid #4a3a28;color:var(--paper);padding:10px 12px;font-family:'Source Serif 4',serif;font-size:15px;line-height:1.5;outline:none;transition:border-color .15s;border-radius:0}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}
+.field textarea{resize:vertical;min-height:90px}
+.field select option{background:#2a1f12}
+.submit-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;background:var(--rust);color:var(--paper);border:none;padding:13px 28px;cursor:pointer;transition:all .15s;margin-top:6px}
+.submit-btn:hover{background:#d44a1a}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+.form-msg{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;margin-top:14px;padding:10px 14px}
+.form-msg.ok{background:rgba(45,106,63,.3);color:#7ecf95;border-left:3px solid var(--green)}
+.form-msg.err{background:rgba(204,34,0,.2);color:#f09090;border-left:3px solid var(--red)}
+.form-msg.hidden{display:none}
+.photo-preview{width:100%;max-height:200px;object-fit:cover;margin-top:8px;border-radius:2px;display:none}
+.photo-pick-row{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.photo-pick-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px dashed #4a3a28;color:#a09070;padding:8px 14px;cursor:pointer;border-radius:2px;transition:all .15s;flex:1 1 auto}
+.photo-pick-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,133,10,.07)}
+
+.manifesto{max-width:740px;margin:50px auto;text-align:center}
+.manifesto blockquote{font-family:'Playfair Display',serif;font-size:26px;font-style:italic;line-height:1.4;color:var(--ink);margin:22px 0}
+.manifesto blockquote::before{content:"\201C";font-size:72px;color:var(--rule);line-height:0;vertical-align:-.4em;margin-right:5px}
+.sec-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin-bottom:5px}
+.sec-h{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;margin-bottom:4px}
+
+.admin-login{position:fixed;inset:0;background:rgba(26,18,9,.85);display:flex;align-items:center;justify-content:center;z-index:100}
+.admin-login.hidden{display:none}
+.login-box{background:var(--paper);padding:40px;max-width:360px;width:90%;border-top:5px solid var(--rust)}
+.login-box h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:20px}
+.login-box input{width:100%;border:var(--border);padding:10px 12px;font-size:15px;font-family:inherit;margin-bottom:14px;background:var(--cream);color:var(--ink);outline:none}
+.login-box input:focus{border-color:var(--gold)}
+.login-err{font-family:'DM Mono',monospace;font-size:11px;color:var(--red);margin-bottom:10px;display:none}
+
+.loading{text-align:center;padding:60px 20px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.15em;color:var(--muted)}
+.section-hidden{display:none}
+
+footer{background:var(--ink);color:var(--cream);padding:36px 40px;text-align:center;margin-top:70px}
+footer .fl{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;margin-bottom:10px}
+footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width:600px;margin-inline:auto}
+
+@media(max-width:900px){
+  .entry{flex:0 0 50%}
+}
+@media(max-width:640px){
+  .entry{flex:0 0 100%}
+  .form-grid{grid-template-columns:1fr}
+  .submit-section{padding:28px 18px}
+  .mast-meta{flex-direction:column;gap:4px;align-items:center}
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .stat:nth-child(2){border-right:none}
+  .filter-bar{gap:4px}
+  /* Mobile carousel: remove side padding so cards fill full width */
+  .carousel-wrap{padding:0}
+  .carousel-arrow-side{width:36px;background:rgba(255,255,255,.85);z-index:20}
+  .carousel-arrow-side.left{left:0}
+  .carousel-arrow-side.right{right:0}
+  .carousel-arrow-inner{font-size:22px}
+  /* Card readability improvements on mobile */
+  .entry{padding:20px 16px;border-right:none;border-bottom:var(--border)}
+  .entry-num{font-size:36px;margin-bottom:4px}
+  .entry-name{font-size:19px}
+  .entry-desc{font-size:15px;line-height:1.7}
+  .entry-comment{font-size:14px}
+  .entry-tag{font-size:9px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="admin-login hidden" id="loginModal">
+  <div class="login-box">
+    <h2 id="loginTitle">Panell d'administrador</h2>
+    <p id="loginDesc" style="font-size:14px;color:var(--muted);margin-bottom:16px">Introdueix la contrasenya d'administrador.</p>
+    <input type="password" id="loginPwd" placeholder="Contrasenya..." autocomplete="current-password">
+    <div class="login-err" id="loginErr">Contrasenya incorrecta.</div>
+    <div style="display:flex;gap:10px">
+      <button class="submit-btn" id="loginOk" style="flex:1">Entrar</button>
+      <button class="submit-btn" id="loginCancel" style="background:#555">Cancel·lar</button>
+    </div>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="mast-kicker" id="kicker">Directori Satíric · Catalunya · Des de 2025</div>
+  <h1 class="mast-title">La Tonteria<br>de l'<em>Anglès</em></h1>
+  <p class="mast-sub" id="mainSub">Guia dels comerços barcelonins que han oblidat on viuen — i en quin idioma</p>
+  <div class="mast-meta">
+    <span id="meta1">🗺 Catalunya, Espanya</span>
+    <span id="meta2">🔤 Idiomes oficials: català i castellà</span>
+    <span id="meta3">🇬🇧 Idioma dels rètols: l'anglès, sorprenentment</span>
+    <span id="meta4">🤷 Raó: misteriosa</span>
+  </div>
+</header>
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('ca')">🟡 Català</button>
+  <button class="lang-btn" onclick="setLang('es')">🔴 Castellano</button>
+  <button class="lang-btn" onclick="setLang('en')">🇬🇧 English</button>
+  <button id="darkBtn" onclick="toggleDark()" title="Mode fosc">🌙</button>
+  <button id="pwaNavBtn" onclick="pwaTriggerInstall()" title="Instal·la l'app">📲 App</button>
+  <button class="lang-btn" onclick="showAdminLogin()" style="margin-left:auto;border-right:none;border-left:1px solid #3a2e1e" id="adminLoginBtn">⚙ Admin</button>
+</div>
+
+<div class="admin-bar hidden" id="adminBar">
+  <span class="admin-badge">ADMIN</span>
+  <span id="pendingCount">0 pendents</span>
+  <button class="admin-tab active" id="tabPublic" onclick="switchAdminTab('public')">Vista pública</button>
+  <button class="admin-tab" id="tabPending" onclick="switchAdminTab('pending')">Submissions pendents</button>
+  <button class="admin-tab" id="tabAll" onclick="switchAdminTab('all')">Tots els casos</button>
+  <button class="admin-tab" id="tabDictProposals" onclick="switchAdminTab('dictProposals')">💡 Propostes diccionari <span id="dictPropCount" style="display:none;background:var(--rust);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;margin-left:4px">0</span></button>
+  <button class="admin-tab" onclick="adminLogout()" style="margin-left:auto">Tancar sessió</button>
+</div>
+
+<div class="container">
+  <div class="stats-bar" style="margin-top:44px">
+    <div class="stat"><span class="stat-n" id="statCount">…</span><span class="stat-l" id="statCountL">Casos documentats</span></div>
+    <div class="stat"><span class="stat-n">0</span><span class="stat-l" id="statZeroL">Rètols en català</span></div>
+    <div class="stat"><span class="stat-n">∞</span><span class="stat-l" id="statInfL">Vergonya aliena</span></div>
+    <div class="stat"><span class="stat-n">100%</span><span class="stat-l" id="statPctL">A Catalunya</span></div>
+  </div>
+
+  <div id="tiLegend" style="margin:0 0 36px;border:1px solid var(--rule);background:var(--cream)">
+    <div style="background:var(--ink);color:var(--paper);padding:11px 18px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:space-between">
+      <span id="tiLegendTitle">🏆 ÍNDEX DE TONTERIA ANGLESA™</span>
+      <span id="tiLegendScale" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;font-weight:400;color:#a09070">ESCALA OFICIAL</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))" id="legendGrid"></div>
+  </div>
+
+  <div class="map-wrap">
+    <div class="map-header" id="mapHeader">🗺 Mapa de la Tonteria — Tots els indrets documentats</div>
+    <div id="mapa" style="width:100%;height:440px"></div>
+  </div>
+
+  <div id="sectionPublic">
+    <hr class="rule">
+    <div class="sec-label" id="secLabel">El directori</div>
+    <h2 class="sec-h" id="secH">Els establiments catalogats</h2>
+    <p style="color:var(--muted);font-size:15px;margin:8px 0 20px" id="secDesc">Casos documentats, revisats i publicats.</p>
+    <div class="filter-bar">
+      <span class="filter-lbl" id="filterLbl">Filtre:</span>
+      <button class="filter-btn active" id="fAll" onclick="setFilter('all')"><span id="filterAll">Tots</span></button>
+      <div class="filter-sep"></div>
+      <button class="filter-btn" id="f5" onclick="setFilter('5')">🔴 5★</button>
+      <button class="filter-btn" id="f4" onclick="setFilter('4')">🔴 4★</button>
+      <button class="filter-btn" id="f3" onclick="setFilter('3')">🟠 3★</button>
+      <button class="filter-btn" id="f2" onclick="setFilter('2')">🟠 2★</button>
+      <button class="filter-btn" id="f1" onclick="setFilter('1')">🟡 1★</button>
+      <div class="filter-sep"></div>
+      <button class="filter-btn" id="fcafeteria" onclick="setFilter('cat:cafeteria')">☕ Cafeteria</button>
+      <button class="filter-btn" id="frestaurant" onclick="setFilter('cat:restaurant')">🍳 Restaurant</button>
+      <button class="filter-btn" id="fbarberia" onclick="setFilter('cat:barberia')">✂️ Barberia</button>
+      <button class="filter-btn" id="fbotiga" onclick="setFilter('cat:botiga')">🛍 Botiga</button>
+      <button class="filter-btn" id="fbeaute" onclick="setFilter('cat:beaute')">💅 Bellesa</button>
+      <button class="filter-btn" id="fnegoci" onclick="setFilter('cat:negoci')">🏢 Negoci</button>
+      <button class="filter-btn" id="fvehicle" onclick="setFilter('cat:vehicle')">🚗 Vehicle</button>
+      <div class="filter-sep"></div>
+      <button class="filter-btn" id="fprov-barcelona" onclick="setFilter('prov:barcelona')">📍 Barcelona</button>
+      <button class="filter-btn" id="fprov-girona" onclick="setFilter('prov:girona')">📍 Girona</button>
+      <button class="filter-btn" id="fprov-lleida" onclick="setFilter('prov:lleida')">📍 Lleida</button>
+      <button class="filter-btn" id="fprov-tarragona" onclick="setFilter('prov:tarragona')">📍 Tarragona</button>
+      <div class="filter-sep"></div>
+      <input class="cas-search" id="casSearch" type="text" placeholder="🔍 Cercar cas o municipi…" oninput="casSearchUpdate()">
+    </div>
+    <div class="carousel-wrap" id="carouselWrap">
+      <button class="carousel-arrow-side left" id="carPrev" onclick="carouselMove(-1)" disabled aria-label="Anterior"><span class="carousel-arrow-inner">‹</span></button>
+      <div class="carousel-track-outer">
+        <div class="entries-grid" id="entriesGrid"><div class="loading" style="flex:0 0 100%">Carregant casos…</div></div>
+      </div>
+      <button class="carousel-arrow-side right" id="carNext" onclick="carouselMove(1)" aria-label="Següent"><span class="carousel-arrow-inner">›</span></button>
+    </div>
+    <div class="carousel-nav" id="carouselNav" style="display:none">
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+  </div>
+
+  <div id="sectionPending" class="section-hidden">
+    <hr class="rule">
+    <h2 class="sec-h">Submissions pendents de revisió</h2>
+    <p style="color:var(--muted);font-size:15px;margin:8px 0 28px">Casos enviats pels usuaris que esperen aprovació.</p>
+    <div class="entries-grid" id="pendingGrid"><div class="loading" style="flex:0 0 100%">Carregant…</div></div>
+  </div>
+
+  <div id="sectionAll" class="section-hidden">
+    <hr class="rule">
+    <h2 class="sec-h">Tots els casos (admin)</h2>
+    <div class="entries-grid" id="allGrid"><div class="loading" style="flex:0 0 100%">Carregant…</div></div>
+  </div>
+
+  <div id="sectionDictProposals" class="section-hidden">
+    <hr class="rule">
+    <h2 class="sec-h">💡 Propostes de diccionari</h2>
+    <p style="color:var(--muted);font-size:14px;margin:6px 0 24px">Entrades proposades pels visitants. Aprova-les per afegir-les directament al diccionari.</p>
+    <div id="dictProposalsList"></div>
+  </div>
+
+  <hr class="rule">
+
+  <div id="dictSection">
+    <div class="sec-label" id="dictLabel">Glossari oficial</div>
+    <h2 class="sec-h" id="dictH">Diccionari de l'Absurd</h2>
+    <p style="color:var(--muted);font-size:15px;margin:6px 0 18px;max-width:620px" id="dictDesc">Una guia de supervivència per entendre el que posa als rètols dels establiments barcelonins.</p>
+
+    <div class="dict-toolbar">
+      <input class="dict-search" id="dictSearch" type="text" placeholder="🔍 Cercar en anglès o català…" oninput="dictUpdate()">
+      <div class="dict-sort-group">
+        <button class="dict-sort-btn active" id="dsort-en" onclick="dictSetSort('en')">A–Z anglès</button>
+        <button class="dict-sort-btn" id="dsort-ca" onclick="dictSetSort('ca')">A–Z català</button>
+        <button class="dict-sort-btn" id="dsort-orig" onclick="dictSetSort('orig')">Original</button>
+      </div>
+      <div class="dict-page-group">
+        <button class="dict-pg-btn active" id="dpg-10" onclick="dictSetPage(10)">10</button>
+        <button class="dict-pg-btn" id="dpg-20" onclick="dictSetPage(20)">20</button>
+        <button class="dict-pg-btn" id="dpg-30" onclick="dictSetPage(30)">30</button>
+      </div>
+      <button id="dictAddBtn" class="dict-add-btn" style="display:none" onclick="dictOpenAdd()">＋ Afegir entrada</button>
+      <button id="dictProposeBtn" class="dict-propose-btn" onclick="dictOpenPropose()">💡 <span id="dictProposeBtnLbl">Proposar entrada</span></button>
+    </div>
+
+    <div style="border:1px solid var(--rule);overflow:hidden;margin-bottom:8px">
+      <div class="dict-header-row">
+        <div class="dict-hcol" style="border-right:1px solid #3a2e1e" id="dictCol1">Anglès misteriós</div>
+        <div class="dict-hcol dict-hcol-comment" id="dictCol2">Traducció / Comentari</div>
+        <div class="dict-hcol dict-hcol-comment-desktop" style="border-left:1px solid #3a2e1e" id="dictCol3">Comentari editorial</div>
+      </div>
+      <div id="dictRows"></div>
+    </div>
+    <div class="dict-pagination" id="dictPagination"></div>
+    <p style="font-style:italic;font-size:15px;color:var(--muted);border-left:3px solid var(--gold);padding:10px 16px;background:rgba(201,133,10,.06);max-width:720px;margin-top:16px" id="dictFooter">
+      Si una paraula té una traducció perfectament normal, probablement acabem de trobar material per a aquesta web.
+    </p>
+
+    <!-- Modal proposta pública -->
+    <div class="dict-modal-bg hidden" id="dictProposeModal">
+      <div class="dict-modal">
+        <h3 style="font-family:'Playfair Display',serif;font-size:18px;margin-bottom:6px">💡 Proposa una entrada</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">L'administrador la revisarà abans de publicar-la.</p>
+        <label class="dict-modal-label">Anglès (el rètol absurd)</label>
+        <input class="dict-modal-input" id="dpen" type="text" placeholder="p.ex. Fresh Corner">
+        <label class="dict-modal-label">Català (com hauria de dir)</label>
+        <input class="dict-modal-input" id="dpca" type="text" placeholder="p.ex. Mercat / Fruiteria">
+        <label class="dict-modal-label">Castellà (opcional)</label>
+        <input class="dict-modal-input" id="dpes" type="text" placeholder="p.ex. Frutería">
+        <label class="dict-modal-label">Explicació humorística (opcional)</label>
+        <input class="dict-modal-input" id="dpeng" type="text" placeholder="p.ex. Just fruit. Very fresh. Very corner.">
+        <div id="dictProposeMsg" style="font-size:13px;margin-top:10px;display:none"></div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="enunciat-save-btn" onclick="dictProposeSend()">📨 Enviar proposta</button>
+          <button class="enunciat-cancel-btn" onclick="dictProposeClose()">Cancel·lar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal afegir/editar entrada diccionari -->
+    <div class="dict-modal-bg hidden" id="dictModal">
+      <div class="dict-modal">
+        <h3 id="dictModalTitle" style="font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px">Nova entrada</h3>
+        <label class="dict-modal-label">Anglès (rètol)</label>
+        <input class="dict-modal-input" id="dmen" type="text" placeholder="p.ex. Coffee Corner">
+        <label class="dict-modal-label">Català</label>
+        <input class="dict-modal-input" id="dmca" type="text" placeholder="p.ex. Cafeteria">
+        <label class="dict-modal-label">Castellà</label>
+        <input class="dict-modal-input" id="dmes" type="text" placeholder="p.ex. Cafetería">
+        <label class="dict-modal-label">Anglès real (explicació humorística)</label>
+        <input class="dict-modal-input" id="dmeng" type="text" placeholder="p.ex. Just a café.">
+        <label class="dict-modal-label">💬 Comentari humorístic (CA)</label>
+        <input class="dict-modal-input" id="dmcomment" type="text" placeholder="p.ex. Mysteriosament, cap local no ha pensat a dir-ho en català.">
+        <label class="dict-modal-label">💬 Comentario humorístico (ES)</label>
+        <input class="dict-modal-input" id="dmcomment_es" type="text" placeholder="p.ej. Misteriosamente, nadie ha pensado en decirlo en catalán.">
+        <label class="dict-modal-label">💬 Humorous comment (EN)</label>
+        <input class="dict-modal-input" id="dmcomment_en" type="text" placeholder="e.g. Mysteriously, nobody thought of saying it in Catalan.">
+        <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+          <button class="enunciat-save-btn" onclick="dictModalSave()">💾 Desar</button>
+          <button class="enunciat-cancel-btn" onclick="dictModalClose()">Cancel·lar</button>
+          <button type="button" id="dictAutoTranslateBtn" class="enunciat-cancel-btn" style="margin-left:auto;background:var(--rust);color:#fff;border-color:var(--rust)" onclick="dictAutoTranslate()">✨ Traduir automàticament</button>
+        </div>
+        <div id="dictTranslateStatus" style="display:none;font-size:12px;color:var(--gold-text);margin-top:8px;font-style:italic"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+  <div class="manifesto">
+    <div class="sec-label" id="whyLabel">Reflexió final</div>
+    <h2 class="sec-h" id="whyH" style="font-size:26px;text-align:center;margin-bottom:14px">Per què passa això?</h2>
+    <blockquote id="whyQuote">Posar el rètol en anglès no fa el negoci millor. Fa que sembli que el propietari no confia que el seu veïnat entengui el que ven.</blockquote>
+    <div style="max-width:660px;margin:22px auto;font-size:15px;color:var(--muted);line-height:1.8;text-align:left" id="whyBody"></div>
+  </div>
+
+  <div class="submit-section">
+    <h2 id="submitH">Coneixes un altre cas?</h2>
+    <p id="submitDesc">Si has vist una fleca «The Bakery» o qualsevol altre absurd lingüístic a Catalunya, envia'l aquí.</p>
+    <div class="form-grid">
+      <div class="field form-full">
+        <label id="fldNameL">Nom del negoci (tal com apareix al rètol)</label>
+        <input type="text" id="fldName" placeholder="p. ex: The Cozy Corner">
+      </div>
+      <div class="field">
+        <label id="fldAddrL">Adreça</label>
+        <input type="text" id="fldAddr" placeholder="Carrer, número, barri">
+      </div>
+      <div class="field">
+        <label id="fldProvL">Província</label>
+        <select id="fldProv">
+          <option value="barcelona">Barcelona</option>
+          <option value="girona">Girona</option>
+          <option value="lleida">Lleida</option>
+          <option value="tarragona">Tarragona</option>
+        </select>
+      </div>
+      <div class="field">
+        <label id="fldMuniL">Municipi</label>
+        <input type="text" id="fldMuni" placeholder="p. ex: Sabadell, Girona, Reus…">
+      </div>
+      <div class="field">
+        <label id="fldCatL">Tipus de negoci</label>
+        <select id="fldCat">
+          <option value="" id="catOptSelect">-- Selecciona --</option>
+          <option value="cafeteria" id="catOptCafeteria">Cafeteria / Cafè</option>
+          <option value="restaurant" id="catOptRestaurant">Restaurant / Brunch</option>
+          <option value="barberia" id="catOptBarberia">Barberia / Perruqueria</option>
+          <option value="botiga" id="catOptBotiga">Botiga / Comerç</option>
+          <option value="beaute" id="catOptBeaute">Estètica / Bellesa</option>
+          <option value="negoci" id="catOptNegoci">Oficina / Serveis</option>
+          <option value="vehicle" id="catOptVehicle">Vehicle / Mobilitat</option>
+          <option value="altre" id="catOptAltre">Altre</option>
+        </select>
+      </div>
+      <div class="field form-full">
+        <label id="fldDescL">Descripció breu (per què és una tonteria?)</label>
+        <textarea id="fldDesc" placeholder="Explica per què et sembla absurd…"></textarea>
+      </div>
+      <div class="field form-full">
+        <label id="fldPhotoL">Foto del rètol (opcional)</label>
+        <div class="photo-pick-row">
+          <button type="button" class="photo-pick-btn" id="btnFerFoto" onclick="document.getElementById('fldPhotoCam').click()">📷 Fer foto</button>
+          <button type="button" class="photo-pick-btn" id="btnTriarFitxer" onclick="document.getElementById('fldPhoto').click()">🖼 Triar fitxer</button>
+        </div>
+        <input type="file" id="fldPhoto" accept="image/*" style="display:none">
+        <input type="file" id="fldPhotoCam" accept="image/*" capture="environment" style="display:none">
+        <img id="photoPreview" class="photo-preview" alt="Previsualització">
+      </div>
+      <div class="field form-full">
+        <label id="fldUbicacioL">Ubicació (opcional)</label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="photo-pick-btn" id="gpsBtn" onclick="captureGPS()">📍 <span id="gpsBtnLbl">Usa la meva ubicació</span></button>
+          <span id="gpsStatus" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)"></span>
+        </div>
+      </div>
+      <div class="field form-full">
+        <label id="fldEmailL">El teu email (opcional)</label>
+        <input type="email" id="fldEmail" placeholder="correu@exemple.com">
+      </div>
+    </div>
+    <button class="submit-btn" id="submitBtn" onclick="submitCase()">Enviar cas →</button>
+    <div class="form-msg hidden" id="formMsg"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="fl">La Tonteria de l'<em style="color:var(--gold)">Anglès</em></div>
+  <p id="footerDesc">Un arxiu satíric del paisatge comercial de Catalunya · Espanya</p>
+  <p style="margin-top:12px;font-size:12px" id="footerDisclaimer">Els comentaris editorials són opinió i sàtira. Les descripcions dels negocis es basen en informació pública.</p>
+</footer>
+
+<script>
+// ── SUPABASE ───────────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://oyvpxncagpentebyftrg.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95dnB4bmNhZ3BlbnRlYnlmdHJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzg2NjcsImV4cCI6MjEwNTkxNDY2N30.dSu7E9R2RrUx6paiRfqdBy2_O-jKL2EBgRCVpNuNo0c';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── CONSTANTS ──────────────────────────────────────────────────────────────
+const ADMIN_PWD = "tonteria2025";
+
+const TINDEX = [
+  {score:0,emoji:"🟢",label:{ca:"0/5 — COMPLETAMENT NORMAL",es:"0/5 — COMPLETAMENTE NORMAL",en:"0/5 — PERFECTLY NORMAL"},desc:{ca:"L'anglès té sentit.",es:"El inglés tiene sentido.",en:"The English actually makes sense."}},
+  {score:1,emoji:"🟡",label:{ca:"1/5 — BÉ...",es:"1/5 — BUENO...",en:"1/5 — WELL..."},desc:{ca:"Podria estar en anglès.",es:"Podría estar en inglés.",en:"Could go in English."}},
+  {score:2,emoji:"🟠",label:{ca:"2/5 — MODERNET",es:"2/5 — MODERNO",en:"2/5 — TRENDY"},desc:{ca:"En català també hauria funcionat.",es:"En catalán también habría funcionado.",en:"Catalan would have worked too."}},
+  {score:3,emoji:"🟠",label:{ca:"3/5 — PERDÓ?",es:"3/5 — ¿PERDONA?",en:"3/5 — EXCUSE ME?"},desc:{ca:"Algú va decidir que en anglès quedava millor.",es:"Alguien decidió que en inglés quedaba mejor.",en:"Someone decided English looked better."}},
+  {score:4,emoji:"🔴",label:{ca:"4/5 — VERY INTERNATIONAL",es:"4/5 — VERY INTERNATIONAL",en:"4/5 — VERY INTERNATIONAL"},desc:{ca:"No sabem ben bé per què, però hi ha molt d'anglès.",es:"No sabemos muy bien por qué, pero hay mucho inglés.",en:"We're not quite sure why, but there's a lot of English."}},
+  {score:5,emoji:"🔴",label:{ca:"5/5 — WHY, GOD, WHY?",es:"5/5 — WHY, GOD, WHY?",en:"5/5 — WHY, GOD, WHY?"},desc:{ca:"La llengua local ha abandonat discretament l'establiment.",es:"La lengua local ha abandonado discretamente el establecimiento.",en:"The local language has quietly left the building."}},
+];
+
+const SEED = [
+  {id:"seed1",status:"published",num:"01",tag:"Cafeteria especialitat",tonteriaIndex:3,category:"cafeteria",lat:41.3842,lng:2.1831,name:"Hidden Coffee Roasters",addr:"Carrer dels Canvis Vells, 10 · El Born, Barcelona",mapUrl:"https://maps.google.com/?q=Hidden+Coffee+Roasters+El+Born+Barcelona",ca:{transl:"«Torrefactors de Cafè Amagat»",desc:"Cafeteria de cafè de tercera onada al barri del Born. La clientela és un 80% local. El nom, en canvi, sembla pensat per a un turista de Portland.",comment:"«Hidden» és especialment encertat: el nom en anglès amaga que ets a Barcelona. «Torrefactor Amagat del Born» sonava massa bé, suposo."},es:{transl:"«Tostadores de Café Escondido»",desc:"Cafetería de café de tercera ola en el Born. La clientela es un 80% local. El nombre parece pensado para un turista de Portland.",comment:"«Hidden» es especialmente acertado: el nombre en inglés esconde que estás en Barcelona."},en:{transl:'Literally: "Hidden Coffee Roasters"',desc:"A specialty coffee shop in El Born. Most customers are local. The name, however, seems designed for a tourist from Portland.",comment:'"Hidden" is especially apt: the English name hides the fact that you\'re in Barcelona.'}},
+  {id:"seed2",status:"published",num:"02",tag:"Brunch / Restaurant",tonteriaIndex:2,category:"restaurant",lat:41.4038,lng:2.2012,name:"Little Fern",addr:"Carrer de Pere IV, 168 · Poblenou, Barcelona",mapUrl:"https://maps.google.com/?q=Little+Fern+Poblenou+Barcelona",ca:{transl:"«La Falguera Petita»",desc:"Restaurant de brunch al Poblenou molt ben valorat, amb cuina creativa i filosofia de sostenibilitat. Un establiment magnífic que porta el nom d'una planta en anglès.",comment:"«Falguera» hauria quedat preciós. Però no: «Little Fern». Perquè si el nom no sona a Brooklyn, el turista de l'Airbnb no hi entra."},es:{transl:"«El Helechito»",desc:"Restaurante de brunch en el Poblenou muy bien valorado. Un local magnífico que lleva el nombre de una planta en inglés.",comment:"«Helechito» habría quedado precioso. Pero no: «Little Fern»."},en:{transl:'Literally: "Little Fern"',desc:"A highly rated brunch restaurant in Poblenou. A magnificent establishment named after a plant. In English.",comment:'"Falguera Petita" would have been beautiful. But no.'}},
+  {id:"seed3",status:"published",num:"03",tag:"Brunch / Restaurant",tonteriaIndex:3,category:"restaurant",lat:41.4021,lng:2.1978,name:"Florentine Brunch Barcelona",addr:"Carrer de Sancho de Ávila, 173 · Poblenou, Barcelona",mapUrl:"https://maps.google.com/?q=Florentine+Brunch+Barcelona+Poblenou",ca:{transl:"«Esmorzar Florentí de Barcelona»",desc:"Restaurant de brunch al Poblenou. «Florentine» fa referència als ous florentins, però cap barceloní sap per què s'ha d'escriure en anglès.",comment:"«Brunch» ja és una paraula que no hem sabut traduir. Afegir «Florentine» és duplicar la rendició."},es:{transl:"«Brunch Florentino de Barcelona»",desc:"Restaurante de brunch en el Poblenou. «Florentine» hace referencia a los huevos florentinos, pero nadie sabe por qué hay que escribirlo en inglés.",comment:"«Brunch» ya es una rendición. Añadir «Florentine» en inglés es doblarla."},en:{transl:'Literally: "Florentine Brunch Barcelona"',desc:"A brunch restaurant in Poblenou. «Florentine» refers to eggs Florentine, yet the full name needs to be in English in Barcelona.",comment:'"Brunch" is already English. Adding "Florentine" in English is doubling down on surrender.'}},
+  {id:"seed4",status:"published",num:"04",tag:"Barberia",tonteriaIndex:4,category:"barberia",lat:41.3788,lng:2.1567,name:"The Professional Barber Shop",addr:"Carrer de Calàbria, 152 · Eixample, Barcelona",mapUrl:"https://maps.google.com/?q=The+Professional+Barber+Shop+Calabria+Barcelona",ca:{transl:"«La Barberia Professional»",desc:"Barberia a l'Eixample. Un client apunta a Google: «even though we have some language barriers, they are very patient». Quin idioma parlen, doncs?",comment:"Ser «professional» és una cosa. Anunciar-ho en anglès a l'Eixample és una altra."},es:{transl:"«La Barbería Profesional»",desc:"Barbería en el Eixample. Un cliente anota en Google: «even though we have some language barriers, they are very patient». ¿En qué idioma hablan?",comment:"Ser «professional» es una cosa. Anunciarlo en inglés en el Eixample es otra."},en:{transl:'Literally: "The Professional Barber Shop"',desc:"A barber shop in Eixample. One Google review: «even though we have some language barriers, they are very patient.» Which language barrier?",comment:"Being professional is one thing. Announcing it in English in the Eixample is another."}},
+  {id:"seed5",status:"published",num:"05",tag:"Barberia / Perruqueria",tonteriaIndex:5,category:"barberia",lat:41.4031,lng:2.1558,name:"Barcelona Barber Shop",addr:"Carrer del Torrent de l'Olla, 62 · Gràcia, Barcelona",mapUrl:"https://maps.google.com/?q=Barcelona+Barber+Shop+Gracia",ca:{transl:"«Barberia de Barcelona»",desc:"Cadena de barberies. El nom és literalment «Barberia de Barcelona» però en anglès. La coherència és admirable.",comment:"«Barberia Barcelona» hauria estat comprensible per a qualsevol. Però «Barcelona Barber Shop» fa que sembli que l'han nomenat turistes. Que, potser, és el públic objectiu."},es:{transl:"«Barbería de Barcelona»",desc:"Cadena de barberías. El nombre es literalmente «Barbería de Barcelona» pero en inglés.",comment:"«Barbería Barcelona» habría sido comprensible para cualquier persona. Pero «Barcelona Barber Shop» parece nombrado por turistas."},en:{transl:'Literally: "Barcelona Barber Shop"',desc:"A barber chain. The name is literally «Barbershop of Barcelona» — in English.",comment:'"Barberia Barcelona" would have been clear to anyone. "Barcelona Barber Shop" sounds like tourists named it. Which may be the point.'}},
+  {id:"seed6",status:"published",num:"06",tag:"Barberia / Perruqueria",tonteriaIndex:4,category:"barberia",lat:41.3901,lng:2.1526,name:"WHY NOT — Peluquería",addr:"Carrer de París, 132 · Eixample, Barcelona",mapUrl:"https://maps.google.com/?q=WHY+NOT+Peluqueria+Barcelona+Eixample",ca:{transl:"«Per Què No — Perruqueria»",desc:"Perruqueria a l'Eixample, al carrer de París (que ja és francès). El lema existencial és la pregunta que tot emprenedor hauria de fer-se.",comment:"«Why Not?» és la pregunta més honesta d'aquesta llista. Per la mateixa raó que el carrer s'anomena París i no «Paris Street»."},es:{transl:"«¿Por Qué No? — Peluquería»",desc:"Peluquería en el Eixample, en el calle de París (que ya es francés). El lema existencial en inglés es la pregunta que todo emprendedor debería hacerse.",comment:"«Why Not?» es la pregunta más honesta de esta lista."},en:{transl:'Literally: "Why Not — Hairdresser"',desc:"A hair salon in Eixample, on Carrer de París (already French). The English slogan is exactly the question every entrepreneur should ask.",comment:'"Why Not?" is the most honest question in this catalogue. For the same reason the street is called «París» and not «Paris Street.»'}},
+  {id:"seed7",status:"published",num:"07",tag:"Brunch / Bar",tonteriaIndex:2,category:"restaurant",lat:41.4055,lng:2.2112,name:"Brunch & Burgers",addr:"Passeig de Garcia Fària, 27 · Sant Martí, Barcelona",mapUrl:"https://maps.google.com/?q=Brunch+Burgers+Passeig+Garcia+Faria+Barcelona",ca:{transl:"«Esmorzar i Hamburgueses»",desc:"Bar-restaurant al Poblenou costaner. Nom funcional: dues paraules en anglès al Passeig de Garcia Fària, una de les vies més barcelonines.",comment:"«Hamburgeria del Passeig»? Poètic. Perdut per sempre."},es:{transl:"«Brunch y Hamburguesas»",desc:"Bar-restaurante en el Poblenou costero. Nombre funcional en inglés en el Passeig de Garcia Fària.",comment:"«Hamburguesería del Passeig»? Poético. Perdido para siempre."},en:{transl:'Literally: "Brunch & Burgers"',desc:"A bar-restaurant on the Poblenou seafront. Two English words on one of the most thoroughly Catalan-named streets in existence.",comment:'"Hamburgeria del Passeig"? Poetic. Gone forever.'}},
+  {id:"seed8",status:"published",num:"08",tag:"Cafeteria especialitat",tonteriaIndex:5,category:"cafeteria",lat:41.3941,lng:2.1631,name:"Granja Hidden",addr:"Carrer de Girona, 59 · Eixample, Barcelona",mapUrl:"https://maps.google.com/?q=Granja+Hidden+Girona+Barcelona",ca:{transl:"«Granja Amagada» (barreja catalano-anglesa)",desc:"Cafeteria d'especialitat. «Granja» recupera la tradició barcelonina de les granges del XX. Però «Hidden» és anglès. El resultat és una obra d'art involuntari.",comment:"«Granja Amagada» hauria estat perfecte. «Granja Hidden» és un gènere literari nou: el costumbrisme anglobarceloní."},es:{transl:"«Granja Escondida» (mezcla catalano-inglesa)",desc:"Cafetería de especialidad. «Granja» recupera la tradición de los cafés lechería del siglo XX. Pero «Hidden» es inglés.",comment:"«Granja Escondida» habría sido perfecto. «Granja Hidden» es un género literario nuevo."},en:{transl:'Literally: "Hidden Granja" (Catalan-English hybrid)',desc:"A specialty coffee shop. «Granja» recalls Barcelona's old-school dairy cafés. «Hidden» is English. Together they are an accidental masterpiece.",comment:'"Granja Amagada" would have been perfect Catalan. "Granja Hidden" is a new literary genre: Anglo-Barcelonan costumbrismo. Chapeau.'}},
+  {id:"seed9",status:"published",num:"09",tag:"Botiga / Moda",tonteriaIndex:3,category:"botiga",lat:41.3859,lng:2.1700,name:"The Corner Store BCN",addr:"Carrer del Consell de Cent, 308 · Eixample, Barcelona",mapUrl:"https://maps.google.com/?q=The+Corner+Store+BCN+Eixample",ca:{transl:"«La Botiga del Cantó BCN»",desc:"Botiga de roba i accessoris a l'Eixample. «Corner Store» és una expressió americana per a un petit comerç de barri. Aquí és una boutique de roba amb preus que no es dirien de barri.",comment:"L'únic corner en qüestió és el del xamfrà de l'Eixample. En català s'hauria dit «cantonada». Però clar, «Cantonada BCN» no llença tant."},es:{transl:"«La Tienda de la Esquina BCN»",desc:"Tienda de ropa y accesorios en el Eixample. «Corner Store» es un término americano para una pequeña tienda de barrio.",comment:"La única esquina en cuestión es la del chaflán del Eixample. «Cantonada BCN» no sonaba tan cool."},en:{transl:'Literally: "The Corner Store BCN"',desc:"A clothing boutique in Eixample. «Corner Store» is American slang for a small neighbourhood shop. Prices are very much not neighbourhood.",comment:"The only corner in question is the Eixample chamfer. «Cantonada BCN» just didn't land as well, apparently."}},
+  {id:"seed10",status:"published",num:"10",tag:"Estètica / Bellesa",tonteriaIndex:4,category:"beaute",lat:41.3957,lng:2.1589,name:"Beauty Lounge",addr:"Carrer de Provença, 221 · Eixample, Barcelona",mapUrl:"https://maps.google.com/?q=Beauty+Lounge+Provenca+Barcelona",ca:{transl:"«Saló de Bellesa»",desc:"Perruqueria i estètica a l'Eixample. El mot «lounge» suggereix que t'hi pots asseure còmodament mentre t'arreglen. Cosa que passa a qualsevol perruqueria.",comment:"«Lounge» és la paraula més treballada del sector per inflar el prestigi d'un servei perfectament normal. «Saló» en català ja ho deia tot."},es:{transl:"«Salón de Belleza»",desc:"Peluquería y estética en el Eixample. «Lounge» sugiere que puedes sentarte cómodamente mientras te arreglan. Como en cualquier peluquería.",comment:"«Lounge» es la palabra más trabajada del sector para inflar el prestigio de un servicio perfectamente normal."},en:{transl:'Literally: "Beauty Lounge"',desc:"A hair and beauty salon in Eixample. The word «lounge» implies you can relax comfortably while being attended to. Which is true of any salon.",comment:'"Lounge" is the hardest-working word in the sector for inflating the prestige of a perfectly ordinary service.'}},
+  {id:"seed11",status:"published",num:"11",tag:"Cafeteria / Brunch",tonteriaIndex:3,category:"cafeteria",lat:41.3977,lng:2.1612,name:"The Pharmacy Coffee",addr:"Carrer de Muntaner, 44 · Eixample Esquerra, Barcelona",mapUrl:"https://maps.google.com/?q=The+Pharmacy+Coffee+Muntaner+Barcelona",ca:{transl:"«La Farmàcia del Cafè»",desc:"Cafeteria que s'instal·la en un local que antigament era una farmàcia. El concepte té gràcia. Però la gent no hi va a buscar ibuprofèn.",comment:"De tots els noms nostàlgics que es podien posar, «The Pharmacy» és el que menys necessitava ser en anglès. «La Farmàcia» ho diu exactament igual i sona molt millor al barri."},es:{transl:"«La Farmacia del Café»",desc:"Cafetería instalada en un local que antiguamente era una farmacia. El concepto tiene gracia.",comment:"De todos los nombres nostálgicos posibles, «The Pharmacy» era el que menos necesitaba estar en inglés."},en:{transl:'Literally: "The Pharmacy Coffee"',desc:"A coffee shop set up in a former pharmacy. The concept has charm. The name, in English, less so.",comment:"Of all the nostalgic names possible, this one least needed to be in English. «La Farmàcia» says the same thing and sounds much better in context."}},
+  {id:"seed12",status:"published",num:"12",tag:"Barberia",tonteriaIndex:5,category:"barberia",lat:41.3871,lng:2.1643,name:"Old School Barber Club",addr:"Carrer del Parlament, 37 · Sant Antoni, Barcelona",mapUrl:"https://maps.google.com/?q=Old+School+Barber+Club+Parlament+Barcelona",ca:{transl:"«Club Barberia d'Escola Vella»",desc:"Barberia al barri de Sant Antoni amb estètica vintage americana: miralls daurats, pell vermella, cartells de boxejadors. Tot en anglès. Som al Parlament de Barcelona.",comment:"«Old School» en una barberia barcelonina és un tautologia involuntària: les barberies d'aquí ja eren old school quan les americanes encara no existien. Però gràcies per l'homenatge."},es:{transl:"«Club Barbería de la Vieja Escuela»",desc:"Barbería en el barrio de Sant Antoni con estética vintage americana. Todo en inglés. Estamos en el Parlament de Barcelona.",comment:"«Old School» en una barbería barcelonesa es una tautología involuntaria."},en:{transl:'Literally: "Old School Barber Club"',desc:"A barber shop in Sant Antoni with American vintage aesthetics: gold mirrors, red leather, boxer posters. All in English. We are on Carrer del Parlament, Barcelona.",comment:'"Old School" in a Barcelona barbershop is an accidental tautology: local barbershops were old school before American ones even existed.'}},
+  {id:"seed13",status:"published",num:"13",tag:"Botiga / Lifestyle",tonteriaIndex:4,category:"botiga",lat:41.3824,lng:2.1751,name:"Urban Jungle",addr:"Carrer de la Princesa, 14 · El Born, Barcelona",mapUrl:"https://maps.google.com/?q=Urban+Jungle+Princesa+Born+Barcelona",ca:{transl:"«Selva Urbana»",desc:"Botiga de plantes d'interior i decoració. El concepte és encertat: la tendència de portar la natura a casa és real. Però «Urban Jungle» en un carrer medieval del Born és un exercici de dissociació geogràfica.",comment:"«Jungla Urbana» o «Selva Urbana» haurien funcionat exactament igual i sonarien com a casa. Però l'anglès «jungles» formen part del paisatge mental de certa decoració."},es:{transl:"«Selva Urbana»",desc:"Tienda de plantas de interior y decoración. El concepto es acertado. El nombre, en inglés, en una calle medieval del Born.",comment:"«Selva Urbana» habría funcionado exactamente igual. Pero el inglés forma parte del paisaje mental de cierta decoración."},en:{transl:'Literally: "Urban Jungle"',desc:"An indoor plant and decor shop. The concept is sound. The name, in English, on a medieval street in El Born.",comment:'"Jungla Urbana" would have worked just as well. But certain aesthetics come pre-packaged with English.'}},
+  {id:"seed14",status:"published",num:"14",tag:"Restaurant / Cuina fusió",tonteriaIndex:3,category:"restaurant",lat:41.3762,lng:2.1490,name:"Street Food Market",addr:"Carrer de Tamarit, 110 · Sant Antoni, Barcelona",mapUrl:"https://maps.google.com/?q=Street+Food+Market+Tamarit+Barcelona",ca:{transl:"«Mercat de Menjar de Carrer»",desc:"Espai de restauració col·lectiva amb diverses parades de cuina del món. La paraula «street food» descriu perfectament el concepte — però «menjar de carrer» ho faria igualment bé en català.",comment:"Quan Barcelona tenia el Mercat de Sant Antoni a tres carrers, la paraula «mercat» ja estava inventada. Però bé."},es:{transl:"«Mercado de Comida Callejera»",desc:"Espacio de restauración colectiva con varias paradas de cocina del mundo.",comment:"Con el Mercado de Sant Antoni a tres calles, la palabra «mercado» ya estaba inventada."},en:{transl:'Literally: "Street Food Market"',desc:"A collective food hall with various world cuisine stalls. «Street food» works as a concept. In English. In Barcelona. Near the actual Sant Antoni Market.",comment:"With the Mercat de Sant Antoni three streets away, the word «mercat» was already invented."}},
+  {id:"seed15",status:"published",num:"15",tag:"Estètica / Bellesa",tonteriaIndex:5,category:"beaute",lat:41.4008,lng:2.1867,name:"Nails & Dreams Studio",addr:"Carrer de l'Arc de Sant Cristòfol, 7 · El Born, Barcelona",mapUrl:"https://maps.google.com/?q=Nails+Dreams+Studio+Born+Barcelona",ca:{transl:"«Estudi d'Ungles i Somnis»",desc:"Centre d'esmalt d'ungles al Born. El servei és manicura. Però el nom suggereix que les ungles et portaran a un estat contemplatiu de reflexió existencial.",comment:"«Ungles i Somnis» en català hauria estat poètic i precís. Amb «Nails & Dreams» perdem la poesia i guanyem una cosa que sembla el nom d'un àlbum de pop dels 90."},es:{transl:"«Estudio de Uñas y Sueños»",desc:"Centro de esmalte de uñas en el Born. El servicio es manicura.",comment:"«Uñas y Sueños» en castellano habría sido poético. Con «Nails & Dreams» ganamos algo que parece el nombre de un álbum de pop de los 90."},en:{transl:'Literally: "Nails & Dreams Studio"',desc:"A nail salon in El Born. The service is a manicure. The name suggests your nails will carry you into an existential state of contemplative bliss.",comment:'"Ungles i Somnis" in Catalan would have been poetic and precise. "Nails & Dreams" sounds like a 90s pop album.'}},
+  {id:"seed16",status:"published",num:"16",tag:"Cafeteria especialitat",tonteriaIndex:3,category:"cafeteria",lat:41.4028,lng:2.1312,name:"GoodNews",addr:"Carrer d'Iradier, 2 · La Bonanova, Sarrià-Sant Gervasi, Barcelona",mapUrl:"https://maps.google.com/?q=GoodNews+Coffee+Iradier+Barcelona",ca:{transl:"«Bones Notícies»",desc:"Cafeteria d'especialitat a La Bonanova. El nom és una declaració d'intencions: el cafè és l'única bona notícia del dia. La hipòtesi és sòlida. El nom en anglès, menys.",comment:"A La Bonanova, on la bona notícia del dia sol ser que el parking és lliure, «GoodNews» funciona com a ironia involuntària. En català, «Bones Notícies» hauria tingut exactament el mateix efecte, però amb accent propi."},es:{transl:"«Buenas Noticias»",desc:"Cafetería de especialidad en La Bonanova. El nombre es una declaración de intenciones: el café es la única buena noticia del día.",comment:"En La Bonanova, donde la buena noticia suele ser encontrar aparcamiento, «GoodNews» funciona como ironía involuntaria. «Buenas Noticias» habría tenido exactamente el mismo efecto, pero con acento propio."},en:{transl:'Literally: "Good News"',desc:"A specialty coffee shop in La Bonanova. The name is an existential declaration: coffee is the only good news of the day.",comment:'In La Bonanova, where good news usually means finding parking, "GoodNews" works as accidental irony. «Bones Notícies» would have had exactly the same effect, but sounded like it belonged there.'}},
+  {id:"seed17",status:"published",num:"17",tag:"Barberia",tonteriaIndex:5,category:"barberia",lat:41.4003,lng:2.1508,name:"Barcelona Barber Shop",addr:"Via Augusta, 92 · Sarrià-Sant Gervasi, Barcelona",mapUrl:"https://maps.google.com/?q=Barcelona+Barber+Shop+Via+Augusta+92+Barcelona",ca:{transl:"«Barberia de Barcelona»",desc:"Una de les sucursals de la cadena «Barcelona Barber Shop». Via Augusta és una avinguda romana que porta el nom d'un emperador. El local es diu «Barcelona» en anglès.",comment:"La Via Augusta va ser construïda per Roma fa dos mil anys. El nom del local porta la mateixa antiguitat d'esperit, però en anglès i amb preu de menú degustació. Podria ser pitjor: podria dir-se «Avenue Augustus Barber Experience»."},es:{transl:"«Barbería de Barcelona»",desc:"Una de las sucursales de la cadena «Barcelona Barber Shop». Via Augusta lleva el nombre de un emperador romano. El local se llama «Barcelona» en inglés.",comment:"La Via Augusta fue construida por Roma hace dos mil años. El nombre del local lleva el mismo espíritu de antigüedad, pero en inglés y con precio de menú degustación."},en:{transl:'Literally: "Barcelona Barber Shop" (Via Augusta branch)',desc:"One of the chain's branches, on a Roman imperial road named after Augustus Caesar. The shop is called «Barcelona» — in English — on the most Roman street in town.",comment:'"Barcelona Barber Shop" on Via Augusta. A two-thousand-year-old road, the name of an emperor, and the English word for barbershop. Civilisation marches on.'}},
+  {id:"seed18",status:"published",num:"18",tag:"Barberia",tonteriaIndex:4,category:"barberia",lat:41.4013,lng:2.1467,name:"SportsCuts Barberia",addr:"Carrer de Balmes, 190 · Sarrià-Sant Gervasi, Barcelona",mapUrl:"https://maps.google.com/?q=SportsCuts+Barberia+Balmes+190+Barcelona",ca:{transl:"«Talls Esportius — Barberia»",desc:"Barberia al Carrer de Balmes que combina el nom anglès amb el substantiu català. «SportsCuts» evoca la imatge d'un futbolista acabant d'entrenar. La clientela de Balmes 190 porta Barbour.",comment:"El geni d'aquest nom és la barreja: «Sports» en anglès (per al prestigi atlètic) i «Barberia» en català (per no perdre del tot el nord). El resultat és un híbrid que no acaba de ser ni una cosa ni l'altra, com un menú amb tataki i croquetes."},es:{transl:"«Cortes Deportivos — Barbería»",desc:"Barbería en el Carrer de Balmes que combina el nombre inglés con el sustantivo en catalán. «SportsCuts» evoca la imagen de un futbolista recién salido del entrenamiento.",comment:"El genio de este nombre es la mezcla: «Sports» en inglés (para el prestigio atlético) y «Barberia» en catalán (para no perder del todo el norte). El resultado es un híbrido que no acaba de ser ninguna de las dos cosas, como un menú con tataki y croquetas."},en:{transl:'Literally: "SportsCuts Barberia" (English-Catalan hybrid)',desc:"A barbershop on Carrer de Balmes combining an English brand name with the Catalan word for barbershop. «SportsCuts» evokes a footballer fresh from training.",comment:'The brilliance here is the hybrid: «Sports» in English (athletic prestige) and «Barberia» in Catalan (not entirely lost). The result is neither fish nor fowl — like a menu offering both tataki and croquetas.'}},
+  {id:"seed19",status:"published",num:"19",tag:"Barberia",tonteriaIndex:4,category:"barberia",lat:41.3985,lng:2.1478,name:"Barcelona Barber Shop",addr:"Carrer de Muntaner, 382 · Sant Gervasi-Galvany, Barcelona",mapUrl:"https://maps.google.com/?q=Barcelona+Barber+Shop+Muntaner+382+Barcelona",ca:{transl:"«Barberia de Barcelona»",desc:"Una altra sucursal de la omnipresent cadena «Barcelona Barber Shop», aquesta al Carrer de Muntaner. Tres sucursals del mateix nom en una mateixa llista és un achievement.",comment:"Barcelona Barber Shop té la coherència d'un franquiciador d'èxit: mateix nom, mateixa estratègia lingüística, mateixa pregunta sense resposta. Al Muntaner, però, el client típic potser esperava «Muntaner Barber Shop». Esperança fallida."},es:{transl:"«Barbería de Barcelona»",desc:"Otra sucursal de la omnipresente cadena «Barcelona Barber Shop», esta vez en el Carrer de Muntaner.",comment:"«Barcelona Barber Shop» tiene la coherencia de un franquiciador de éxito: mismo nombre, misma estrategia lingüística, misma pregunta sin respuesta. Tercer avistamiento en esta lista. A estas alturas, es un clásico."},en:{transl:'Literally: "Barcelona Barber Shop" (Muntaner branch)',desc:"Yet another branch of the omnipresent chain, this one on Carrer de Muntaner. Three sightings in this catalogue. It is now a phenomenon.",comment:'At this point, «Barcelona Barber Shop» deserves its own entry in the Oxford English Dictionary. Definition: noun. A barbershop in Barcelona. Not to be confused with a barbershop not in Barcelona.'}},
+  {id:"seed20",status:"published",num:"20",tag:"Perruqueria",tonteriaIndex:3,category:"barberia",lat:41.4021,lng:2.1501,name:"Hair Cut Day",addr:"Avinguda Diagonal, 511 · Sarrià-Sant Gervasi, Barcelona",mapUrl:"https://maps.google.com/?q=Hair+Cut+Day+Diagonal+511+Barcelona",ca:{transl:"«Dia de Tallar els Cabells»",desc:"Perruqueria a l'Avinguda Diagonal. El nom converteix una activitat rutinària en un esdeveniment anual. «Avui és el meu Hair Cut Day» implica que no és gaire sovint.",comment:"«Hair Cut Day» suggereix que tallar-se els cabells és un dia assenyalat al calendari, com el Nadal o l'aniversari. Les perruqueries catalanes de tota la vida s'hi referien com a «anar a la perruqueria», sense dramatisme. I funcionava."},es:{transl:"«Día del Corte de Pelo»",desc:"Peluquería en la Avinguda Diagonal. El nombre convierte una actividad rutinaria en un acontecimiento anual.",comment:"«Hair Cut Day» sugiere que cortarse el pelo es un día señalado en el calendario, como la Navidad. Las peluquerías de toda la vida lo llamaban «ir a la peluquería», sin dramatismo. Y funcionaba."},en:{transl:'Literally: "Hair Cut Day"',desc:"A hair salon on Avinguda Diagonal. The name transforms a routine activity into what sounds like an annual national holiday.",comment:'"Hair Cut Day" implies this happens once a year, like Christmas. Barcelona\'s traditional hairdressers called it «anar a la perruqueria» — going to the hairdresser\'s. Simple, effective, in the local language. But apparently not aspirational enough.'}},
+  {id:"seed21",status:"published",num:"21",tag:"Hostaleria",tonteriaIndex:4,category:"hostaleria",lat:41.3855,lng:2.1814,name:"chic&basic Born Boutique Hotel",addr:"Carrer de la Princesa · El Born, Barcelona",mapUrl:"https://maps.google.com/?q=chic%26basic+Born+Boutique+Hotel+Barcelona",ca:{transl:"«Xic i bàsic»",desc:"Hotel boutique al cor del Born. El nom barreja anglès i un símbol tipogràfic que en català s'escriu «i». Podria dir-se «Xic i bàsic», però no és el mateix, suposadament.",comment:"El símbol «&» és una et llatina que en català es llegeix «i». El nom complet seria «Xic i bàsic», cosa que, paradoxalment, sona menys xic."},es:{transl:"«Chic y básico»",desc:"Hotel boutique en el corazón del Born. El nombre mezcla inglés con un símbolo tipográfico. Podría llamarse «Chic y básico», pero no transmite lo mismo en el escaparate.",comment:"El símbolo «&» es una et latina que en castellano se lee «y». El nombre completo sería «Chic y básico», que suena, paradójicamente, menos chic."},en:{transl:"Chic and Basic",desc:"Boutique hotel in El Born. The name mixes English with a typographical symbol. It could be called «Chic and Basic», but that would be too straightforward.",comment:'The «&» is an ampersand, which reads as «and». Full name: «Chic and Basic» — which is, paradoxically, less chic.'}},
+  {id:"seed22",status:"published",num:"22",tag:"Restauració",tonteriaIndex:5,category:"restauracio",lat:41.3858,lng:2.1820,name:"THE JUNGLE BCN",addr:"Sant Pere / El Born, Barcelona",mapUrl:"https://maps.google.com/?q=THE+JUNGLE+BCN+Barcelona",ca:{transl:"«La Selva BCN»",desc:"Bar al Born. «The Jungle» en majúscules i «BCN» per si no quedava clar on ets. La selva, en aquest context, és un local amb il·luminació tènue i carta de còctels.",comment:"Tot en majúscules per transmetre intensitat. La selva, en aquest cas, tanca a les 2 de la matinada."},es:{transl:"«La Selva BCN»",desc:"Bar en El Born. «The Jungle» en mayúsculas y «BCN» por si no quedaba claro. La selva, en este contexto, tiene carta de cócteles y música ambiente.",comment:"Todo en mayúsculas para transmitir intensidad. La selva, en este caso, cierra a las 2 de la madrugada."},en:{transl:"The Jungle BCN",desc:"Bar in El Born. «The Jungle» in capitals and «BCN» just in case. The jungle, in this context, has a cocktail menu and ambient music.",comment:"All caps for intensity. This particular jungle closes at 2am."}},
+  {id:"seed23",status:"published",num:"23",tag:"Restauració",tonteriaIndex:4,category:"restauracio",lat:41.3860,lng:2.1818,name:"Jungle Bites",addr:"El Born, Barcelona",mapUrl:"https://maps.google.com/?q=Jungle+Bites+El+Born+Barcelona",ca:{transl:"«Mossegades de selva»",desc:"Restaurant de menjar saludable al Born. «Jungle» per l'ambient verd i «Bites» per les racions. La selva barcelonina és, doncs, un espai on menges en bols i pagues amb targeta.",comment:"Dos locals amb «Jungle» al Born. La selva urbana barcelonina és, pel que sembla, un ecosistema molt concorregut."},es:{transl:"«Bocados de selva»",desc:"Restaurante de comida saludable en el Born. «Jungle» por el ambiente verde y «Bites» por las raciones. La selva barcelonesa tiene boles de superalimentos.",comment:"Dos locales con «Jungle» en el Born. La selva urbana barcelonesa es, al parecer, un ecosistema muy concurrido."},en:{transl:"Jungle Bites",desc:"Health food restaurant in El Born. «Jungle» for the green vibe, «Bites» for the portions. The Barcelona jungle serves açaí bowls.",comment:"Two «Jungle» venues in El Born. The Barcelona urban jungle is, apparently, a crowded ecosystem."}},
+  {id:"seed24",status:"published",num:"24",tag:"Restauració",tonteriaIndex:3,category:"restauracio",lat:41.3856,lng:2.1815,name:"Jon Cake",addr:"Carrer de la Princesa, El Born, Barcelona",mapUrl:"https://maps.google.com/?q=Jon+Cake+Barcelona",ca:{transl:"«En Joan Pastís»",desc:"Pastisseria al Born. «Jon» és un nom propi anglès i «Cake» és pastís. Junts, creen la impressió que el pastís el fa algú de fora, cosa que, aparentment, el fa millor.",comment:"Si el nom fos «Joan Pastís» ningú no hi entraria. Aquesta és la hipòtesi de treball."},es:{transl:"«Juan Pastel»",desc:"Pastelería en El Born. «Jon» es un nombre propio inglés y «Cake» es pastel. Juntos, sugieren que quien hace los pasteles es de fuera, lo que aparentemente los mejora.",comment:"Si el nombre fuera «Juan Pastel» nadie entraría. Esa es la hipótesis de trabajo."},en:{transl:"Jon Cake",desc:"Pastry shop in El Born. «Jon» is an English first name and «Cake» is cake. Together they imply the baker is foreign, which apparently makes the pastries better.",comment:"If the name were «Joan Pastís» nobody would go in. That is the working hypothesis."}},
+  {id:"seed25",status:"published",num:"25",tag:"Alimentació",tonteriaIndex:5,category:"alimentacio",lat:41.3795,lng:2.1677,name:"Be You Grocery Store",addr:"El Raval, Barcelona",mapUrl:"https://maps.google.com/?q=Be+You+Grocery+Store+Raval+Barcelona",ca:{transl:"«Sigues tu, Supermercat»",desc:"Supermercat al Raval. «Be You» és un eslògan de benestar personal i «Grocery Store» és supermercat. La combinació suggereix que comprar llenties és un acte d'autenticitat.",comment:"L'únic supermercat del món on comprar iogurts és un acte de rebel·lia personal."},es:{transl:"«Sé tú, Supermercado»",desc:"Supermercado en el Raval. «Be You» es un eslogan de bienestar personal y «Grocery Store» es supermercado. Comprar lentejas, aquí, es un acto de autenticidad.",comment:"El único supermercado del mundo donde comprar yogures es un acto de rebeldía personal."},en:{transl:"Be You, Grocery Store",desc:"Grocery store in El Raval. «Be You» is a wellness slogan and «Grocery Store» is... a grocery store. Buying lentils here is apparently an act of self-expression.",comment:"The only supermarket where buying yoghurt is an act of personal rebellion."}},
+  {id:"seed26",status:"published",num:"26",tag:"Moda",tonteriaIndex:4,category:"moda",lat:41.7970,lng:2.2189,name:"Krisbel&Co OUTLET",addr:"Centelles",mapUrl:"https://maps.google.com/?q=Krisbel+Co+OUTLET+Centelles",ca:{transl:"«Krisbel i Companyia, Liquidació»",desc:"Botiga de roba a Centelles. «Krisbel» és un nom propi, «&Co» implica societat mercantil i «OUTLET» en majúscules indica rebaixes. Tot en anglès, a Centelles.",comment:"Centelles, 2026: tres idiomes en un rètol, zero en català. Una fita."},es:{transl:"«Krisbel y Compañía, Liquidación»",desc:"Tienda de ropa en Centelles. «Krisbel» es un nombre propio, «&Co» implica sociedad mercantil y «OUTLET» en mayúsculas indica rebajas. Todo en inglés, en Centelles.",comment:"Centelles, 2026: tres idiomas en un rótulo, cero en catalán. Un hito."},en:{transl:"Krisbel and Co., Clearance",desc:"Clothing store in Centelles. «Krisbel» is a personal name, «&Co» implies a business partnership, and «OUTLET» in capitals means discounts. All in English, in Centelles.",comment:"Centelles, 2026: three languages on one sign, zero in Catalan. A milestone."}},
+  {id:"seed27",status:"published",num:"27",tag:"Moda",tonteriaIndex:5,category:"moda",lat:41.7969,lng:2.2190,name:"unnati outlet",addr:"Centelles",mapUrl:"https://maps.google.com/?q=unnati+outlet+Centelles",ca:{transl:"«Progrés, Rebaixes»",desc:"Botiga de roba a Centelles. «Unnati» és una paraula en hindi que significa «progrés» i «outlet» és anglès per a rebaixes. Un negoci que combina l'Àsia meridional i l'anglès comercial sense passar pel català.",comment:"«Progrés», en hindi, venut en anglès, a Centelles. La globalització és un lloc concret."},es:{transl:"«Progreso, Liquidación»",desc:"Tienda de ropa en Centelles. «Unnati» es hindi para «progreso» y «outlet» es inglés para rebajas. Un negocio que combina el sur de Asia y el inglés comercial sin pasar por el catalán.",comment:"«Progreso», en hindi, vendido en inglés, en Centelles. La globalización es un lugar concreto."},en:{transl:"Progress, Outlet",desc:"Clothing store in Centelles. «Unnati» is Hindi for «progress» and «outlet» is English for discounts. A business that bridges South Asia and commercial English, bypassing Catalan entirely.",comment:"«Progress», in Hindi, sold in English, in Centelles. Globalisation is a specific place."}},
+  {id:"seed28",status:"published",num:"28",tag:"Cultura",tonteriaIndex:3,category:"cultura",lat:41.7973,lng:2.2188,name:"Magazine",addr:"Centelles",mapUrl:"https://maps.google.com/?q=Magazine+Centelles",ca:{transl:"«Papereria / Revista»",desc:"Papereria a Centelles. «Magazine» és anglès per a «revista». En català existia «papereria», però «magazine» transmet millor que allà es venen revistes, suposadament.",comment:"Un nom que ja descriu el producte principal, però en anglès. Eficient, com a mínim."},es:{transl:"«Papelería / Revista»",desc:"Papelería en Centelles. «Magazine» es inglés para «revista». En catalán existía «papelería», pero «magazine» transmite mejor que allí se venden revistas, se supone.",comment:"Un nombre que ya describe el producto principal, pero en inglés. Eficiente, como mínimo."},en:{transl:"Newsagent / Magazine",desc:"Print shop in Centelles. «Magazine» is English for «revista». «Papereria» existed in Catalan, but «magazine» apparently communicates the concept more effectively.",comment:"A name that describes the main product, just in English. Efficient, at least."}},
+  {id:"seed29",status:"published",num:"29",tag:"Moda",tonteriaIndex:5,category:"moda",lat:41.9307,lng:2.2572,name:"Ö concept store",addr:"Vic",mapUrl:"https://maps.google.com/?q=Ö+concept+store+Vic",ca:{transl:"«Botiga conceptual amb lletra sueca»",desc:"Botiga de roba a Vic. «Ö» és una lletra escandinava sense cap relació amb Vic ni amb el català, i «concept store» és anglès per a «botiga amb personalitat». El concepte és vendre roba.",comment:"La «Ö» és una vocal amb dièresi que en suec o alemany es pronuncia diferent. A Vic, es pronuncia com ningú no sap."},es:{transl:"«Tienda conceptual con letra sueca»",desc:"Tienda de roba en Vic. «Ö» es una letra escandinava sin relación con Vic ni con el catalán, y «concept store» es inglés para «tienda con personalidad». El concepto es vender ropa.",comment:"La «Ö» es una vocal con diéresis que en sueco o alemán se pronuncia diferente. En Vic, se pronuncia como nadie sabe."},en:{transl:"Concept store with Swedish vowel",desc:"Clothing store in Vic. «Ö» is a Scandinavian letter with no connection to Vic or Catalan, and «concept store» is English for «shop with a personality». The concept is selling clothes.",comment:"«Ö» is an umlaut vowel from Swedish or German. In Vic, nobody is quite sure how to say it."}},
+  {id:"seed30",status:"published",num:"30",tag:"Moda",tonteriaIndex:4,category:"moda",lat:41.9225,lng:2.2519,name:"Second Hand",addr:"Vic",mapUrl:"https://maps.google.com/?q=Second+Hand+Vic",ca:{transl:"«De Segona Mà»",desc:"Botiga de roba de segona mà a Vic. «Second Hand» és la traducció literal de «de segona mà». La paraula catalana existia, era clara i tenia exactament el mateix significat. Va perdre.",comment:"El català tenia «de segona mà». Tres paraules, significat idèntic, zero prestigi. Va perdre."},es:{transl:"«De Segunda Mano»",desc:"Tienda de ropa de segunda mano en Vic. «Second Hand» es la traducción literal de «de segunda mano». La palabra catalana existía, era clara y significaba lo mismo. Perdió.",comment:"El catalán tenía «de segunda mano». Tres palabras, significado idéntico, cero prestigio. Perdió."},en:{transl:"Second Hand",desc:"Second-hand clothing store in Vic. «Second Hand» is the literal translation of «de segona mà». The Catalan word existed, was clear, and meant exactly the same. It lost.",comment:"Catalan had «de segona mà». Same meaning, zero prestige. It lost."}},
+  {id:"seed31",status:"published",num:"31",tag:"Moda",tonteriaIndex:4,category:"moda",lat:41.9409,lng:2.2555,name:"Galaxy & Star",addr:"Vic nord",mapUrl:"https://maps.google.com/?q=Galaxy+Star+Vic",ca:{transl:"«Galàxia i Estrella»",desc:"Botiga de roba a Vic. «Galaxy» és galàxia, «Star» és estrella i «&» és la conjunció «i». Un nom còsmic per a una botiga de roba que podria dir-se «Galàxia i Estrella» sense perdre res.",comment:"Una galàxia conté centenars de milers de milions d'estrelles. Aquí només n'hi ha una. Nom excessiu per al contingut."},es:{transl:"«Galaxia y Estrella»",desc:"Tienda de ropa en Vic. «Galaxy» es galaxia, «Star» es estrella y «&» es la conjunción «y». Un nombre cósmico para una tienda de ropa que podría llamarse «Galaxia y Estrella».",comment:"Una galaxia contiene cientos de miles de millones de estrellas. Aquí solo hay una. Nombre excesivo para el contenido."},en:{transl:"Galaxy and Star",desc:"Clothing store in Vic. «Galaxy» is galaxy, «Star» is star, and «&» is «and». A cosmic name for a clothing shop that could be called «Galàxia i Estrella» without losing anything.",comment:"A galaxy contains hundreds of billions of stars. There is only one here. Overselling the content."}},
+  {id:"seed32",status:"published",num:"32",tag:"Moda",tonteriaIndex:3,category:"moda",lat:41.9307,lng:2.2516,name:"Pretty",addr:"Vic",mapUrl:"https://maps.google.com/?q=Pretty+Vic+vestits",ca:{transl:"«Maca»",desc:"Botiga de vestits a Vic. «Pretty» significa «maca» en anglès. «Maca» en català també significa «maca», però no queda igual al rètol. Aquesta és, en essència, tota la diferència.",comment:"Un adjectiu. Just un adjectiu. Ni substantiu, ni verb, ni context. Només «maca», però en anglès."},es:{transl:"«Bonita»",desc:"Tienda de vestidos en Vic. «Pretty» significa «bonita» en inglés. «Bonita» en castellano también significa «bonita», pero no queda igual en el escaparate. Esa es, en esencia, toda la diferencia.",comment:"Un adjetivo. Solo un adjetivo. Ni sustantivo, ni verbo, ni contexto. Solo «bonita», pero en inglés."},en:{transl:"Pretty",desc:"Dress shop in Vic. «Pretty» means «maca» in English. «Maca» in Catalan also means «pretty», but it doesn't look the same on a sign. That is, essentially, the entire difference.",comment:"An adjective. Just an adjective. No noun, no verb, no context. Just «pretty», but in English."}},
+  {id:"seed33",status:"published",num:"33",tag:"Moda",tonteriaIndex:4,category:"moda",lat:41.9323,lng:2.2550,name:"Minimit • Name It",addr:"Vic",mapUrl:"https://maps.google.com/?q=Minimit+Name+It+Vic",ca:{transl:"«Minimit • Posa-li nom»",desc:"Botiga de roba infantil a Vic. «Minimit» és un diminutiu català encantador, i «Name It» és una marca escandinava de roba per a nens. Bilingüe en català i anglès, sense el castellà — cas únic.",comment:"L'excepció que confirma la regla: un nom català al costat d'un de marca escandinava. Cap castellà a la vista. Cas únic al catàleg."},es:{transl:"«Minimit • Ponle nombre»",desc:"Tienda de ropa infantil en Vic. «Minimit» es un diminutivo catalán encantador, y «Name It» es una marca escandinava de ropa para niños. Bilingüe en catalán e inglés, sin el castellano.",comment:"La excepción que confirma la regla: un nombre catalán junto a uno de marca escandinava. Ningún castellano a la vista. Caso único en el catálogo."},en:{transl:"Minimit • Name It",desc:"Children's clothing store in Vic. «Minimit» is a Catalan diminutive, and «Name It» is a Scandinavian children's clothing brand. Bilingual in Catalan and English — no Spanish in sight. Unique in the catalogue.",comment:"The exception that proves the rule: a Catalan name alongside a Scandinavian brand. No Spanish in sight. Unique in the catalogue."}},
+];
+
+let DICT = []; // s'omple des de Supabase via loadDict()
+
+const T = {
+  ca:{kicker:"Directori Satíric · Catalunya · Des de 2025",mainSub:"Guia dels comerços catalans que han oblidat on viuen — i en quin idioma",meta1:"🗺 Catalunya, Espanya",meta2:"🔤 Idiomes oficials: català i castellà",meta3:"🇬🇧 Idioma dels rètols: l'anglès, sorprenentment",meta4:"🤷 Raó: misteriosa",statCountL:"Casos documentats",statZeroL:"Rètols en català",statInfL:"Vergonya aliena",statPctL:"A Catalunya",mapHeader:"🗺 Mapa de la Tonteria — Tots els indrets documentats",secLabel:"El directori",secH:"Els establiments catalogats",secDesc:"Casos documentats, revisats i publicats.",whyLabel:"Reflexió final",whyH:"Per què passa això?",whyQuote:"Posar el rètol en anglès no fa el negoci millor. Fa que sembli que el propietari no confia que el seu veïnat entengui el que ven.",whyBody:`<p>Hi ha raons comprensibles: Barcelona rep milions de turistes, l'anglès és la llengua franca global. Fins aquí, tot lògic.</p><p style="margin-top:14px">El problema és quan un negoci completament local decideix posar el rètol en una llengua que no és la de ningú que hi viu al voltant. No per necessitat, sinó per <em>aspiració estètica</em>.</p><p style="margin-top:14px">La tonteria no és l'anglès. La tonteria és no adonar-se que «La Barberia del Carrer» o «La Falgueta» sonen exactament tan bé — o millor — que les seves versions angleses.</p>`,submitH:"Coneixes un altre cas?",submitDesc:"Si has vist una fleca «The Bakery» o qualsevol altre absurd lingüístic a Catalunya, envia'l aquí.",fldNameL:"Nom del negoci",fldAddrL:"Adreça",fldProvL:"Província",fldMuniL:"Municipi",fldCatL:"Tipus de negoci",fldDescL:"Descripció breu",fldEmailL:"El teu email (opcional)",fldPhotoL:"Foto del rètol (opcional)",submitBtn:"Enviar cas →",formOk:"✓ Cas rebut! El revisarem aviat.",formErr:"Error en enviar. Torna-ho a intentar.",loginTitle:"Panell d'administrador",loginDesc:"Introdueix la contrasenya d'administrador.",footerDesc:"Un arxiu satíric del paisatge comercial de Catalunya · Espanya",footerDisclaimer:"Els comentaris editorials són opinió i sàtira.",pendingOf:"de revisió editorial",approveBtn:"Aprovar ✓",rejectBtn:"Rebutjar ✗",deleteBtn:"Eliminar",commentLabel:"Comentari editorial",mapBtn:"Veure al mapa ↗",noEntries:"Cap cas publicat encara.",noPending:"Cap submission pendent.",catNames:{cafeteria:"Cafeteria / Cafè",restaurant:"Restaurant / Brunch",barberia:"Barberia / Perruqueria",botiga:"Botiga / Comerç",beaute:"Estètica / Bellesa",negoci:"Oficina / Serveis",vehicle:"Vehicle / Mobilitat",altre:"Altre"},submittedBy:"Enviat per",shareWA:"💬 WhatsApp",shareTW:"𝕏 Twitter",shareMS:"🐘 Mastodon",shareCopy:"🔗 Copiar",copied:"✓ Enllaç copiat!",visits:"visita",visitsPlural:"visites",dictLabel:"Glossari oficial",dictH:"Diccionari de l'Absurd",dictDesc:"Una guia de supervivència per entendre el que posa als rètols.",dictCol1:"Anglès misteriós",dictCol2:"Traducció revolucionària",dictCol3:"Comentari editorial",dictFooter:"Si una paraula té una traducció perfectament normal, probablement acabem de trobar material per a aquesta web.",tonteriaIndexTitle:"🏆 ÍNDEX DE TONTERIA ANGLESA™",escalaOficial:"ESCALA OFICIAL",filterLbl:"Filtre:",filterAll:"Tots",dictSortEn:"A–Z anglès",dictSortCa:"A–Z català",dictSortOrig:"Original",dictSearchPh:"🔍 Cercar en anglès o català…",casSearchPh:"🔍 Cercar cas o municipi…",fldNamePh:"p. ex: The Cozy Corner",fldAddrPh:"Carrer, número, barri",fldMuniPh:"p. ex: Sabadell, Girona, Reus…",fldDescPh:"Explica per què et sembla absurd…",fldEmailPh:"correu@exemple.com",dictProposeBtnLbl:"Proposar entrada",fldUbicacioL:"Ubicació (opcional)",gpsBtnLbl:"Usa la meva ubicació",btnFerFoto:"📷 Fer foto",btnTriarFitxer:"🖼 Triar fitxer",catOptSelect:"-- Selecciona --",catOptAltre:"Altre"},
+  es:{kicker:"Directorio Satírico · Cataluña · Desde 2025",mainSub:"Guía de los comercios catalanes que han olvidado dónde viven — y en qué idioma",meta1:"🗺 Cataluña, España",meta2:"🔤 Idiomas oficiales: catalán y castellano",meta3:"🇬🇧 Idioma de los rótulos: inglés, sorprendentemente",meta4:"🤷 Razón: misteriosa",statCountL:"Casos documentados",statZeroL:"Rótulos en catalán",statInfL:"Vergüenza ajena",statPctL:"En Cataluña",mapHeader:"🗺 Mapa de la Tontería — Todos los lugares documentados",secLabel:"El directorio",secH:"Los establecimientos catalogados",secDesc:"Casos documentados, revisados y publicados.",whyLabel:"Reflexión final",whyH:"¿Por qué pasa esto?",whyQuote:"Poner el rótulo en inglés no hace el negocio mejor. Hace que parezca que el propietario no confía en que sus vecinos entiendan lo que vende.",whyBody:`<p>Hay razones comprensibles: Barcelona recibe millones de turistas, el inglés es la lengua franca global. Hasta aquí, todo lógico.</p><p style="margin-top:14px">El problema es cuando un negocio completamente local decide poner el rótulo en una lengua que no es la de nadie que vive alrededor. No por necesidad, sino por <em>aspiración estética</em>.</p><p style="margin-top:14px">La tontería no es el inglés. La tontería es no darse cuenta de que «La Barbería de la Calle» o «El Helechito» suenan exactamente igual de bien — o mejor — que sus versiones en inglés.</p>`,submitH:"¿Conoces otro caso?",submitDesc:"Si has visto una panadería «The Bakery» o cualquier otro absurdo lingüístico en Cataluña, envíalo aquí.",fldNameL:"Nombre del negocio",fldAddrL:"Dirección",fldProvL:"Provincia",fldMuniL:"Municipio",fldCatL:"Tipo de negocio",fldDescL:"Descripción breve",fldEmailL:"Tu email (opcional)",fldPhotoL:"Foto del rótulo (opcional)",submitBtn:"Enviar caso →",formOk:"✓ Caso recibido. Lo revisaremos pronto.",formErr:"Error al enviar. Inténtalo de nuevo.",loginTitle:"Panel de administrador",loginDesc:"Introduce la contraseña de administrador.",footerDesc:"Un archivo satírico del paisaje comercial de Cataluña · España",footerDisclaimer:"Los comentarios editoriales son opinión y sátira.",pendingOf:"de revisión editorial",approveBtn:"Aprobar ✓",rejectBtn:"Rechazar ✗",deleteBtn:"Eliminar",commentLabel:"Comentario editorial",mapBtn:"Ver en el mapa ↗",noEntries:"No hay casos publicados aún.",noPending:"No hay submissions pendientes.",catNames:{cafeteria:"Cafetería / Café",restaurant:"Restaurante / Brunch",barberia:"Barbería / Peluquería",botiga:"Tienda / Comercio",beaute:"Estética / Belleza",negoci:"Oficina / Servicios",vehicle:"Vehículo / Movilidad",altre:"Otro"},submittedBy:"Enviado por",shareWA:"💬 WhatsApp",shareTW:"𝕏 Twitter",shareMS:"🐘 Mastodon",shareCopy:"🔗 Copiar",copied:"✓ ¡Enlace copiado!",visits:"visita",visitsPlural:"visitas",dictLabel:"Glosario oficial",dictH:"Diccionario del Absurdo",dictDesc:"Una guía de supervivencia para entender los rótulos barceloneses.",dictCol1:"Inglés misterioso",dictCol2:"Traducción revolucionaria",dictCol3:"Comentario editorial",dictFooter:"Si una palabra tiene una traducción perfectamente normal, probablemente acabamos de encontrar material para esta web.",tonteriaIndexTitle:"🏆 ÍNDICE DE TONTERÍA ANGLÓFILA™",escalaOficial:"ESCALA OFICIAL",filterLbl:"Filtro:",filterAll:"Todos",dictSortEn:"A–Z inglés",dictSortCa:"A–Z catalán",dictSortOrig:"Original",dictSearchPh:"🔍 Buscar en inglés o catalán…",casSearchPh:"🔍 Buscar caso o municipio…",fldNamePh:"p. ej: The Cozy Corner",fldAddrPh:"Calle, número, barrio",fldMuniPh:"p. ej: Sabadell, Girona, Reus…",fldDescPh:"Explica por qué te parece un absurdo…",fldEmailPh:"correo@ejemplo.com",dictProposeBtnLbl:"Proponer entrada",fldUbicacioL:"Ubicación (opcional)",gpsBtnLbl:"Usar mi ubicación",btnFerFoto:"📷 Hacer foto",btnTriarFitxer:"🖼 Elegir archivo",catOptSelect:"-- Selecciona --",catOptAltre:"Otro"},
+  en:{kicker:"Satirical Directory · Catalonia · Since 2025",mainSub:"A guide to Catalonia's businesses that have forgotten where they are — and what language they speak",meta1:"🗺 Catalonia, Spain",meta2:"🔤 Official languages: Catalan and Spanish",meta3:"🇬🇧 Sign language: English, surprisingly",meta4:"🤷 Reason: mysterious",statCountL:"Documented cases",statZeroL:"Signs in Catalan",statInfL:"Second-hand embarrassment",statPctL:"In Catalonia",mapHeader:"🗺 Map of The Silliness — All documented locations",secLabel:"The directory",secH:"The catalogued establishments",secDesc:"Documented, reviewed and published cases.",whyLabel:"A final thought",whyH:"Why does this happen?",whyQuote:"Putting up a sign in English doesn't make the business better. It makes it look like the owner doesn't trust their neighbours to understand what they're selling.",whyBody:`<p>There are understandable reasons: Barcelona receives millions of tourists, English is the global lingua franca. So far, so logical.</p><p style="margin-top:14px">The problem arises when a completely local business decides to put up a sign in a language that nobody living nearby actually speaks. Not out of necessity, but out of <em>aesthetic aspiration</em>.</p><p style="margin-top:14px">The silliness isn't English. The silliness is failing to notice that «La Barberia del Carrer» or «La Falgueta» sound just as good — or better — than their English versions.</p>`,submitH:"Know another case?",submitDesc:"If you've spotted a bakery called «The Bakery» or any other linguistic absurdity in Catalonia, send it here.",fldNameL:"Business name (as on the sign)",fldAddrL:"Address",fldProvL:"Province",fldMuniL:"Town / City",fldCatL:"Type of business",fldDescL:"Brief description (why is it silly?)",fldEmailL:"Your email (optional)",fldPhotoL:"Photo of the sign (optional)",submitBtn:"Submit case →",formOk:"✓ Case received! We'll review it soon.",formErr:"Error sending. Please try again.",loginTitle:"Admin panel",loginDesc:"Enter the admin password.",footerDesc:"A satirical archive of Catalonia's commercial landscape · Spain",footerDisclaimer:"Editorial comments are opinion and satire.",pendingOf:"awaiting editorial review",approveBtn:"Approve ✓",rejectBtn:"Reject ✗",deleteBtn:"Delete",commentLabel:"Editorial comment",mapBtn:"View on map ↗",noEntries:"No published cases yet.",noPending:"No pending submissions.",catNames:{cafeteria:"Café / Coffee shop",restaurant:"Restaurant / Brunch",barberia:"Barbershop / Hairdresser",botiga:"Shop / Store",beaute:"Beauty / Aesthetics",negoci:"Office / Services",vehicle:"Vehicle / Mobility",altre:"Other"},submittedBy:"Submitted by",shareWA:"💬 WhatsApp",shareTW:"𝕏 Twitter",shareMS:"🐘 Mastodon",shareCopy:"🔗 Copy",copied:"✓ Link copied!",visits:"visit",visitsPlural:"visits",dictLabel:"Official glossary",dictH:"Dictionary of the Absurd",dictDesc:"A survival guide to understanding what Barcelona's business signs actually say.",dictCol1:"Mysterious English",dictCol2:"Revolutionary translation",dictCol3:"Editorial comment",dictFooter:"If a word has a perfectly normal translation, we've probably just found material for this website.",tonteriaIndexTitle:"🏆 ANGLOPHONE SILLINESS INDEX™",escalaOficial:"OFFICIAL SCALE",filterLbl:"Filter:",filterAll:"All",dictSortEn:"A–Z English",dictSortCa:"A–Z Catalan",dictSortOrig:"Original",dictSearchPh:"🔍 Search in English or Catalan…",casSearchPh:"🔍 Search case or town…",fldNamePh:"e.g. The Cozy Corner",fldAddrPh:"Street, number, neighbourhood",fldMuniPh:"e.g. Sabadell, Girona, Reus…",fldDescPh:"Explain why this is absurd…",fldEmailPh:"email@example.com",dictProposeBtnLbl:"Suggest an entry",fldUbicacioL:"Location (optional)",gpsBtnLbl:"Use my location",btnFerFoto:"📷 Take photo",btnTriarFitxer:"🖼 Choose file",catOptSelect:"-- Select --",catOptAltre:"Other"},
+};
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let lang = 'ca';
+let isAdmin = false;
+let adminView = 'public';
+let publishedEntries = [];
+let pendingEntries = [];
+let activeFilter = 'all';
+let darkMode = false;
+let pendingPhotoB64 = null;
+let pendingLat = null, pendingLng = null;
+const visitCounts = {};
+const adminPendingPhotos = {};
+
+// ── DARK MODE ──────────────────────────────────────────────────────────────
+function toggleDark() {
+  darkMode = !darkMode;
+  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : '');
+  const btn = document.getElementById('darkBtn');
+  if (btn) btn.textContent = darkMode ? '☀️' : '🌙';
+  try { localStorage.setItem('tonteria-dark', darkMode ? '1' : '0'); } catch(e){}
+}
+function initDark() {
+  try { if (localStorage.getItem('tonteria-dark') === '1') toggleDark(); } catch(e){}
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ── FILTER ─────────────────────────────────────────────────────────────────
+let casSearchQ = '';
+function casSearchUpdate() {
+  casSearchQ = (document.getElementById('casSearch')||{value:''}).value.trim().toLowerCase();
+  carPage = 0;
+  renderPublic();
+}
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  const idMap = {'all':'fAll','5':'f5','4':'f4','3':'f3','2':'f2','1':'f1','cat:cafeteria':'fcafeteria','cat:restaurant':'frestaurant','cat:barberia':'fbarberia','cat:botiga':'fbotiga','cat:beaute':'fbeaute','cat:negoci':'fnegoci','cat:vehicle':'fvehicle','prov:barcelona':'fprov-barcelona','prov:girona':'fprov-girona','prov:lleida':'fprov-lleida','prov:tarragona':'fprov-tarragona'};
+  const btn = document.getElementById(idMap[f]);
+  if (btn) btn.classList.add('active');
+  carPage = 0;
+  renderPublic();
+}
+function applyFilter(entries) {
+  let result = entries;
+  if (activeFilter !== 'all') {
+    if (activeFilter.startsWith('cat:')) result = result.filter(e => e.category === activeFilter.slice(4));
+    else if (activeFilter.startsWith('prov:')) result = result.filter(e => (e.provincia||'barcelona') === activeFilter.slice(5));
+    else result = result.filter(e => e.tonteriaIndex === parseInt(activeFilter, 10));
+  }
+  if (casSearchQ) {
+    result = result.filter(e => {
+      const name = (e.name||'').toLowerCase();
+      const addr = (e.addr||'').toLowerCase();
+      const muni = (e.municipi||'').toLowerCase();
+      const desc = ((e[lang]&&e[lang].desc)||e.descOriginal||'').toLowerCase();
+      return name.includes(casSearchQ) || addr.includes(casSearchQ) || desc.includes(casSearchQ) || muni.includes(casSearchQ);
+    });
+  }
+  return result;
+}
+
+// ── SHARE ──────────────────────────────────────────────────────────────────
+function shareWA(name, mapUrl) {
+  window.open('https://wa.me/?text=' + encodeURIComponent(`"${name}" — La Tonteria de l'Anglès\n${mapUrl||location.href}`), '_blank');
+}
+function shareTW(name, mapUrl) {
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(`"${name}" — La Tonteria de l'Anglès\n${mapUrl||location.href}`), '_blank');
+}
+function shareMS(name, mapUrl) {
+  window.open('https://mastodon.social/share?text=' + encodeURIComponent(`"${name}" — La Tonteria de l'Anglès\n${mapUrl||location.href}`), '_blank');
+}
+function copyLink(name, mapUrl) {
+  navigator.clipboard.writeText(mapUrl || location.href).then(() => showToast(t('copied'))).catch(() => showToast(mapUrl || location.href));
+}
+
+// ── SUPABASE HELPERS ───────────────────────────────────────────────────────
+async function loadPublished() {
+  const { data, error } = await sb.from('entries').select('*').eq('status', 'published');
+  if (error) { console.warn('loadPublished error:', error); return; }
+  publishedEntries = (data || []).map(e => ({
+    ...e,
+    tonteriaIndex: e.tonteriaIndex !== null && e.tonteriaIndex !== undefined ? Number(e.tonteriaIndex) : null,
+  })).sort((a,b) => {
+    const ti = ((b.tonteriaIndex??-1)) - ((a.tonteriaIndex??-1));
+    if (ti !== 0) return ti;
+    return (b.createdAt||0) - (a.createdAt||0);
+  });
+  publishedEntries.forEach((e,i) => { e.num = String(i+1).padStart(2,'0'); });
+  renderPublic();
+  updateStats();
+}
+
+async function loadPending() {
+  const { data, error } = await sb.from('entries').select('*').eq('status', 'pending').order('createdAt', { ascending: false });
+  if (error) { console.warn(error); return; }
+  pendingEntries = data || [];
+  document.getElementById('pendingCount').textContent = pendingEntries.length + (pendingEntries.length === 1 ? ' pendent' : ' pendents');
+  if (adminView === 'pending') renderPending();
+  if (adminView === 'all') renderAll();
+}
+
+async function loadVisitCounts() {
+  const { data } = await sb.from('visits').select('*');
+  (data || []).forEach(r => { visitCounts[r.id] = r.count || 0; });
+}
+
+// Lookup de coordenades per id (dels seeds + entrades amb coords guardades localment)
+const COORDS_BY_ID = {};
+SEED.forEach(e => { if (e.lat && e.lng) COORDS_BY_ID[e.id] = {lat: e.lat, lng: e.lng}; });
+
+async function seedIfEmpty() {
+  const { data: existing } = await sb.from('entries').select('id,status');
+  const existingMap = {};
+  (existing || []).forEach(r => { existingMap[r.id] = r; });
+
+  for (const e of SEED) {
+    const { lat, lng, ...dbEntry } = e; // lat/lng no existeixen a la taula BD
+    if (!existingMap[e.id]) {
+      // Insertar nou
+      await sb.from('entries').insert({...dbEntry, createdAt: Date.now()});
+    } else if (existingMap[e.id].status !== 'published') {
+      // Corregir status si cal
+      await sb.from('entries').update({status:'published'}).eq('id', e.id);
+    }
+  }
+}
+
+async function incrementVisit(id, url) {
+  // Comptabilitzar la visita
+  const cur = visitCounts[id] || 0;
+  visitCounts[id] = cur + 1;
+  const badge = document.getElementById('vb-' + id);
+  if (badge) badge.textContent = visitCountText(cur + 1);
+  sb.from('visits').upsert({ id, count: cur + 1 }); // fire-and-forget
+  // Obrir la web del negoci
+  if (url) window.open(url, '_blank', 'noopener');
+}
+
+function visitCountText(n) {
+  if (!n) return '';
+  return `👁 ${n} ${n === 1 ? t('visits') : t('visitsPlural')}`;
+}
+
+// ── RENDER ──────────────────────────────────────────────────────────────────
+function t(key) { return T[lang][key] || T.ca[key] || key; }
+function entryLangData(e) { return e[lang] || e.ca || {}; }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderTonteriaIndex(score, entryId, adminMode) {
+  const s = (typeof score === 'number' && score >= 0 && score <= 5) ? score : null;
+  const ti = s !== null ? TINDEX[s] : null;
+  const colorClass = s !== null ? `ti-${s}` : 'ti-0';
+  const stars = Array.from({length:5},(_,i)=>`<div class="ti-star ${s!==null&&i<s?'filled':'empty'}"></div>`).join('');
+  const labelText = ti ? `${ti.emoji} ${ti.label[lang]||ti.label.ca}` : '—';
+  const descText = ti ? (ti.desc[lang]||ti.desc.ca) : '';
+  let adminSel = '';
+  if (adminMode && isAdmin) {
+    const opts = TINDEX.map(ti2=>`<option value="${ti2.score}" ${ti2.score===s?'selected':''}>${ti2.emoji} ${ti2.score}/5 — ${ti2.label.ca}</option>`).join('');
+    adminSel = `<div class="ti-admin-row"><label>Índex:</label><select class="ti-admin-sel" id="ti-sel-${entryId}">${opts}</select><button class="ti-save-btn" onclick="saveTonteriaIndex('${entryId}');event.stopPropagation()">Desar ✓</button></div>`;
+  }
+  return `<div class="tonteria-index ${colorClass}"><div class="ti-label"><span>🏆 ÍNDEX DE TONTERIA ANGLESA™</span></div><div class="ti-stars">${stars}</div><div class="ti-verdesc"><strong>${labelText}</strong><br>${descText}</div>${adminSel}</div>`;
+}
+
+// ── ENUNCIAT EDITOR ────────────────────────────────────────────────────────
+let enunciatEditLang = {};
+
+function openEnunciatEdit(id) {
+  const panel = document.getElementById('enunciat-edit-' + id);
+  if (!panel) return;
+  panel.classList.add('open');
+  enunciatEditLang[id] = 'ca';
+  loadEnunciatTab(id, 'ca');
+  // nom i adreça (globals)
+  const entry = [...publishedEntries, ...pendingEntries].find(e => e.id === id);
+  if (!entry) return;
+  const nameEl = document.getElementById('enunciat-name-' + id);
+  const addrEl = document.getElementById('enunciat-addr-' + id);
+  const provEl = document.getElementById('enunciat-prov-' + id);
+  const muniEl = document.getElementById('enunciat-muni-' + id);
+  if (nameEl) nameEl.value = entry.name || '';
+  if (addrEl) addrEl.value = entry.addr || '';
+  if (provEl) provEl.value = entry.provincia || 'barcelona';
+  if (muniEl) muniEl.value = entry.municipi || '';
+  const latEl = document.getElementById('enunciat-lat-' + id);
+  const lngEl = document.getElementById('enunciat-lng-' + id);
+  const coords = COORDS_BY_ID[id] || {};
+  if (latEl) latEl.value = (entry.lat != null ? entry.lat : (coords.lat || ''));
+  if (lngEl) lngEl.value = (entry.lng != null ? entry.lng : (coords.lng || ''));
+}
+function closeEnunciatEdit(id) {
+  const panel = document.getElementById('enunciat-edit-' + id);
+  if (panel) panel.classList.remove('open');
+}
+function switchEnunciatTab(id, l) {
+  saveEnunciatBuffer(id, enunciatEditLang[id] || 'ca');
+  enunciatEditLang[id] = l;
+  ['ca','es','en'].forEach(ll => {
+    const tab = document.getElementById('etab-' + ll + '-' + id);
+    if (tab) tab.classList.toggle('active', ll === l);
+  });
+  loadEnunciatTab(id, l);
+}
+function loadEnunciatTab(id, l) {
+  const entry = [...publishedEntries, ...pendingEntries].find(e => e.id === id);
+  if (!entry) return;
+  const buf = (window._enunciatBuffer || {})[id];
+  const descEl = document.getElementById('edesc-' + id);
+  const translEl = document.getElementById('etransl-' + id);
+  if (descEl) descEl.value = (buf && buf[l] && buf[l].desc !== undefined) ? buf[l].desc : ((entry[l] && entry[l].desc) || entry.descOriginal || '');
+  if (translEl) translEl.value = (buf && buf[l] && buf[l].transl !== undefined) ? buf[l].transl : ((entry[l] && entry[l].transl) || '');
+}
+function saveEnunciatBuffer(id, l) {
+  const descEl = document.getElementById('edesc-' + id);
+  const translEl = document.getElementById('etransl-' + id);
+  if (!window._enunciatBuffer) window._enunciatBuffer = {};
+  if (!window._enunciatBuffer[id]) window._enunciatBuffer[id] = {};
+  if (!window._enunciatBuffer[id][l]) window._enunciatBuffer[id][l] = {};
+  if (descEl) window._enunciatBuffer[id][l].desc = descEl.value;
+  if (translEl) window._enunciatBuffer[id][l].transl = translEl.value;
+}
+async function saveEnunciat(id) {
+  const curLang = enunciatEditLang[id] || 'ca';
+  saveEnunciatBuffer(id, curLang);
+  const buf = (window._enunciatBuffer || {})[id] || {};
+  const entry = [...publishedEntries, ...pendingEntries].find(e => e.id === id);
+  if (!entry) return;
+  const nameEl = document.getElementById('enunciat-name-' + id);
+  const addrEl = document.getElementById('enunciat-addr-' + id);
+  const provEl2 = document.getElementById('enunciat-prov-' + id);
+  const muniEl2 = document.getElementById('enunciat-muni-' + id);
+  const newName = nameEl ? nameEl.value.trim() : entry.name;
+  const newAddr = addrEl ? addrEl.value.trim() : entry.addr;
+  const newProv = provEl2 ? provEl2.value : (entry.provincia || 'barcelona');
+  const newMuni = muniEl2 ? muniEl2.value.trim() : (entry.municipi || '');
+  const update = { name: newName, addr: newAddr, provincia: newProv, municipi: newMuni };
+  ['ca','es','en'].forEach(l => {
+    const ld = buf[l] || {};
+    const existing = entry[l] || {};
+    update[l] = { ...existing, desc: ld.desc !== undefined ? ld.desc : (existing.desc || ''), transl: ld.transl !== undefined ? ld.transl : (existing.transl || '') };
+  });
+  const { error } = await sb.from('entries').update(update).eq('id', id);
+  if (error) { showToast('Error desant: ' + error.message); return; }
+  // actualitzar en memòria
+  entry.name = newName; entry.addr = newAddr; entry.provincia = newProv; entry.municipi = newMuni;
+  ['ca','es','en'].forEach(l => { entry[l] = update[l]; });
+  closeEnunciatEdit(id);
+  delete (window._enunciatBuffer || {})[id];
+  // actualitzar UI sense re-renderitzar tot
+  const card = document.querySelector('[data-entry-id="' + id + '"]');
+  if (card) {
+    const h3 = card.querySelector('.entry-name'); if (h3) h3.textContent = newName;
+    const addr = card.querySelector('.entry-addr'); if (addr) addr.textContent = '📍 ' + newAddr;
+    const ld = entry[lang] || entry.ca || {};
+    const descEl2 = card.querySelector('.entry-desc'); if (descEl2) descEl2.textContent = ld.desc || entry.descOriginal || '';
+    const translEl2 = card.querySelector('.entry-transl'); if (translEl2) translEl2.textContent = ld.transl ? '→ ' + ld.transl : '';
+  }
+  showToast('✓ Enunciat desat');
+}
+
+async function saveAdminCoords(id) {
+  const latEl = document.getElementById('enunciat-lat-' + id);
+  const lngEl = document.getElementById('enunciat-lng-' + id);
+  const lat = latEl ? parseFloat(latEl.value) : NaN;
+  const lng = lngEl ? parseFloat(lngEl.value) : NaN;
+  if (isNaN(lat) || isNaN(lng)) { showToast('Introdueix lat i lng vàlids'); return; }
+  const { error } = await sb.from('entries').update({ lat, lng }).eq('id', id);
+  if (error) { showToast('Error desant coords: ' + error.message); return; }
+  // Actualitzar COORDS_BY_ID en memòria per reflectir-ho al mapa
+  COORDS_BY_ID[id] = { lat, lng };
+  const entry = [...publishedEntries, ...pendingEntries].find(e => e.id === id);
+  if (entry) { entry.lat = lat; entry.lng = lng; }
+  showToast(`✓ Coords desades: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+  renderMap();
+}
+
+// ── COMMENT EDITOR ─────────────────────────────────────────────────────────
+let commentEditLang = {}; // entryId → current tab lang
+
+function openCommentEdit(id) {
+  const panel = document.getElementById(`comment-edit-${id}`);
+  if (!panel) return;
+  panel.classList.add('open');
+  commentEditLang[id] = 'ca';
+  loadCommentTab(id, 'ca');
+}
+function closeCommentEdit(id) {
+  const panel = document.getElementById(`comment-edit-${id}`);
+  if (panel) panel.classList.remove('open');
+}
+function switchCommentTab(id, l) {
+  // desar el text actual de la pestanya anterior
+  const prev = commentEditLang[id] || 'ca';
+  saveCommentBuffer(id, prev);
+  commentEditLang[id] = l;
+  ['ca','es','en'].forEach(ll => {
+    const tab = document.getElementById(`ctab-${ll}-${id}`);
+    if (tab) tab.classList.toggle('active', ll === l);
+  });
+  loadCommentTab(id, l);
+}
+function loadCommentTab(id, l) {
+  const ta = document.getElementById(`ctxt-${id}`);
+  if (!ta) return;
+  const entry = [...publishedEntries, ...pendingEntries].find(e => e.id === id);
+  if (!entry) return;
+  // primer mirem el buffer en memòria, si no la base de dades
+  const buf = (window._commentBuffer||{})[id]?.[l];
+  ta.value = buf !== undefined ? buf : ((entry[l]&&entry[l].comment) || '');
+}
+function saveCommentBuffer(id, l) {
+  const ta = document.getElementById(`ctxt-${id}`);
+  if (!ta) return;
+  if (!window._commentBuffer) window._commentBuffer = {};
+  if (!window._commentBuffer[id]) window._commentBuffer[id] = {};
+  window._commentBuffer[id][l] = ta.value;
+}
+async function saveComment(id) {
+  const curLang = commentEditLang[id] || 'ca';
+  saveCommentBuffer(id, curLang);
+  const buf = (window._commentBuffer||{})[id] || {};
+  const entry = [...publishedEntries, ...pendingEntries].find(e => e.id === id);
+  if (!entry) return;
+
+  // Construïm l'objecte d'actualització: actualitzem els 3 idiomes
+  const update = {};
+  ['ca','es','en'].forEach(l => {
+    const newComment = buf[l] !== undefined ? buf[l] : ((entry[l]&&entry[l].comment)||'');
+    update[l] = { ...(entry[l]||{}), comment: newComment };
+  });
+
+  const btn = document.querySelector(`#comment-edit-${id} .comment-save-btn`);
+  if (btn) { btn.textContent = 'Desant…'; btn.disabled = true; }
+
+  const { error } = await sb.from('entries').update(update).eq('id', id);
+  if (error) {
+    showToast('Error en desar el comentari');
+  } else {
+    // Actualitzar en memòria
+    ['ca','es','en'].forEach(l => { if (entry[l]) entry[l].comment = update[l].comment; });
+    // Actualitzar text visible sense re-renderitzar tota la targeta
+    const span = document.getElementById(`comment-text-${id}`);
+    const ld = entry[lang] || entry.ca || {};
+    if (span) span.textContent = ld.comment || '—';
+    closeCommentEdit(id);
+    delete (window._commentBuffer||{})[id];
+    showToast('✓ Comentari desat');
+  }
+  if (btn) { btn.textContent = '💾 Desar comentari'; btn.disabled = false; }
+}
+
+function renderCard(e, showAdminActions) {
+  const ld = entryLangData(e);
+  const isPending = e.status === 'pending';
+  const tagClass = isPending ? 'entry-tag pending' : 'entry-tag';
+  const catName = t('catNames')[e.category] || e.tag || '';
+  const displayTag = isPending ? catName + ' · ' + t('pendingOf') : (e.tag || catName);
+  const transl = ld.transl || '';
+  const desc = ld.desc || e.descOriginal || '';
+  const comment = ld.comment || '';
+  const nameEsc = escHtml(e.name);
+  const mapUrlEsc = escHtml(e.mapUrl||'');
+  const photoHtml = e.photoB64 ? `<img class="entry-photo" src="${e.photoB64}" alt="Foto de ${nameEsc}">` : '';
+  const visits = visitCounts[e.id] || 0;
+  const visitHtml = `<div class="visit-badge" id="vb-${e.id}">${visitCountText(visits)}</div>`;
+  const shareHtml = `<div class="share-row">
+    <button class="share-btn wa" onclick="shareWA('${nameEsc}','${mapUrlEsc}');event.stopPropagation()">${t('shareWA')}</button>
+    <button class="share-btn tw" onclick="shareTW('${nameEsc}','${mapUrlEsc}');event.stopPropagation()">${t('shareTW')}</button>
+    <button class="share-btn ms" onclick="shareMS('${nameEsc}','${mapUrlEsc}');event.stopPropagation()">${t('shareMS')}</button>
+    <button class="share-btn cp" onclick="copyLink('${nameEsc}','${mapUrlEsc}');event.stopPropagation()">${t('shareCopy')}</button>
+  </div>`;
+  let adminHtml = '';
+  if (showAdminActions && isAdmin) {
+    adminHtml = `<div class="admin-actions">`;
+    if (isPending) {
+      adminHtml += `<button class="act-btn act-approve" onclick="approveEntry('${e.id}');event.stopPropagation()">${t('approveBtn')}</button>`;
+      adminHtml += `<button class="act-btn act-reject" onclick="rejectEntry('${e.id}');event.stopPropagation()">${t('rejectBtn')}</button>`;
+    }
+    adminHtml += `<button class="act-btn act-delete" onclick="deleteEntry('${e.id}');event.stopPropagation()">${t('deleteBtn')}</button>`;
+    adminHtml += `</div>`;
+    const hasPhoto = !!e.photoB64;
+    adminHtml += `<div class="admin-photo-row">
+      <label for="aphoto-cam-${e.id}" onclick="event.stopPropagation()" style="border-style:solid">📷 Fer foto</label>
+      <label for="aphoto-${e.id}" onclick="event.stopPropagation()">🖼 ${hasPhoto?'Canviar foto':'Afegir foto'}</label>
+      <input type="file" id="aphoto-cam-${e.id}" accept="image/*" capture="environment" onchange="adminPhotoChange('${e.id}',this)" onclick="event.stopPropagation()" style="display:none">
+      <input type="file" id="aphoto-${e.id}" accept="image/*" onchange="adminPhotoChange('${e.id}',this)" onclick="event.stopPropagation()">
+      <img id="aphoto-prev-${e.id}" class="admin-photo-preview" alt="">
+      <div style="display:flex;gap:6px;margin-top:4px">
+        <button class="act-photo-save" id="aphoto-save-${e.id}" onclick="adminPhotoSave('${e.id}');event.stopPropagation()">💾 Desar foto</button>
+        ${hasPhoto?`<button class="act-photo-remove" onclick="adminPhotoRemove('${e.id}');event.stopPropagation()">🗑 Eliminar foto</button>`:''}
+      </div>
+    </div>`;
+  }
+  const googleMapsUrl = e.name ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.name+(e.addr?', '+e.addr:''))}` : (e.mapUrl||'');
+  const clickUrl = googleMapsUrl.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  return `<article class="entry" data-entry-id="${e.id}" onclick="incrementVisit('${e.id}','${clickUrl}')" title="Obrir ${nameEsc} →">
+    ${photoHtml}
+    <div class="entry-num">${e.num||'??'}</div>
+    <span class="${tagClass}">${displayTag}</span>
+    <h3 class="entry-name">${nameEsc}</h3>
+    ${transl?`<p class="entry-transl">→ ${escHtml(transl)}</p>`:''}
+    <p class="entry-addr">📍 ${escHtml(e.addr||'')}${e.municipi && e.municipi !== 'Barcelona' ? ' · ' + escHtml(e.municipi) : ''}${e.provincia && e.provincia !== 'barcelona' ? ' <span style="font-family:\'DM Mono\',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:var(--cream);padding:1px 5px;border-radius:2px;margin-left:4px">' + escHtml(e.provincia.charAt(0).toUpperCase()+e.provincia.slice(1)) + '</span>' : ''}</p>
+    ${renderEnunciatBlock(e, isAdmin)}
+    ${renderTonteriaIndex(e.tonteriaIndex,e.id,showAdminActions)}
+    ${visitHtml}
+    <p class="entry-desc">${escHtml(desc)}</p>
+    ${renderCommentBlock(e, comment, isAdmin)}
+    ${e.email&&isAdmin?`<p style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px">${t('submittedBy')}: ${escHtml(e.email)}</p>`:''}
+    ${e.name?`<a class="map-btn" href="${escHtml(googleMapsUrl)}" target="_blank" onclick="event.stopPropagation()">${t('mapBtn')}</a>`:''}
+    ${shareHtml}
+    ${adminHtml}
+  </article>`;
+}
+function renderCommentBlock(e, comment, isAdmin) {
+  if (!comment && !isAdmin) return '';
+  var id = e.id;
+  var html = '<div class="entry-comment" id="comment-block-' + id + '">';
+  html += '<strong>' + t('commentLabel') + '</strong>';
+  html += '<span id="comment-text-' + id + '">' + escHtml(comment||'—') + '</span>';
+  if (isAdmin) {
+    html += '<button class="comment-edit-btn" onclick="openCommentEdit(\'' + id + '\');event.stopPropagation()">✏ Editar</button>';
+    html += '<div class="comment-edit-panel" id="comment-edit-' + id + '">';
+    html += '<div class="comment-lang-tabs">';
+    html += '<button class="comment-lang-tab active" id="ctab-ca-' + id + '" onclick="switchCommentTab(\'' + id + '\',\'ca\');event.stopPropagation()">CA</button>';
+    html += '<button class="comment-lang-tab" id="ctab-es-' + id + '" onclick="switchCommentTab(\'' + id + '\',\'es\');event.stopPropagation()">ES</button>';
+    html += '<button class="comment-lang-tab" id="ctab-en-' + id + '" onclick="switchCommentTab(\'' + id + '\',\'en\');event.stopPropagation()">EN</button>';
+    html += '</div>';
+    html += '<textarea class="comment-textarea" id="ctxt-' + id + '" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()"></textarea>';
+    html += '<div>';
+    html += '<button class="comment-save-btn" onclick="saveComment(\'' + id + '\');event.stopPropagation()">💾 Desar comentari</button>';
+    html += '<button class="comment-cancel-btn" onclick="closeCommentEdit(\'' + id + '\');event.stopPropagation()">Cancel·lar</button>';
+    html += '</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+function renderEnunciatBlock(e, isAdmin) {
+  if (!isAdmin) return '';
+  var id = e.id;
+  var html = '<div style="margin-top:4px">';
+  html += '<button class="enunciat-edit-btn" onclick="openEnunciatEdit(\'' + id + '\');event.stopPropagation()">✏ Editar enunciat</button>';
+  html += '<div class="enunciat-edit-panel" id="enunciat-edit-' + id + '">';
+  html += '<label>Nom del local</label>';
+  html += '<input type="text" id="enunciat-name-' + id + '" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()">';
+  html += '<label>Adreça</label>';
+  html += '<input type="text" id="enunciat-addr-' + id + '" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()">';
+  html += '<div style="display:flex;gap:8px;margin-top:4px">';
+  html += '<div style="flex:1"><label>Província</label><select id="enunciat-prov-' + id + '" onclick="event.stopPropagation()"><option value="barcelona">Barcelona</option><option value="girona">Girona</option><option value="lleida">Lleida</option><option value="tarragona">Tarragona</option></select></div>';
+  html += '<div style="flex:2"><label>Municipi</label><input type="text" id="enunciat-muni-' + id + '" placeholder="p. ex: Sabadell" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()"></div>';
+  html += '</div>';
+  html += '<div style="display:flex;gap:8px;margin-top:4px">';
+  html += '<div style="flex:1"><label>Lat</label><input type="number" step="any" id="enunciat-lat-' + id + '" placeholder="41.3851" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()" style="width:100%"></div>';
+  html += '<div style="flex:1"><label>Lng</label><input type="number" step="any" id="enunciat-lng-' + id + '" placeholder="2.1734" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()" style="width:100%"></div>';
+  html += '<div style="display:flex;align-items:flex-end"><button class="enunciat-save-btn" style="white-space:nowrap" onclick="saveAdminCoords(\'' + id + '\');event.stopPropagation()">📍 Desar coords</button></div>';
+  html += '</div>';
+  html += '<div class="enunciat-lang-tabs">';
+  html += '<button class="enunciat-lang-tab active" id="etab-ca-' + id + '" onclick="switchEnunciatTab(\'' + id + '\',\'ca\');event.stopPropagation()">CA</button>';
+  html += '<button class="enunciat-lang-tab" id="etab-es-' + id + '" onclick="switchEnunciatTab(\'' + id + '\',\'es\');event.stopPropagation()">ES</button>';
+  html += '<button class="enunciat-lang-tab" id="etab-en-' + id + '" onclick="switchEnunciatTab(\'' + id + '\',\'en\');event.stopPropagation()">EN</button>';
+  html += '</div>';
+  html += '<label>Descripció</label>';
+  html += '<textarea class="comment-textarea" id="edesc-' + id + '" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()"></textarea>';
+  html += '<label>Traducció al català (opcional)</label>';
+  html += '<input type="text" id="etransl-' + id + '" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()">';
+  html += '<div>';
+  html += '<button class="enunciat-save-btn" onclick="saveEnunciat(\'' + id + '\');event.stopPropagation()">💾 Desar enunciat</button>';
+  html += '<button class="enunciat-cancel-btn" onclick="closeEnunciatEdit(\'' + id + '\');event.stopPropagation()">Cancel·lar</button>';
+  html += '</div></div></div>';
+  return html;
+}
+
+// ── CAROUSEL STATE ─────────────────────────────────────────────────────────
+let carPage = 0;
+function carCols() {
+  if (window.innerWidth <= 640) return 1;
+  if (window.innerWidth <= 900) return 2;
+  return 3;
+}
+function carTotalPages(n) { return Math.max(1, Math.ceil(n / carCols())); }
+function carouselMove(dir) {
+  const grid = document.getElementById('entriesGrid');
+  const filtered = applyFilter(publishedEntries);
+  const pages = carTotalPages(filtered.length);
+  carPage = Math.max(0, Math.min(carPage + dir, pages - 1));
+  applyCarousel(filtered.length);
+}
+function applyCarousel(n) {
+  const grid  = document.getElementById('entriesGrid');
+  const outer = document.querySelector('.carousel-track-outer');
+  const nav   = document.getElementById('carouselNav');
+  const dots  = document.getElementById('carouselDots');
+  const prev  = document.getElementById('carPrev');
+  const next  = document.getElementById('carNext');
+  if (!grid || !outer) return;
+  const cols     = carCols();
+  const pages    = carTotalPages(n);
+  const visibleW = outer.offsetWidth;
+  const itemW    = visibleW / cols;
+  const shiftPx  = carPage * cols * itemW;
+  grid.style.transform = `translateX(-${shiftPx}px)`;
+  if (dots) {
+    dots.innerHTML = Array.from({length:pages},(_,i)=>`<button class="carousel-dot${i===carPage?' active':''}" onclick="carJump(${i})" aria-label="Pàgina ${i+1}"></button>`).join('');
+  }
+  if (prev) prev.disabled = carPage === 0;
+  if (next) next.disabled = carPage === pages - 1;
+  // fletxes sempre visibles si hi ha més d'una pàgina
+  if (prev) prev.style.display = pages > 1 ? 'flex' : 'none';
+  if (next) next.style.display = pages > 1 ? 'flex' : 'none';
+  if (nav)  nav.style.display  = pages > 1 ? 'flex' : 'none';
+}
+function carJump(p) { carPage = p; applyCarousel(applyFilter(publishedEntries).length); }
+window.addEventListener('resize', () => {
+  const filtered = applyFilter(publishedEntries);
+  const pages = carTotalPages(filtered.length);
+  if (carPage >= pages) carPage = pages - 1;
+  applyCarousel(filtered.length);
+});
+
+function renderPublic() {
+  const grid = document.getElementById('entriesGrid');
+  if (!grid) return;
+  const filtered = applyFilter(publishedEntries);
+  carPage = 0;
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="loading" style="flex:0 0 100%">${t('noEntries')}</div>`;
+    const nav = document.getElementById('carouselNav'); if(nav) nav.style.display='none';
+    return;
+  }
+  grid.innerHTML = filtered.map(e=>renderCard(e,true)).join('');
+  applyCarousel(filtered.length);
+}
+function renderPending() {
+  const grid = document.getElementById('pendingGrid');
+  if (!grid) return;
+  grid.innerHTML = pendingEntries.length ? pendingEntries.map(e=>renderCard(e,true)).join('') : `<div class="loading">${t('noPending')}</div>`;
+}
+function renderAll() {
+  const grid = document.getElementById('allGrid');
+  if (!grid) return;
+  const all = [...publishedEntries,...pendingEntries].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  grid.innerHTML = all.length ? all.map(e=>renderCard(e,true)).join('') : `<div class="loading">${t('noEntries')}</div>`;
+}
+function updateStats() {
+  const el = document.getElementById('statCount');
+  if (el) el.textContent = publishedEntries.length;
+  renderMap();
+}
+
+// ── MAPA LEAFLET ────────────────────────────────────────────────────────────
+let leafletMap = null;
+let leafletMarkers = [];
+
+function buildMap(entries) {
+  const colors = ['#4caf50','#a8c61b','#f0a500','#e07000','#d03020','#8b0000'];
+  if (!leafletMap) {
+    leafletMap = L.map('mapa', {scrollWheelZoom: false, zoomControl: true}).setView([41.392, 2.168], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19
+    }).addTo(leafletMap);
+  } else {
+    leafletMap.invalidateSize();
+  }
+  leafletMarkers.forEach(m => m.remove());
+  leafletMarkers = [];
+  entries.forEach(e => {
+    const ti = (typeof e.tonteriaIndex === 'number' && e.tonteriaIndex >= 0) ? e.tonteriaIndex : 0;
+    const col = colors[Math.min(ti, 5)];
+    const stars = '★'.repeat(ti) + '☆'.repeat(5 - ti);
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:32px;height:32px;background:${col};border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;font-family:'DM Mono',monospace;line-height:1">${ti}</div>`,
+      iconSize: [32,32], iconAnchor: [16,16], popupAnchor: [0,-20]
+    });
+    const m = L.marker([e.lat, e.lng], {icon}).addTo(leafletMap);
+    m.bindPopup(`<div class="map-popup-name">${e.name}</div>
+      <span class="map-popup-tag">${e.tag||''}</span>
+      <div class="map-popup-addr">📍 ${e.addr||''}</div>
+      <div class="map-popup-stars" style="color:${col};font-size:14px">${stars} <span style="font-family:'DM Mono',monospace;font-size:11px">${ti}/5</span></div>
+      <br><button onclick="scrollToEntry('${e.id}')" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:#b8390e;color:#fff;border:none;padding:6px 12px;cursor:pointer;margin-top:4px;width:100%">Veure fitxa ↓</button>
+      ${(e.name)?`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.name+(e.addr?', '+e.addr:''))}" target="_blank" style="font-family:'DM Mono',monospace;font-size:10px;color:#b8390e;text-decoration:none;display:block;margin-top:6px">Obrir a Google Maps ↗</a>`:''}`);
+    m.on('mouseover', function() { this.openPopup(); });
+    leafletMarkers.push(m);
+  });
+  if (entries.length === 1) {
+    leafletMap.setView([entries[0].lat, entries[0].lng], 15);
+  } else {
+    const bounds = L.latLngBounds(entries.map(e => [e.lat, e.lng]));
+    leafletMap.fitBounds(bounds, {padding:[40,40]});
+  }
+}
+
+function renderMap() {
+  const entries = publishedEntries.map(e => ({
+    ...e,
+    lat: e.lat || (COORDS_BY_ID[e.id] ? COORDS_BY_ID[e.id].lat : null),
+    lng: e.lng || (COORDS_BY_ID[e.id] ? COORDS_BY_ID[e.id].lng : null),
+  })).filter(e => e.lat && e.lng);
+  if (!entries.length) return;
+  // Defer map init to ensure div has dimensions
+  setTimeout(() => buildMap(entries), 50);
+}
+
+function renderLegend() {
+  const grid = document.getElementById('legendGrid');
+  if (!grid) return;
+  grid.innerHTML = TINDEX.map(ti => {
+    const colors = ['#4caf50','#a8c61b','#f0a500','#e07000','#d03020','#8b0000'];
+    const bg = colors[ti.score];
+    const stars = Array.from({length:5},(_,i)=>`<span style="display:inline-block;width:14px;height:14px;border-radius:2px;margin-right:2px;background:${i<ti.score?bg:'#c4b89a'};opacity:${i<ti.score?1:.4}"></span>`).join('');
+    return `<div style="padding:12px 16px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)">
+      <div style="margin-bottom:5px">${stars}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--ink)">${ti.emoji} ${ti.label[lang]||ti.label.ca}</div>
+      <div style="font-family:'Source Serif 4',serif;font-style:italic;font-size:13px;color:var(--muted);margin-top:3px">${ti.desc[lang]||ti.desc.ca}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── DICT STATE ─────────────────────────────────────────────────────────────
+let dictSort = 'en';
+let dictPageSize = 10;
+let dictPageNum = 0;
+let dictEditIdx = -1; // -1 = nova entrada
+
+function dictGetFiltered() {
+  const q = (document.getElementById('dictSearch')||{value:''}).value.trim().toLowerCase();
+  let arr = DICT.map((r,i) => ({...r, _orig: i}));
+  if (q) arr = arr.filter(r => r.en.toLowerCase().includes(q) || r.ca.toLowerCase().includes(q) || (r.es||'').toLowerCase().includes(q));
+  if (dictSort === 'en') arr.sort((a,b) => a.en.localeCompare(b.en));
+  else if (dictSort === 'ca') arr.sort((a,b) => a.ca.localeCompare(b.ca, 'ca'));
+  else arr.sort((a,b) => a._orig - b._orig);
+  return arr;
+}
+function dictUpdate() {
+  dictPageNum = 0;
+  renderDict();
+}
+function dictSetSort(s) {
+  dictSort = s;
+  ['en','ca','orig'].forEach(k => {
+    const b = document.getElementById('dsort-' + k);
+    if (b) b.classList.toggle('active', k === s);
+  });
+  dictUpdate();
+}
+function dictSetPage(n) {
+  dictPageSize = n;
+  dictPageNum = 0;
+  [10,20,30].forEach(k => {
+    const b = document.getElementById('dpg-' + k);
+    if (b) b.classList.toggle('active', k === n);
+  });
+  renderDict();
+}
+function dictGoPage(p) {
+  dictPageNum = p;
+  renderDict();
+}
+
+function renderDict() {
+  const di = {label:t('dictLabel'),h:t('dictH'),desc:t('dictDesc'),col1:t('dictCol1'),col2:t('dictCol2'),col3:t('dictCol3'),footer:t('dictFooter')};
+  ['dictLabel','dictH','dictDesc','dictCol1','dictCol2','dictCol3','dictFooter'].forEach((id,i)=>{
+    const el=document.getElementById(id); if(el) el.textContent=[di.label,di.h,di.desc,di.col1,di.col2,di.col3,di.footer][i];
+  });
+  // botons admin vs públic
+  const addBtn = document.getElementById('dictAddBtn');
+  const propBtn = document.getElementById('dictProposeBtn');
+  if (addBtn) addBtn.style.display = isAdmin ? 'inline-block' : 'none';
+  if (propBtn) propBtn.style.display = isAdmin ? 'none' : 'inline-block';
+
+  // Ajusta header a mode admin (4 columnes) o públic (3)
+  const dictHeader = document.querySelector('.dict-header-row');
+  if (dictHeader) dictHeader.classList.toggle('admin-mode', isAdmin);
+
+  const rows = document.getElementById('dictRows');
+  if (!rows) return;
+  const transl = lang === 'en' ? 'eng' : lang;
+  const filtered = dictGetFiltered();
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / dictPageSize));
+  if (dictPageNum >= totalPages) dictPageNum = totalPages - 1;
+  const page = filtered.slice(dictPageNum * dictPageSize, (dictPageNum + 1) * dictPageSize);
+
+  rows.innerHTML = page.map((row, i) => {
+    const bg = i%2===0?'var(--paper)':'var(--cream)';
+    const origIdx = row._orig;
+    const adminCols = isAdmin
+      ? '<div style="display:flex;gap:4px;padding:0 12px;align-items:center">'
+        + '<button class="dict-row-edit" onclick="dictOpenEdit(' + origIdx + ')">✏</button>'
+        + '<button class="dict-row-del" onclick="dictDelete(' + origIdx + ')">🗑</button>'
+        + '</div>'
+      : '';
+    const isMobile = window.innerWidth <= 640;
+    const commentText = (lang==='es'?row.comment_es:lang==='en'?row.comment_en:null) || row.comment || '';
+    const commentHtml = commentText
+      ? '<span style="font-style:italic;color:var(--gold-text);font-size:13px">' + escHtml(commentText) + '</span>'
+      : '<span style="color:var(--rule);font-size:12px">—</span>';
+    if (isMobile) {
+      // En mòbil: 2 columnes (terme | traducció+comentari), botons admin dins la 2a cel·la
+      const grid2 = isAdmin ? '1fr 70px' : '1fr';
+      const translPlusComment = '<div style="padding:13px 16px;display:flex;flex-direction:column;gap:5px">'
+        + '<div style="display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-weight:600">→</span><span style="font-size:14px">' + escHtml(row[transl]||row.ca) + '</span></div>'
+        + (row.comment ? '<div style="margin-left:18px">' + commentHtml + '</div>' : '')
+        + '</div>';
+      return '<div style="display:grid;grid-template-columns:' + grid2 + ';background:' + bg + ';border-top:1px solid var(--rule)">'
+        + '<div style="padding:13px 16px;border-right:1px solid var(--rule)"><span style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:700;font-style:italic">' + escHtml(row.en) + '</span></div>'
+        + translPlusComment
+        + (isAdmin ? adminCols : '')
+        + '</div>';
+    }
+    const grid = isAdmin ? '1fr 1fr 1.4fr 70px' : '1fr 1fr 1.4fr';
+    return '<div style="display:grid;grid-template-columns:' + grid + ';background:' + bg + ';border-top:1px solid var(--rule)">'
+      + '<div style="padding:13px 20px;border-right:1px solid var(--rule)"><span style="font-family:\'Playfair Display\',serif;font-size:17px;font-weight:700;font-style:italic">' + escHtml(row.en) + '</span></div>'
+      + '<div style="padding:13px 20px;border-right:1px solid var(--rule);display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-weight:600">→</span><span style="font-size:15px">' + escHtml(row[transl]||row.ca) + '</span></div>'
+      + '<div style="padding:13px 20px' + (isAdmin ? ';border-right:1px solid var(--rule)' : '') + ';display:flex;align-items:center">' + commentHtml + '</div>'
+      + adminCols
+      + '</div>';
+  }).join('');
+
+  // Paginació
+  const pag = document.getElementById('dictPagination');
+  if (pag) {
+    if (totalPages <= 1) { pag.innerHTML = '<span class="dict-pag-info">' + total + ' entrades</span>'; return; }
+    let html = '<span class="dict-pag-info">' + total + ' entrades &nbsp;·&nbsp; pàg. ' + (dictPageNum+1) + ' / ' + totalPages + '</span>';
+    for (let p = 0; p < totalPages; p++) {
+      html += '<button class="dict-pag-btn' + (p===dictPageNum?' active':'') + '" onclick="dictGoPage(' + p + ')">' + (p+1) + '</button>';
+    }
+    pag.innerHTML = html;
+  }
+}
+
+function dictOpenAdd() {
+  dictEditIdx = -1;
+  document.getElementById('dictModalTitle').textContent = 'Nova entrada';
+  ['dmen','dmca','dmes','dmeng','dmcomment','dmcomment_es','dmcomment_en'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('dictModal').classList.remove('hidden');
+}
+function dictOpenEdit(idx) {
+  const row = DICT[idx];
+  if (!row) return;
+  dictEditIdx = idx;
+  document.getElementById('dictModalTitle').textContent = 'Editar entrada';
+  document.getElementById('dmen').value = row.en || '';
+  document.getElementById('dmca').value = row.ca || '';
+  document.getElementById('dmes').value = row.es || '';
+  document.getElementById('dmeng').value = row.eng || '';
+  document.getElementById('dmcomment').value = row.comment || '';
+  document.getElementById('dmcomment_es').value = row.comment_es || '';
+  document.getElementById('dmcomment_en').value = row.comment_en || '';
+  document.getElementById('dictModal').classList.remove('hidden');
+}
+function dictOpenPropose() {
+  ['dpen','dpca','dpes','dpeng'].forEach(id => { document.getElementById(id).value = ''; });
+  const msg = document.getElementById('dictProposeMsg');
+  if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+  document.getElementById('dictProposeModal').classList.remove('hidden');
+}
+function dictProposeClose() {
+  document.getElementById('dictProposeModal').classList.add('hidden');
+}
+async function dictProposeSend() {
+  const en = document.getElementById('dpen').value.trim();
+  const ca = document.getElementById('dpca').value.trim();
+  const es = document.getElementById('dpes').value.trim();
+  const eng = document.getElementById('dpeng').value.trim();
+  const msg = document.getElementById('dictProposeMsg');
+  if (!en || !ca) {
+    msg.style.display = 'block'; msg.style.color = 'var(--rust)';
+    msg.textContent = 'Cal el terme en anglès i la traducció al català.'; return;
+  }
+  const { error } = await sb.from('dict_proposals').insert({en, ca, es, eng, status: 'pending'});
+  if (error) {
+    msg.style.display = 'block'; msg.style.color = 'var(--rust)';
+    msg.textContent = 'Error en enviar. Torna-ho a intentar.'; return;
+  }
+  msg.style.display = 'block'; msg.style.color = 'var(--green)';
+  msg.textContent = '✓ Proposta enviada! L\'administrador la revisarà aviat.';
+  setTimeout(dictProposeClose, 2000);
+}
+async function dictAutoTranslate() {
+  const ca = document.getElementById('dmca').value.trim();
+  const eng = document.getElementById('dmen').value.trim();
+  if (!ca) { showToast('Cal el terme en català primer'); return; }
+  const btn = document.getElementById('dictAutoTranslateBtn');
+  const status = document.getElementById('dictTranslateStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ Traduint…';
+  status.style.display = 'block';
+  status.textContent = 'Consultant la IA…';
+  try {
+    const res = await fetch('/.netlify/functions/translate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ ca, eng, comment: document.getElementById('dmcomment').value.trim() })
+    });
+    if (!res.ok) throw new Error('Error ' + res.status);
+    const data = await res.json();
+    if (data.es) document.getElementById('dmes').value = data.es;
+    if (data.comment_es) document.getElementById('dmcomment_es').value = data.comment_es;
+    if (data.comment_en) document.getElementById('dmcomment_en').value = data.comment_en;
+    status.textContent = '✓ Traduccions generades — revisa-les abans de desar';
+  } catch(e) {
+    status.textContent = '⚠ Error: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ Traduir automàticament';
+  }
+}
+function dictModalClose() {
+  document.getElementById('dictModal').classList.add('hidden');
+  document.getElementById('dictTranslateStatus').style.display = 'none';
+}
+async function dictModalSave() {
+  const en = document.getElementById('dmen').value.trim();
+  const ca = document.getElementById('dmca').value.trim();
+  const es = document.getElementById('dmes').value.trim();
+  const eng = document.getElementById('dmeng').value.trim();
+  const comment = document.getElementById('dmcomment').value.trim();
+  const comment_es = document.getElementById('dmcomment_es').value.trim();
+  const comment_en = document.getElementById('dmcomment_en').value.trim();
+  if (!en || !ca) { showToast('Cal el terme en anglès i en català'); return; }
+  if (dictEditIdx >= 0) {
+    const row = DICT[dictEditIdx];
+    const { error } = await sb.from('dict_entries').update({en, ca, es, eng, comment, comment_es, comment_en}).eq('id', row.id);
+    if (error) { showToast('Error: ' + error.message); return; }
+    DICT[dictEditIdx] = {...row, en, ca, es, eng, comment, comment_es, comment_en};
+    showToast('✓ Entrada actualitzada');
+  } else {
+    const maxOrd = DICT.length ? Math.max(...DICT.map(r => r.ord||0)) : 0;
+    const { data, error } = await sb.from('dict_entries').insert({en, ca, es, eng, comment, comment_es, comment_en, ord: maxOrd + 1}).select().single();
+    if (error) { showToast('Error: ' + error.message); return; }
+    DICT.push(data);
+    showToast('✓ Entrada afegida');
+  }
+  dictModalClose();
+  renderDict();
+}
+async function dictDelete(idx) {
+  if (!confirm('Eliminar aquesta entrada del diccionari?')) return;
+  const row = DICT[idx];
+  const { error } = await sb.from('dict_entries').delete().eq('id', row.id);
+  if (error) { showToast('Error: ' + error.message); return; }
+  DICT.splice(idx, 1);
+  renderDict();
+  showToast('🗑 Entrada eliminada');
+}
+// ── DICT PROPOSALS ─────────────────────────────────────────────────────────
+let dictProposals = [];
+async function loadDictProposals() {
+  const { data, error } = await sb.from('dict_proposals').select('*').eq('status','pending').order('created_at',{ascending:true});
+  if (!error && data) {
+    dictProposals = data;
+    // badge de compte
+    const badge = document.getElementById('dictPropCount');
+    if (badge) {
+      badge.textContent = data.length;
+      badge.style.display = data.length ? 'inline' : 'none';
+    }
+  }
+}
+function renderDictProposals() {
+  const container = document.getElementById('dictProposalsList');
+  if (!container) return;
+  if (!dictProposals.length) {
+    container.innerHTML = '<div class="loading">Cap proposta pendent.</div>'; return;
+  }
+  container.innerHTML = dictProposals.map(p => {
+    const transl = [p.ca, p.es ? '(' + escHtml(p.es) + ')' : '', p.eng ? '· ' + escHtml(p.eng) : ''].filter(Boolean).join(' ');
+    return '<div class="dict-proposal-row" id="dpr-' + p.id + '">'
+      + '<div>'
+      + '<div class="dict-proposal-terms">' + escHtml(p.en) + '</div>'
+      + '<div class="dict-proposal-transl">→ ' + transl + '</div>'
+      + '</div>'
+      + '<div class="dict-proposal-actions">'
+      + '<button class="dict-prop-approve" onclick="approveProposal(' + p.id + ')">✓ Aprovar</button>'
+      + '<button class="dict-prop-reject" onclick="rejectProposal(' + p.id + ')">✗ Rebutjar</button>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+async function approveProposal(id) {
+  const prop = dictProposals.find(p => p.id === id);
+  if (!prop) return;
+  const maxOrd = DICT.length ? Math.max(...DICT.map(r => r.ord||0)) : 0;
+  const { data: newEntry, error: insErr } = await sb.from('dict_entries')
+    .insert({en: prop.en, ca: prop.ca, es: prop.es||'', eng: prop.eng||'', ord: maxOrd + 1})
+    .select().single();
+  if (insErr) { showToast('Error afegint al diccionari: ' + insErr.message); return; }
+  await sb.from('dict_proposals').update({status:'approved'}).eq('id', id);
+  DICT.push(newEntry);
+  dictProposals = dictProposals.filter(p => p.id !== id);
+  const badge = document.getElementById('dictPropCount');
+  if (badge) { badge.textContent = dictProposals.length; badge.style.display = dictProposals.length ? 'inline' : 'none'; }
+  renderDictProposals();
+  showToast('✓ Proposta aprovada i afegida al diccionari');
+}
+async function rejectProposal(id) {
+  if (!confirm('Rebutjar aquesta proposta?')) return;
+  await sb.from('dict_proposals').update({status:'rejected'}).eq('id', id);
+  dictProposals = dictProposals.filter(p => p.id !== id);
+  const badge = document.getElementById('dictPropCount');
+  if (badge) { badge.textContent = dictProposals.length; badge.style.display = dictProposals.length ? 'inline' : 'none'; }
+  renderDictProposals();
+  showToast('🗑 Proposta rebutjada');
+}
+
+async function loadDict() {
+  const { data, error } = await sb.from('dict_entries').select('*').order('ord', {ascending: true});
+  if (!error && data) { DICT = data; renderDict(); }
+}
+
+// ── LANG ───────────────────────────────────────────────────────────────────
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach((b,i)=>b.classList.toggle('active',['ca','es','en'][i]===l));
+  applyLang(l);
+}
+function applyLang(l) {
+  const keys = ['kicker','mainSub','meta1','meta2','meta3','meta4','statCountL','statZeroL','statInfL','statPctL','mapHeader','secLabel','secH','secDesc','whyLabel','whyH','submitH','submitDesc','fldNameL','fldAddrL','fldProvL','fldMuniL','fldCatL','fldDescL','fldEmailL','fldPhotoL','footerDesc','footerDisclaimer','dictCol3','tiLegendTitle','tiLegendScale','filterLbl','filterAll','dictProposeBtnLbl','fldUbicacioL'];
+  keys.forEach(id=>{const el=document.getElementById(id);if(el&&T[l][id]!==undefined)el.textContent=T[l][id];});
+  const whyBody=document.getElementById('whyBody');if(whyBody)whyBody.innerHTML=T[l].whyBody||'';
+  const whyQ=document.getElementById('whyQuote');if(whyQ)whyQ.textContent=T[l].whyQuote||'';
+  const sb2=document.getElementById('submitBtn');if(sb2)sb2.textContent=T[l].submitBtn||'';
+  // Placeholders
+  const ph = {casSearch:'casSearchPh',dictSearch:'dictSearchPh',fldName:'fldNamePh',fldAddr:'fldAddrPh',fldMuni:'fldMuniPh',fldDesc:'fldDescPh',fldEmail:'fldEmailPh'};
+  Object.entries(ph).forEach(([elId,key])=>{const el=document.getElementById(elId);if(el&&T[l][key])el.placeholder=T[l][key];});
+  // Botons formulari (foto, GPS)
+  const gpsl=document.getElementById('gpsBtnLbl');if(gpsl)gpsl.textContent=T[l].gpsBtnLbl||'';
+  const bff=document.getElementById('btnFerFoto');if(bff)bff.textContent=T[l].btnFerFoto||'';
+  bff&&bff.setAttribute('onclick',"document.getElementById('fldPhotoCam').click()");
+  const btf=document.getElementById('btnTriarFitxer');if(btf)btf.textContent=T[l].btnTriarFitxer||'';
+  btf&&btf.setAttribute('onclick',"document.getElementById('fldPhoto').click()");
+  // Opcions del desplegable de categoria
+  const catMap={catOptSelect:'catOptSelect',cafeteria:'catOptCafeteria',restaurant:'catOptRestaurant',barberia:'catOptBarberia',botiga:'catOptBotiga',beaute:'catOptBeaute',negoci:'catOptNegoci',vehicle:'catOptVehicle',altre:'catOptAltre'};
+  const optSelect=document.getElementById('catOptSelect');if(optSelect)optSelect.textContent=T[l].catOptSelect||'-- Selecciona --';
+  const optAltre=document.getElementById('catOptAltre');if(optAltre)optAltre.textContent=T[l].catOptAltre||'Altre';
+  if(T[l].catNames){
+    ['cafeteria','restaurant','barberia','botiga','beaute','negoci','vehicle'].forEach(cat=>{
+      const opt=document.getElementById('catOpt'+cat.charAt(0).toUpperCase()+cat.slice(1));
+      if(opt&&T[l].catNames[cat])opt.textContent=T[l].catNames[cat];
+    });
+  }
+  // Botons de diccionari (sort)
+  const dse=document.getElementById('dsort-en');if(dse)dse.textContent=T[l].dictSortEn||'';
+  const dsc=document.getElementById('dsort-ca');if(dsc)dsc.textContent=T[l].dictSortCa||'';
+  const dso=document.getElementById('dsort-orig');if(dso)dso.textContent=T[l].dictSortOrig||'';
+  // Category buttons text
+  if (T[l].catNames) {
+    ['cafeteria','restaurant','barberia','botiga','beaute','negoci','vehicle'].forEach(cat=>{
+      const icons={cafeteria:'☕',restaurant:'🍳',barberia:'✂️',botiga:'🛍',beaute:'💅',negoci:'🏢',vehicle:'🚗'};
+      const btn=document.getElementById('f'+cat);
+      if(btn&&T[l].catNames[cat])btn.textContent=(icons[cat]||'')+' '+T[l].catNames[cat];
+    });
+  }
+  renderLegend(); renderDict(); renderPublic(); renderMap();
+  if (isAdmin) { if(adminView==='pending')renderPending(); if(adminView==='all')renderAll(); }
+}
+
+// ── ADMIN LOGIN ─────────────────────────────────────────────────────────────
+function showAdminLogin() {
+  if (isAdmin) return;
+  document.getElementById('loginModal').classList.remove('hidden');
+  document.getElementById('loginPwd').focus();
+}
+document.getElementById('loginOk').addEventListener('click', doLogin);
+document.getElementById('loginCancel').addEventListener('click', ()=>document.getElementById('loginModal').classList.add('hidden'));
+document.getElementById('loginPwd').addEventListener('keydown', e=>{if(e.key==='Enter')doLogin();});
+function doLogin() {
+  const pwd = document.getElementById('loginPwd').value;
+  if (pwd === ADMIN_PWD) {
+    isAdmin = true;
+    document.getElementById('loginModal').classList.add('hidden');
+    document.getElementById('loginPwd').value = '';
+    document.getElementById('adminBar').classList.remove('hidden');
+    document.getElementById('adminLoginBtn').style.display = 'none';
+    loadPending();
+    loadDictProposals();
+    renderPublic();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('loginPwd').value = '';
+    document.getElementById('loginPwd').focus();
+  }
+}
+function adminLogout() {
+  isAdmin = false;
+  document.getElementById('adminBar').classList.add('hidden');
+  document.getElementById('adminLoginBtn').style.display = '';
+  switchAdminTab('public');
+  location.reload();
+}
+function switchAdminTab(tab) {
+  adminView = tab;
+  ['public','pending','all','dictProposals'].forEach(t=>{
+    const secId = 'section' + t.charAt(0).toUpperCase() + t.slice(1);
+    const tabId = 'tab' + t.charAt(0).toUpperCase() + t.slice(1);
+    const sec = document.getElementById(secId); if(sec) sec.classList.toggle('section-hidden', t!==tab);
+    const tb  = document.getElementById(tabId);  if(tb)  tb.classList.toggle('active', t===tab);
+  });
+  if (tab==='pending') renderPending();
+  if (tab==='all') renderAll();
+  if (tab==='dictProposals') renderDictProposals();
+  // Scroll fins a la secció activa quan no és la vista pública
+  if (tab !== 'public') {
+    const secId = 'section' + tab.charAt(0).toUpperCase() + tab.slice(1);
+    const sec = document.getElementById(secId);
+    if (sec) setTimeout(() => sec.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+  }
+}
+
+// ── ADMIN ACTIONS ──────────────────────────────────────────────────────────
+async function approveEntry(id) {
+  const nextNum = String(publishedEntries.length + 1).padStart(2,'0');
+  await sb.from('entries').update({status:'published',num:nextNum}).eq('id',id);
+  await loadPublished(); await loadPending();
+}
+async function rejectEntry(id) {
+  await sb.from('entries').update({status:'rejected'}).eq('id',id);
+  await loadPending();
+}
+async function deleteEntry(id) {
+  if (!confirm('Eliminar aquest cas?')) return;
+  await sb.from('entries').delete().eq('id',id);
+  await loadPublished(); await loadPending();
+}
+async function saveTonteriaIndex(id) {
+  const sel = document.getElementById('ti-sel-'+id);
+  if (!sel) return;
+  await sb.from('entries').update({tonteriaIndex:parseInt(sel.value,10)}).eq('id',id);
+  await loadPublished();
+}
+
+// ── ADMIN PHOTO EDIT ────────────────────────────────────────────────────────
+function adminPhotoChange(id, input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    adminPendingPhotos[id] = ev.target.result;
+    const prev = document.getElementById('aphoto-prev-'+id);
+    if (prev) { prev.src = ev.target.result; prev.style.display = 'block'; }
+    const saveBtn = document.getElementById('aphoto-save-'+id);
+    if (saveBtn) saveBtn.style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+}
+async function adminPhotoSave(id) {
+  if (!adminPendingPhotos[id]) return;
+  const saveBtn = document.getElementById('aphoto-save-'+id);
+  if (saveBtn) { saveBtn.textContent = '…'; saveBtn.disabled = true; }
+  await sb.from('entries').update({photoB64: adminPendingPhotos[id]}).eq('id',id);
+  delete adminPendingPhotos[id];
+  showToast('✓ Foto desada');
+  if (saveBtn) { saveBtn.textContent = '✓ Desada'; saveBtn.disabled = false; }
+  await loadPublished();
+}
+async function adminPhotoRemove(id) {
+  if (!confirm('Eliminar la foto?')) return;
+  await sb.from('entries').update({photoB64: null}).eq('id',id);
+  showToast('Foto eliminada');
+  await loadPublished();
+}
+
+// ── PHOTO UPLOAD FORM ───────────────────────────────────────────────────────
+function handlePhotoFile(file, preview) {
+  if (!file) { pendingPhotoB64 = null; if(preview)preview.style.display='none'; return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    pendingPhotoB64 = ev.target.result;
+    if (preview) { preview.src = pendingPhotoB64; preview.style.display = 'block'; }
+  };
+  reader.readAsDataURL(file);
+}
+function initPhotoUpload() {
+  const inp = document.getElementById('fldPhoto');
+  const inpCam = document.getElementById('fldPhotoCam');
+  const preview = document.getElementById('photoPreview');
+  if (!inp) return;
+  function onFileChosen(e, otherInp) {
+    const file = e.target.files[0];
+    if (otherInp) otherInp.value = '';
+    handlePhotoFile(file, preview);
+  }
+  inp.addEventListener('change', e => onFileChosen(e, inpCam));
+  if (inpCam) inpCam.addEventListener('change', e => onFileChosen(e, inp));
+}
+
+// ── SUBMIT ─────────────────────────────────────────────────────────────────
+function captureGPS() {
+  const btn = document.getElementById('gpsBtn');
+  const status = document.getElementById('gpsStatus');
+  if (!navigator.geolocation) {
+    status.textContent = '❌ Geolocalització no disponible';
+    return;
+  }
+  btn.disabled = true;
+  status.textContent = '⏳ Obtenint ubicació…';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      pendingLat = pos.coords.latitude;
+      pendingLng = pos.coords.longitude;
+      status.textContent = `✓ ${pendingLat.toFixed(5)}, ${pendingLng.toFixed(5)}`;
+      btn.disabled = false;
+    },
+    err => {
+      status.textContent = '❌ No s\'ha pogut obtenir la ubicació';
+      btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+async function submitCase() {
+  const name = document.getElementById('fldName').value.trim();
+  const addr = document.getElementById('fldAddr').value.trim();
+  const provincia = document.getElementById('fldProv').value;
+  const municipi = document.getElementById('fldMuni').value.trim();
+  const category = document.getElementById('fldCat').value;
+  const desc = document.getElementById('fldDesc').value.trim();
+  const email = document.getElementById('fldEmail').value.trim();
+  const msg = document.getElementById('formMsg');
+  if (!name || !addr || !category || !desc) {
+    msg.className='form-msg err'; msg.textContent='Emplena tots els camps obligatoris.'; return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  const entry = {
+    id: 'user-' + Date.now(),
+    status:'pending', name, addr, provincia, municipi, category,
+    tonteriaIndex: null,
+    descOriginal: desc,
+    email: email||'',
+    photoB64: pendingPhotoB64||null,
+    ca:{desc,transl:'',comment:''},
+    es:{desc:'',transl:'',comment:''},
+    en:{desc:'',transl:'',comment:''},
+    tag: T.ca.catNames[category]||category,
+    mapUrl:`https://maps.google.com/?q=${encodeURIComponent(name+' '+addr)}`,
+    lat: pendingLat,
+    lng: pendingLng,
+    createdAt: Date.now(),
+    num:'??'
+  };
+  const { error } = await sb.from('entries').insert(entry);
+  if (error) {
+    msg.className='form-msg err'; msg.textContent=t('formErr');
+  } else {
+    msg.className='form-msg ok'; msg.textContent=t('formOk');
+    ['fldName','fldAddr','fldMuni','fldDesc','fldEmail'].forEach(id=>{document.getElementById(id).value='';});
+    document.getElementById('fldProv').value='barcelona';
+    document.getElementById('fldCat').value='';
+    pendingPhotoB64=null;
+    pendingLat=null; pendingLng=null;
+    const gpsStatus=document.getElementById('gpsStatus'); if(gpsStatus) gpsStatus.textContent='';
+    const preview=document.getElementById('photoPreview');
+    if(preview){preview.src='';preview.style.display='none';}
+    document.getElementById('fldPhoto').value='';
+  }
+  btn.disabled = false;
+}
+
+// ── SCROLL TO ENTRY ────────────────────────────────────────────────────────
+function scrollToEntry(id) {
+  if (leafletMap) leafletMap.closePopup();
+  if (adminView !== 'public') switchAdminTab('public');
+  if (activeFilter !== 'all') setFilter('all');
+  if (casSearchQ) { casSearchQ = ''; const cs = document.getElementById('casSearch'); if(cs) cs.value=''; }
+  // Trobar l'índex de la targeta dins dels filtrats per calcular la pàgina del carrusel
+  const filtered = applyFilter(publishedEntries);
+  const idx = filtered.findIndex(e => e.id === id);
+  if (idx >= 0) {
+    const page = Math.floor(idx / carCols());
+    carPage = page;
+    applyCarousel(filtered.length);
+  }
+  // Esperar un frame perquè el carrusel es mogui, llavors animar
+  requestAnimationFrame(() => {
+    const card = document.querySelector(`[data-entry-id="${id}"]`);
+    if (!card) return;
+    card.scrollIntoView({behavior:'smooth', block:'nearest'});
+    card.classList.add('entry-highlight');
+    setTimeout(() => card.classList.remove('entry-highlight'), 2200);
+  });
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+async function init() {
+  initDark();
+  initPhotoUpload();
+  await seedIfEmpty();
+  await Promise.all([loadPublished(), loadVisitCounts(), loadDict()]);
+  applyLang(lang);
+  // Realtime subscriptions
+  sb.channel('entries-changes')
+    .on('postgres_changes', {event:'*', schema:'public', table:'entries'}, () => {
+      loadPublished();
+      if (isAdmin) loadPending();
+    })
+    .subscribe();
+}
+
+init();
+
+// ── PWA SERVICE WORKER ──────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
+// ── PWA INSTALL BANNER ──────────────────────────────────────────────────────
+(function() {
+  // No mostrar si ja estava instal·lat o descartat
+  if (localStorage.getItem('pwaDismissed')) return;
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  if (window.navigator.standalone === true) return; // iOS standalone
+
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const isAndroid = /android/i.test(navigator.userAgent);
+  if (!isIOS && !isAndroid) return; // Només mòbil
+
+  let deferredPrompt = null;
+
+  // Funció global per al botó de la barra
+  window.pwaTriggerInstall = async function() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      const btn = document.getElementById('pwaNavBtn');
+      if (btn) btn.style.display = 'none';
+      dismissBanner();
+    } else if (isIOS) {
+      showBanner('ios');
+    }
+  };
+
+  // Android: captura l'event d'instal·lació
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Mostra el botó a la barra
+    const btn = document.getElementById('pwaNavBtn');
+    if (btn) btn.style.display = 'block';
+    showBanner('android');
+  });
+
+  function showBanner(platform) {
+    const banner = document.getElementById('pwaBanner');
+    if (!banner) return;
+    if (platform === 'android') {
+      banner.innerHTML = `
+        <div class="pwa-icon">📲</div>
+        <div class="pwa-text">
+          <strong>Instal·la La Tonteria</strong>
+          <span>Accés ràpid des de la pantalla d'inici, sense obrir el navegador</span>
+        </div>
+        <button class="pwa-install-btn" id="pwaInstallBtn">Instal·la</button>
+        <button class="pwa-close-btn" id="pwaCloseBtn" title="Tanca">✕</button>
+      `;
+      document.getElementById('pwaInstallBtn').addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        dismissBanner();
+      });
+    } else if (platform === 'ios') {
+      banner.innerHTML = `
+        <div class="pwa-icon">📲</div>
+        <div class="pwa-text">
+          <strong>Instal·la La Tonteria a l'inici</strong>
+          <div class="pwa-ios-steps">
+            Prem <b>⎙ Compartir</b> → <b>«Afegir a la pantalla d'inici»</b>
+          </div>
+        </div>
+        <button class="pwa-close-btn" id="pwaCloseBtn" title="Tanca">✕</button>
+      `;
+    }
+    banner.classList.remove('hidden');
+    document.getElementById('pwaCloseBtn').addEventListener('click', dismissBanner);
+  }
+
+  function dismissBanner() {
+    const banner = document.getElementById('pwaBanner');
+    if (banner) banner.classList.add('hidden');
+    localStorage.setItem('pwaDismissed', '1');
+  }
+
+  // iOS: mostra el botó a la barra i el banner als 3s
+  if (isIOS) {
+    const btn = document.getElementById('pwaNavBtn');
+    if (btn) btn.style.display = 'block';
+    setTimeout(() => showBanner('ios'), 3000);
+  }
+  // Android: el banner apareix quan es dispara beforeinstallprompt (automàtic)
+})();
+</script>
+
+<!-- PWA Install Banner -->
+<div id="pwaBanner" class="hidden"></div>
+
+</body>
+</html>
