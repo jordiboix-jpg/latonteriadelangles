@@ -2,6 +2,21 @@
 // Tradueix text català → castellà + anglès via Anthropic API
 // La ANTHROPIC_API_KEY va a Netlify > Site configuration > Environment variables
 
+const https = require('https');
+
+function httpsPost(options, postData) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve({ status: res.statusCode, body: data }));
+    });
+    req.on('error', reject);
+    req.write(postData);
+    req.end();
+  });
+}
+
 exports.handler = async (event) => {
   // Només POST
   if (event.httpMethod !== 'POST') {
@@ -40,37 +55,38 @@ Proporciona:
 Respon ÚNICAMENT amb JSON vàlid, sense cap text addicional:
 {"es":"...","comment_es":"...","comment_en":"..."}`;
 
+  const postData = JSON.stringify({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 300,
+    messages: [{ role: 'user', content: prompt }]
+  });
+
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const result = await httpsPost({
+      hostname: 'api.anthropic.com',
+      path: '/v1/messages',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData),
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
+      }
+    }, postData);
 
-    if (!response.ok) {
-      let errBody = '';
-      try { errBody = await response.text(); } catch(_) {}
-      // Diagnòstic: mostra status + primers 400 chars de la resposta
+    if (result.status !== 200) {
       return {
         statusCode: 502,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          error: 'API Anthropic ha retornat ' + response.status,
-          detail: errBody.slice(0, 400),
-          keyPrefix: apiKey ? apiKey.slice(0,12) + '…' : 'absent'
+          error: 'API Anthropic ha retornat ' + result.status,
+          detail: result.body.slice(0, 400),
+          keyPrefix: apiKey.slice(0, 12) + '…'
         })
       };
     }
 
-    const data = await response.json();
+    const data = JSON.parse(result.body);
     const text = data.content?.[0]?.text || '';
 
     // Extreu el JSON de la resposta
@@ -79,11 +95,11 @@ Respon ÚNICAMENT amb JSON vàlid, sense cap text addicional:
       return { statusCode: 502, body: JSON.stringify({ error: 'Resposta inesperada', raw: text }) };
     }
 
-    const result = JSON.parse(match[0]);
+    const parsed = JSON.parse(match[0]);
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(result)
+      body: JSON.stringify(parsed)
     };
   } catch (err) {
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
