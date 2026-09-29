@@ -56,8 +56,18 @@ Respon ÚNICAMENT amb JSON vàlid, sense cap text addicional:
     });
 
     if (!response.ok) {
-      const err = await response.text();
-      return { statusCode: 502, body: JSON.stringify({ error: 'Error API (status ' + response.status + '): ' + err.slice(0,300) }) };
+      let errBody = '';
+      try { errBody = await response.text(); } catch(_) {}
+      // Diagnòstic: mostra status + primers 400 chars de la resposta
+      return {
+        statusCode: 502,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          error: 'API Anthropic ha retornat ' + response.status,
+          detail: errBody.slice(0, 400),
+          keyPrefix: apiKey ? apiKey.slice(0,12) + '…' : 'absent'
+        })
+      };
     }
 
     const data = await response.json();
