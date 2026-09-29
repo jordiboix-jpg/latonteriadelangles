@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v40 build:20260928-1530 -->
+<!-- v43 build:20260929-1500 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -133,10 +133,10 @@ hr.rule{border:none;border-top:3px double var(--rule);margin:50px 0 36px}
 .dict-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
 .dict-search{flex:1 1 180px;min-width:140px;font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
 .dict-search:focus{border-color:var(--rust);outline:none}
-.dict-sort-group,.dict-page-group{display:flex;gap:2px}
-.dict-sort-btn,.dict-pg-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:5px 9px;cursor:pointer;transition:all .15s}
-.dict-sort-btn.active,.dict-pg-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.dict-sort-btn:not(.active):hover,.dict-pg-btn:not(.active):hover{border-color:var(--ink);color:var(--ink)}
+.dict-page-group{display:flex;gap:2px}
+.dict-pg-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:5px 9px;cursor:pointer;transition:all .15s}
+.dict-pg-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.dict-pg-btn:not(.active):hover{border-color:var(--ink);color:var(--ink)}
 .dict-add-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--rust);color:var(--paper);border:none;padding:6px 12px;cursor:pointer;margin-left:auto;transition:opacity .15s}
 .dict-add-btn:hover{opacity:.8}
 .dict-propose-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--gold);border:1px solid var(--gold);padding:5px 11px;cursor:pointer;margin-left:auto;transition:all .15s}
@@ -157,7 +157,13 @@ hr.rule{border:none;border-top:3px double var(--rule);margin:50px 0 36px}
 .dict-row-del:hover{background:var(--rust);color:var(--paper)}
 .dict-header-row{display:grid;grid-template-columns:1fr 1fr 1.4fr;background:var(--ink);color:var(--paper)}
 .dict-header-row.admin-mode{grid-template-columns:1fr 1fr 1.4fr 70px}
-.dict-hcol{padding:12px 20px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+.dict-hcol{padding:12px 20px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;user-select:none}
+.dict-hcol:hover{background:rgba(255,255,255,.08)}
+.dict-hcol.sort-active{background:rgba(255,255,255,.13)}
+.dict-hcol .sort-arrow{margin-left:5px;opacity:.5;font-style:normal}
+.dict-hcol.sort-active .sort-arrow{opacity:1}
+.sort-arrows{margin-left:5px;font-style:normal;color:rgba(255,255,255,.3);font-size:14px;letter-spacing:0;display:inline-block}
+.sort-col-active .sort-arrows{color:#fff;text-shadow:0 0 4px rgba(255,255,255,.5)}
 @media(max-width:640px){
   .dict-header-row{grid-template-columns:1fr 1fr}
   .dict-hcol-comment-desktop{display:none}
@@ -239,8 +245,20 @@ hr.rule{border:none;border-top:3px double var(--rule);margin:50px 0 36px}
 .act-photo-remove:hover{background:var(--red)}
 
 .map-wrap{border:var(--border);overflow:hidden;margin:40px 0}
-.map-header{background:var(--ink);color:var(--paper);padding:13px 18px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700}
+.map-wrap.map-fullscreen{position:fixed;inset:0;z-index:9000;margin:0;border:none}
+.map-wrap.map-fullscreen #mapa{height:calc(100vh - 48px)}
+.map-wrap.map-content-hidden #mapa{visibility:hidden;min-height:440px}
+.map-header{background:var(--ink);color:var(--paper);padding:13px 18px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.map-fs-btn{background:none;border:1px solid rgba(255,255,255,.3);color:var(--paper);padding:3px 10px;font-size:13px;cursor:pointer;border-radius:2px;font-family:'DM Mono',monospace}
+.map-fs-btn:hover{background:rgba(255,255,255,.1)}
 #mapa{width:100%;height:440px;border:none;display:block}
+/* Map float panel */
+#mapFloat{display:none;position:fixed;z-index:9500;width:60vw;min-width:400px;height:520px;background:var(--paper);border:var(--border);box-shadow:0 8px 40px rgba(0,0,0,.35);top:60px;left:20vw;flex-direction:column;overflow:hidden}
+#mapFloatHeader{background:var(--ink);color:var(--paper);padding:10px 18px;cursor:move;display:flex;align-items:center;justify-content:space-between;font-family:'Playfair Display',serif;font-weight:700;font-size:16px;user-select:none;flex-shrink:0}
+#mapFloatBody{flex:1;position:relative;overflow:hidden;min-height:0}
+#mapaFloat{position:absolute;top:0;left:0;right:0;bottom:0}
+#mapFloatResize{position:absolute;right:0;bottom:0;width:20px;height:20px;cursor:se-resize;background:linear-gradient(135deg,transparent 50%,var(--ink) 50%);opacity:.5;z-index:10}
+@media(max-width:767px){#mapFloat{display:none!important}}
 .leaflet-popup-content-wrapper{border-radius:2px;font-family:'Source Serif 4',Georgia,serif;border-top:3px solid var(--rust,#b8390e)}
 .leaflet-popup-content{margin:12px 14px;font-size:14px;line-height:1.5}
 .map-popup-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:3px}
@@ -383,7 +401,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   </div>
 
   <div class="map-wrap">
-    <div class="map-header" id="mapHeader">🗺 Mapa de la Tonteria — Tots els indrets documentats</div>
+    <div class="map-header"><span id="mapHeader">🗺 Mapa de la Tonteria — Tots els indrets documentats</span><button class="map-fs-btn" id="mapFsBtn" onclick="openMapFloat()">⛶ Pantalla completa</button></div>
     <div id="mapa" style="width:100%;height:440px"></div>
   </div>
 
@@ -458,11 +476,6 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
 
     <div class="dict-toolbar">
       <input class="dict-search" id="dictSearch" type="text" placeholder="🔍 Cercar en anglès o català…" oninput="dictUpdate()">
-      <div class="dict-sort-group">
-        <button class="dict-sort-btn active" id="dsort-en" onclick="dictSetSort('en')">A–Z anglès</button>
-        <button class="dict-sort-btn" id="dsort-ca" onclick="dictSetSort('ca')">A–Z català</button>
-        <button class="dict-sort-btn" id="dsort-orig" onclick="dictSetSort('orig')">Original</button>
-      </div>
       <div class="dict-page-group">
         <button class="dict-pg-btn active" id="dpg-10" onclick="dictSetPage(10)">10</button>
         <button class="dict-pg-btn" id="dpg-20" onclick="dictSetPage(20)">20</button>
@@ -474,8 +487,8 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
 
     <div style="border:1px solid var(--rule);overflow:hidden;margin-bottom:8px">
       <div class="dict-header-row">
-        <div class="dict-hcol" style="border-right:1px solid #3a2e1e" id="dictCol1">Anglès misteriós</div>
-        <div class="dict-hcol dict-hcol-comment" id="dictCol2">Traducció / Comentari</div>
+        <div class="dict-hcol" style="border-right:1px solid #3a2e1e" id="dictCol1" onclick="dictSetSort('en')"><span id="dictCol1Lbl">Anglès misteriós</span> <span class="sort-arrows" id="dictCol1Arrow">↑↓</span></div>
+        <div class="dict-hcol dict-hcol-comment" id="dictCol2" onclick="dictSetSort(lang==='en'?'eng':lang)"><span id="dictCol2Lbl">Traducció / Comentari</span> <span class="sort-arrows" id="dictCol2Arrow">↑↓</span></div>
         <div class="dict-hcol dict-hcol-comment-desktop" style="border-left:1px solid #3a2e1e" id="dictCol3">Comentari editorial</div>
       </div>
       <div id="dictRows"></div>
@@ -675,9 +688,9 @@ const SEED = [
 let DICT = []; // s'omple des de Supabase via loadDict()
 
 const T = {
-  ca:{kicker:"Directori Satíric · Catalunya · Des de 2025",mainSub:"Guia dels comerços catalans que han oblidat on viuen — i en quin idioma",meta1:"🗺 Catalunya, Espanya",meta2:"🔤 Idiomes oficials: català i castellà",meta3:"🇬🇧 Idioma dels rètols: l'anglès, sorprenentment",meta4:"🤷 Raó: misteriosa",statCountL:"Casos documentats",statZeroL:"Rètols en català",statInfL:"Vergonya aliena",statPctL:"A Catalunya",mapHeader:"🗺 Mapa de la Tonteria — Tots els indrets documentats",secLabel:"El directori",secH:"Els establiments catalogats",secDesc:"Casos documentats, revisats i publicats.",whyLabel:"Reflexió final",whyH:"Per què passa això?",whyQuote:"Posar el rètol en anglès no fa el negoci millor. Fa que sembli que el propietari no confia que el seu veïnat entengui el que ven.",whyBody:`<p>Hi ha raons comprensibles: Barcelona rep milions de turistes, l'anglès és la llengua franca global. Fins aquí, tot lògic.</p><p style="margin-top:14px">El problema és quan un negoci completament local decideix posar el rètol en una llengua que no és la de ningú que hi viu al voltant. No per necessitat, sinó per <em>aspiració estètica</em>.</p><p style="margin-top:14px">La tonteria no és l'anglès. La tonteria és no adonar-se que «La Barberia del Carrer» o «La Falgueta» sonen exactament tan bé — o millor — que les seves versions angleses.</p>`,submitH:"Coneixes un altre cas?",submitDesc:"Si has vist una fleca «The Bakery» o qualsevol altre absurd lingüístic a Catalunya, envia'l aquí.",fldNameL:"Nom del negoci",fldAddrL:"Adreça",fldProvL:"Província",fldMuniL:"Municipi",fldCatL:"Tipus de negoci",fldDescL:"Descripció breu",fldEmailL:"El teu email (opcional)",fldPhotoL:"Foto del rètol (opcional)",submitBtn:"Enviar cas →",formOk:"✓ Cas rebut! El revisarem aviat.",formErr:"Error en enviar. Torna-ho a intentar.",loginTitle:"Panell d'administrador",loginDesc:"Introdueix la contrasenya d'administrador.",footerDesc:"Un arxiu satíric del paisatge comercial de Catalunya · Espanya",footerDisclaimer:"Els comentaris editorials són opinió i sàtira.",pendingOf:"de revisió editorial",approveBtn:"Aprovar ✓",rejectBtn:"Rebutjar ✗",deleteBtn:"Eliminar",commentLabel:"Comentari editorial",mapBtn:"Veure al mapa ↗",noEntries:"Cap cas publicat encara.",noPending:"Cap submission pendent.",catNames:{cafeteria:"Cafeteria / Cafè",restaurant:"Restaurant / Brunch",barberia:"Barberia / Perruqueria",botiga:"Botiga / Comerç",beaute:"Estètica / Bellesa",negoci:"Oficina / Serveis",vehicle:"Vehicle / Mobilitat",altre:"Altre"},submittedBy:"Enviat per",shareWA:"💬 WhatsApp",shareTW:"𝕏 Twitter",shareMS:"🐘 Mastodon",shareCopy:"🔗 Copiar",copied:"✓ Enllaç copiat!",visits:"visita",visitsPlural:"visites",dictLabel:"Glossari oficial",dictH:"Diccionari de l'Absurd",dictDesc:"Una guia de supervivència per entendre el que posa als rètols.",dictCol1:"Anglès misteriós",dictCol2:"Traducció revolucionària",dictCol3:"Comentari editorial",dictFooter:"Si una paraula té una traducció perfectament normal, probablement acabem de trobar material per a aquesta web.",tonteriaIndexTitle:"🏆 ÍNDEX DE TONTERIA ANGLESA™",escalaOficial:"ESCALA OFICIAL",filterLbl:"Filtre:",filterAll:"Tots",dictSortEn:"A–Z anglès",dictSortCa:"A–Z català",dictSortOrig:"Original",dictSearchPh:"🔍 Cercar en anglès o català…",casSearchPh:"🔍 Cercar cas o municipi…",fldNamePh:"p. ex: The Cozy Corner",fldAddrPh:"Carrer, número, barri",fldMuniPh:"p. ex: Sabadell, Girona, Reus…",fldDescPh:"Explica per què et sembla absurd…",fldEmailPh:"correu@exemple.com",dictProposeBtnLbl:"Proposar entrada",fldUbicacioL:"Ubicació (opcional)",gpsBtnLbl:"Usa la meva ubicació",btnFerFoto:"📷 Fer foto",btnTriarFitxer:"🖼 Triar fitxer",catOptSelect:"-- Selecciona --",catOptAltre:"Altre"},
-  es:{kicker:"Directorio Satírico · Cataluña · Desde 2025",mainSub:"Guía de los comercios catalanes que han olvidado dónde viven — y en qué idioma",meta1:"🗺 Cataluña, España",meta2:"🔤 Idiomas oficiales: catalán y castellano",meta3:"🇬🇧 Idioma de los rótulos: inglés, sorprendentemente",meta4:"🤷 Razón: misteriosa",statCountL:"Casos documentados",statZeroL:"Rótulos en catalán",statInfL:"Vergüenza ajena",statPctL:"En Cataluña",mapHeader:"🗺 Mapa de la Tontería — Todos los lugares documentados",secLabel:"El directorio",secH:"Los establecimientos catalogados",secDesc:"Casos documentados, revisados y publicados.",whyLabel:"Reflexión final",whyH:"¿Por qué pasa esto?",whyQuote:"Poner el rótulo en inglés no hace el negocio mejor. Hace que parezca que el propietario no confía en que sus vecinos entiendan lo que vende.",whyBody:`<p>Hay razones comprensibles: Barcelona recibe millones de turistas, el inglés es la lengua franca global. Hasta aquí, todo lógico.</p><p style="margin-top:14px">El problema es cuando un negocio completamente local decide poner el rótulo en una lengua que no es la de nadie que vive alrededor. No por necesidad, sino por <em>aspiración estética</em>.</p><p style="margin-top:14px">La tontería no es el inglés. La tontería es no darse cuenta de que «La Barbería de la Calle» o «El Helechito» suenan exactamente igual de bien — o mejor — que sus versiones en inglés.</p>`,submitH:"¿Conoces otro caso?",submitDesc:"Si has visto una panadería «The Bakery» o cualquier otro absurdo lingüístico en Cataluña, envíalo aquí.",fldNameL:"Nombre del negocio",fldAddrL:"Dirección",fldProvL:"Provincia",fldMuniL:"Municipio",fldCatL:"Tipo de negocio",fldDescL:"Descripción breve",fldEmailL:"Tu email (opcional)",fldPhotoL:"Foto del rótulo (opcional)",submitBtn:"Enviar caso →",formOk:"✓ Caso recibido. Lo revisaremos pronto.",formErr:"Error al enviar. Inténtalo de nuevo.",loginTitle:"Panel de administrador",loginDesc:"Introduce la contraseña de administrador.",footerDesc:"Un archivo satírico del paisaje comercial de Cataluña · España",footerDisclaimer:"Los comentarios editoriales son opinión y sátira.",pendingOf:"de revisión editorial",approveBtn:"Aprobar ✓",rejectBtn:"Rechazar ✗",deleteBtn:"Eliminar",commentLabel:"Comentario editorial",mapBtn:"Ver en el mapa ↗",noEntries:"No hay casos publicados aún.",noPending:"No hay submissions pendientes.",catNames:{cafeteria:"Cafetería / Café",restaurant:"Restaurante / Brunch",barberia:"Barbería / Peluquería",botiga:"Tienda / Comercio",beaute:"Estética / Belleza",negoci:"Oficina / Servicios",vehicle:"Vehículo / Movilidad",altre:"Otro"},submittedBy:"Enviado por",shareWA:"💬 WhatsApp",shareTW:"𝕏 Twitter",shareMS:"🐘 Mastodon",shareCopy:"🔗 Copiar",copied:"✓ ¡Enlace copiado!",visits:"visita",visitsPlural:"visitas",dictLabel:"Glosario oficial",dictH:"Diccionario del Absurdo",dictDesc:"Una guía de supervivencia para entender los rótulos barceloneses.",dictCol1:"Inglés misterioso",dictCol2:"Traducción revolucionaria",dictCol3:"Comentario editorial",dictFooter:"Si una palabra tiene una traducción perfectamente normal, probablemente acabamos de encontrar material para esta web.",tonteriaIndexTitle:"🏆 ÍNDICE DE TONTERÍA ANGLÓFILA™",escalaOficial:"ESCALA OFICIAL",filterLbl:"Filtro:",filterAll:"Todos",dictSortEn:"A–Z inglés",dictSortCa:"A–Z catalán",dictSortOrig:"Original",dictSearchPh:"🔍 Buscar en inglés o catalán…",casSearchPh:"🔍 Buscar caso o municipio…",fldNamePh:"p. ej: The Cozy Corner",fldAddrPh:"Calle, número, barrio",fldMuniPh:"p. ej: Sabadell, Girona, Reus…",fldDescPh:"Explica por qué te parece un absurdo…",fldEmailPh:"correo@ejemplo.com",dictProposeBtnLbl:"Proponer entrada",fldUbicacioL:"Ubicación (opcional)",gpsBtnLbl:"Usar mi ubicación",btnFerFoto:"📷 Hacer foto",btnTriarFitxer:"🖼 Elegir archivo",catOptSelect:"-- Selecciona --",catOptAltre:"Otro"},
-  en:{kicker:"Satirical Directory · Catalonia · Since 2025",mainSub:"A guide to Catalonia's businesses that have forgotten where they are — and what language they speak",meta1:"🗺 Catalonia, Spain",meta2:"🔤 Official languages: Catalan and Spanish",meta3:"🇬🇧 Sign language: English, surprisingly",meta4:"🤷 Reason: mysterious",statCountL:"Documented cases",statZeroL:"Signs in Catalan",statInfL:"Second-hand embarrassment",statPctL:"In Catalonia",mapHeader:"🗺 Map of The Silliness — All documented locations",secLabel:"The directory",secH:"The catalogued establishments",secDesc:"Documented, reviewed and published cases.",whyLabel:"A final thought",whyH:"Why does this happen?",whyQuote:"Putting up a sign in English doesn't make the business better. It makes it look like the owner doesn't trust their neighbours to understand what they're selling.",whyBody:`<p>There are understandable reasons: Barcelona receives millions of tourists, English is the global lingua franca. So far, so logical.</p><p style="margin-top:14px">The problem arises when a completely local business decides to put up a sign in a language that nobody living nearby actually speaks. Not out of necessity, but out of <em>aesthetic aspiration</em>.</p><p style="margin-top:14px">The silliness isn't English. The silliness is failing to notice that «La Barberia del Carrer» or «La Falgueta» sound just as good — or better — than their English versions.</p>`,submitH:"Know another case?",submitDesc:"If you've spotted a bakery called «The Bakery» or any other linguistic absurdity in Catalonia, send it here.",fldNameL:"Business name (as on the sign)",fldAddrL:"Address",fldProvL:"Province",fldMuniL:"Town / City",fldCatL:"Type of business",fldDescL:"Brief description (why is it silly?)",fldEmailL:"Your email (optional)",fldPhotoL:"Photo of the sign (optional)",submitBtn:"Submit case →",formOk:"✓ Case received! We'll review it soon.",formErr:"Error sending. Please try again.",loginTitle:"Admin panel",loginDesc:"Enter the admin password.",footerDesc:"A satirical archive of Catalonia's commercial landscape · Spain",footerDisclaimer:"Editorial comments are opinion and satire.",pendingOf:"awaiting editorial review",approveBtn:"Approve ✓",rejectBtn:"Reject ✗",deleteBtn:"Delete",commentLabel:"Editorial comment",mapBtn:"View on map ↗",noEntries:"No published cases yet.",noPending:"No pending submissions.",catNames:{cafeteria:"Café / Coffee shop",restaurant:"Restaurant / Brunch",barberia:"Barbershop / Hairdresser",botiga:"Shop / Store",beaute:"Beauty / Aesthetics",negoci:"Office / Services",vehicle:"Vehicle / Mobility",altre:"Other"},submittedBy:"Submitted by",shareWA:"💬 WhatsApp",shareTW:"𝕏 Twitter",shareMS:"🐘 Mastodon",shareCopy:"🔗 Copy",copied:"✓ Link copied!",visits:"visit",visitsPlural:"visits",dictLabel:"Official glossary",dictH:"Dictionary of the Absurd",dictDesc:"A survival guide to understanding what Barcelona's business signs actually say.",dictCol1:"Mysterious English",dictCol2:"Revolutionary translation",dictCol3:"Editorial comment",dictFooter:"If a word has a perfectly normal translation, we've probably just found material for this website.",tonteriaIndexTitle:"🏆 ANGLOPHONE SILLINESS INDEX™",escalaOficial:"OFFICIAL SCALE",filterLbl:"Filter:",filterAll:"All",dictSortEn:"A–Z English",dictSortCa:"A–Z Catalan",dictSortOrig:"Original",dictSearchPh:"🔍 Search in English or Catalan…",casSearchPh:"🔍 Search case or town…",fldNamePh:"e.g. The Cozy Corner",fldAddrPh:"Street, number, neighbourhood",fldMuniPh:"e.g. Sabadell, Girona, Reus…",fldDescPh:"Explain why this is absurd…",fldEmailPh:"email@example.com",dictProposeBtnLbl:"Suggest an entry",fldUbicacioL:"Location (optional)",gpsBtnLbl:"Use my location",btnFerFoto:"📷 Take photo",btnTriarFitxer:"🖼 Choose file",catOptSelect:"-- Select --",catOptAltre:"Other"},
+  ca:{kicker:"Directori Satíric · Catalunya · Des de 2025",mainSub:"Guia dels comerços catalans que han oblidat on viuen — i en quin idioma",meta1:"🗺 Catalunya, Espanya",meta2:"🔤 Idiomes oficials: català i castellà",meta3:"🇬🇧 Idioma dels rètols: l'anglès, sorprenentment",meta4:"🤷 Raó: misteriosa",statCountL:"Casos documentats",statZeroL:"Rètols en català",statInfL:"Vergonya aliena",statPctL:"A Catalunya",mapHeader:"🗺 Mapa de la Tonteria — Tots els indrets documentats",secLabel:"El directori",secH:"Els establiments catalogats",secDesc:"Casos documentats, revisats i publicats.",whyLabel:"Reflexió final",whyH:"Per què passa això?",whyQuote:"Posar el rètol en anglès no fa el negoci millor. Fa que sembli que el propietari no confia que el seu veïnat entengui el que ven.",whyBody:`<p>Hi ha raons comprensibles: Barcelona rep milions de turistes, l'anglès és la llengua franca global. Fins aquí, tot lògic.</p><p style="margin-top:14px">El problema és quan un negoci completament local decideix posar el rètol en una llengua que no és la de ningú que hi viu al voltant. No per necessitat, sinó per <em>aspiració estètica</em>.</p><p style="margin-top:14px">La tonteria no és l'anglès. La tonteria és no adonar-se que «La Barberia del Carrer» o «La Falgueta» sonen exactament tan bé — o millor — que les seves versions angleses.</p>`,submitH:"Coneixes un altre cas?",submitDesc:"Si has vist una fleca «The Bakery» o qualsevol altre absurd lingüístic a Catalunya, envia'l aquí.",fldNameL:"Nom del negoci",fldAddrL:"Adreça",fldProvL:"Província",fldMuniL:"Municipi",fldCatL:"Tipus de negoci",fldDescL:"Descripció breu",fldEmailL:"El teu email (opcional)",fldPhotoL:"Foto del rètol (opcional)",submitBtn:"Enviar cas →",formOk:"✓ Cas rebut! El revisarem aviat.",formErr:"Error en enviar. Torna-ho a intentar.",loginTitle:"Panell d'administrador",loginDesc:"Introdueix la contrasenya d'administrador.",footerDesc:"Un arxiu satíric del paisatge comercial de Catalunya · Espanya",footerDisclaimer:"Els comentaris editorials són opinió i sàtira.",pendingOf:"de revisió editorial",approveBtn:"Aprovar ✓",rejectBtn:"Rebutjar ✗",deleteBtn:"Eliminar",commentLabel:"Comentari editorial",mapBtn:"Veure al mapa ↗",noEntries:"Cap cas publicat encara.",noPending:"Cap submission pendent.",catNames:{cafeteria:"Cafeteria / Cafè",restaurant:"Restaurant / Brunch",barberia:"Barberia / Perruqueria",botiga:"Botiga / Comerç",beaute:"Estètica / Bellesa",negoci:"Oficina / Serveis",vehicle:"Vehicle / Mobilitat",altre:"Altre"},submittedBy:"Enviat per",shareWA:"💬 WhatsApp",shareTW:"𝕏 Twitter",shareMS:"🐘 Mastodon",shareCopy:"🔗 Copiar",copied:"✓ Enllaç copiat!",visits:"visita",visitsPlural:"visites",dictLabel:"Glossari oficial",dictH:"Diccionari de l'Absurd",dictDesc:"Una guia de supervivència per entendre el que posa als rètols.",dictCol1:"Anglès misteriós",dictCol2:"Traducció revolucionària",dictCol3:"Comentari editorial",dictFooter:"Si una paraula té una traducció perfectament normal, probablement acabem de trobar material per a aquesta web.",tonteriaIndexTitle:"🏆 ÍNDEX DE TONTERIA ANGLESA™",escalaOficial:"ESCALA OFICIAL",filterLbl:"Filtre:",filterAll:"Tots",dictSortEn:"A–Z anglès",dictSortCa:"A–Z català",dictSortEs:"A–Z castellà",dictSearchPh:"🔍 Cercar en anglès, català o castellà…",casSearchPh:"🔍 Cercar cas o municipi…",fldNamePh:"p. ex: The Cozy Corner",fldAddrPh:"Carrer, número, barri",fldMuniPh:"p. ex: Sabadell, Girona, Reus…",fldDescPh:"Explica per què et sembla absurd…",fldEmailPh:"correu@exemple.com",dictProposeBtnLbl:"Proposar entrada",fldUbicacioL:"Ubicació (opcional)",gpsBtnLbl:"Usa la meva ubicació",btnFerFoto:"📷 Fer foto",btnTriarFitxer:"🖼 Triar fitxer",catOptSelect:"-- Selecciona --",catOptAltre:"Altre"},
+  es:{kicker:"Directorio Satírico · Cataluña · Desde 2025",mainSub:"Guía de los comercios catalanes que han olvidado dónde viven — y en qué idioma",meta1:"🗺 Cataluña, España",meta2:"🔤 Idiomas oficiales: catalán y castellano",meta3:"🇬🇧 Idioma de los rótulos: inglés, sorprendentemente",meta4:"🤷 Razón: misteriosa",statCountL:"Casos documentados",statZeroL:"Rótulos en catalán",statInfL:"Vergüenza ajena",statPctL:"En Cataluña",mapHeader:"🗺 Mapa de la Tontería — Todos los lugares documentados",secLabel:"El directorio",secH:"Los establecimientos catalogados",secDesc:"Casos documentados, revisados y publicados.",whyLabel:"Reflexión final",whyH:"¿Por qué pasa esto?",whyQuote:"Poner el rótulo en inglés no hace el negocio mejor. Hace que parezca que el propietario no confía en que sus vecinos entiendan lo que vende.",whyBody:`<p>Hay razones comprensibles: Barcelona recibe millones de turistas, el inglés es la lengua franca global. Hasta aquí, todo lógico.</p><p style="margin-top:14px">El problema es cuando un negocio completamente local decide poner el rótulo en una lengua que no es la de nadie que vive alrededor. No por necesidad, sino por <em>aspiración estética</em>.</p><p style="margin-top:14px">La tontería no es el inglés. La tontería es no darse cuenta de que «La Barbería de la Calle» o «El Helechito» suenan exactamente igual de bien — o mejor — que sus versiones en inglés.</p>`,submitH:"¿Conoces otro caso?",submitDesc:"Si has visto una panadería «The Bakery» o cualquier otro absurdo lingüístico en Cataluña, envíalo aquí.",fldNameL:"Nombre del negocio",fldAddrL:"Dirección",fldProvL:"Provincia",fldMuniL:"Municipio",fldCatL:"Tipo de negocio",fldDescL:"Descripción breve",fldEmailL:"Tu email (opcional)",fldPhotoL:"Foto del rótulo (opcional)",submitBtn:"Enviar caso →",formOk:"✓ Caso recibido. Lo revisaremos pronto.",formErr:"Error al enviar. Inténtalo de nuevo.",loginTitle:"Panel de administrador",loginDesc:"Introduce la contraseña de administrador.",footerDesc:"Un archivo satírico del paisaje comercial de Cataluña · España",footerDisclaimer:"Los comentarios editoriales son opinión y sátira.",pendingOf:"de revisión editorial",approveBtn:"Aprobar ✓",rejectBtn:"Rechazar ✗",deleteBtn:"Eliminar",commentLabel:"Comentario editorial",mapBtn:"Ver en el mapa ↗",noEntries:"No hay casos publicados aún.",noPending:"No hay submissions pendientes.",catNames:{cafeteria:"Cafetería / Café",restaurant:"Restaurante / Brunch",barberia:"Barbería / Peluquería",botiga:"Tienda / Comercio",beaute:"Estética / Belleza",negoci:"Oficina / Servicios",vehicle:"Vehículo / Movilidad",altre:"Otro"},submittedBy:"Enviado por",shareWA:"💬 WhatsApp",shareTW:"𝕏 Twitter",shareMS:"🐘 Mastodon",shareCopy:"🔗 Copiar",copied:"✓ ¡Enlace copiado!",visits:"visita",visitsPlural:"visitas",dictLabel:"Glosario oficial",dictH:"Diccionario del Absurdo",dictDesc:"Una guía de supervivencia para entender los rótulos barceloneses.",dictCol1:"Inglés misterioso",dictCol2:"Traducción revolucionaria",dictCol3:"Comentario editorial",dictFooter:"Si una palabra tiene una traducción perfectamente normal, probablemente acabamos de encontrar material para esta web.",tonteriaIndexTitle:"🏆 ÍNDICE DE TONTERÍA ANGLÓFILA™",escalaOficial:"ESCALA OFICIAL",filterLbl:"Filtro:",filterAll:"Todos",dictSortEn:"A–Z inglés",dictSortCa:"A–Z catalán",dictSortEs:"A–Z castellano",dictSearchPh:"🔍 Buscar en inglés, catalán o castellano…",casSearchPh:"🔍 Buscar caso o municipio…",fldNamePh:"p. ej: The Cozy Corner",fldAddrPh:"Calle, número, barrio",fldMuniPh:"p. ej: Sabadell, Girona, Reus…",fldDescPh:"Explica por qué te parece un absurdo…",fldEmailPh:"correo@ejemplo.com",dictProposeBtnLbl:"Proponer entrada",fldUbicacioL:"Ubicación (opcional)",gpsBtnLbl:"Usar mi ubicación",btnFerFoto:"📷 Hacer foto",btnTriarFitxer:"🖼 Elegir archivo",catOptSelect:"-- Selecciona --",catOptAltre:"Otro"},
+  en:{kicker:"Satirical Directory · Catalonia · Since 2025",mainSub:"A guide to Catalonia's businesses that have forgotten where they are — and what language they speak",meta1:"🗺 Catalonia, Spain",meta2:"🔤 Official languages: Catalan and Spanish",meta3:"🇬🇧 Sign language: English, surprisingly",meta4:"🤷 Reason: mysterious",statCountL:"Documented cases",statZeroL:"Signs in Catalan",statInfL:"Second-hand embarrassment",statPctL:"In Catalonia",mapHeader:"🗺 Map of The Silliness — All documented locations",secLabel:"The directory",secH:"The catalogued establishments",secDesc:"Documented, reviewed and published cases.",whyLabel:"A final thought",whyH:"Why does this happen?",whyQuote:"Putting up a sign in English doesn't make the business better. It makes it look like the owner doesn't trust their neighbours to understand what they're selling.",whyBody:`<p>There are understandable reasons: Barcelona receives millions of tourists, English is the global lingua franca. So far, so logical.</p><p style="margin-top:14px">The problem arises when a completely local business decides to put up a sign in a language that nobody living nearby actually speaks. Not out of necessity, but out of <em>aesthetic aspiration</em>.</p><p style="margin-top:14px">The silliness isn't English. The silliness is failing to notice that «La Barberia del Carrer» or «La Falgueta» sound just as good — or better — than their English versions.</p>`,submitH:"Know another case?",submitDesc:"If you've spotted a bakery called «The Bakery» or any other linguistic absurdity in Catalonia, send it here.",fldNameL:"Business name (as on the sign)",fldAddrL:"Address",fldProvL:"Province",fldMuniL:"Town / City",fldCatL:"Type of business",fldDescL:"Brief description (why is it silly?)",fldEmailL:"Your email (optional)",fldPhotoL:"Photo of the sign (optional)",submitBtn:"Submit case →",formOk:"✓ Case received! We'll review it soon.",formErr:"Error sending. Please try again.",loginTitle:"Admin panel",loginDesc:"Enter the admin password.",footerDesc:"A satirical archive of Catalonia's commercial landscape · Spain",footerDisclaimer:"Editorial comments are opinion and satire.",pendingOf:"awaiting editorial review",approveBtn:"Approve ✓",rejectBtn:"Reject ✗",deleteBtn:"Delete",commentLabel:"Editorial comment",mapBtn:"View on map ↗",noEntries:"No published cases yet.",noPending:"No pending submissions.",catNames:{cafeteria:"Café / Coffee shop",restaurant:"Restaurant / Brunch",barberia:"Barbershop / Hairdresser",botiga:"Shop / Store",beaute:"Beauty / Aesthetics",negoci:"Office / Services",vehicle:"Vehicle / Mobility",altre:"Other"},submittedBy:"Submitted by",shareWA:"💬 WhatsApp",shareTW:"𝕏 Twitter",shareMS:"🐘 Mastodon",shareCopy:"🔗 Copy",copied:"✓ Link copied!",visits:"visit",visitsPlural:"visits",dictLabel:"Official glossary",dictH:"Dictionary of the Absurd",dictDesc:"A survival guide to understanding what Barcelona's business signs actually say.",dictCol1:"Mysterious English",dictCol2:"Revolutionary translation",dictCol3:"Editorial comment",dictFooter:"If a word has a perfectly normal translation, we've probably just found material for this website.",tonteriaIndexTitle:"🏆 ANGLOPHONE SILLINESS INDEX™",escalaOficial:"OFFICIAL SCALE",filterLbl:"Filter:",filterAll:"All",dictSortEn:"A–Z English",dictSortCa:"A–Z Catalan",dictSortEs:"A–Z Spanish",dictSearchPh:"🔍 Search in English, Catalan or Spanish…",casSearchPh:"🔍 Search case or town…",fldNamePh:"e.g. The Cozy Corner",fldAddrPh:"Street, number, neighbourhood",fldMuniPh:"e.g. Sabadell, Girona, Reus…",fldDescPh:"Explain why this is absurd…",fldEmailPh:"email@example.com",dictProposeBtnLbl:"Suggest an entry",fldUbicacioL:"Location (optional)",gpsBtnLbl:"Use my location",btnFerFoto:"📷 Take photo",btnTriarFitxer:"🖼 Choose file",catOptSelect:"-- Select --",catOptAltre:"Other"},
 };
 
 // ── STATE ──────────────────────────────────────────────────────────────────
@@ -1243,6 +1256,7 @@ function buildMap(entries) {
   const colors = ['#4caf50','#a8c61b','#f0a500','#e07000','#d03020','#8b0000'];
   if (!leafletMap) {
     leafletMap = L.map('mapa', {scrollWheelZoom: false, zoomControl: true}).setView([41.392, 2.168], 13);
+    window._map = leafletMap;
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19
@@ -1313,10 +1327,25 @@ let dictEditIdx = -1; // -1 = nova entrada
 
 function dictGetFiltered() {
   const q = (document.getElementById('dictSearch')||{value:''}).value.trim().toLowerCase();
-  let arr = DICT.map((r,i) => ({...r, _orig: i}));
-  if (q) arr = arr.filter(r => r.en.toLowerCase().includes(q) || r.ca.toLowerCase().includes(q) || (r.es||'').toLowerCase().includes(q));
+  let arr = DICT.map((r,i) => ({...r, _orig: i, _matchLang: null}));
+  if (q) {
+    arr = arr.filter(r => r.en.toLowerCase().includes(q) || r.ca.toLowerCase().includes(q) || (r.es||'').toLowerCase().includes(q));
+    arr.forEach(r => {
+      const matchEn = r.en.toLowerCase().includes(q);
+      const matchCa = r.ca.toLowerCase().includes(q);
+      const matchEs = (r.es||'').toLowerCase().includes(q);
+      if (matchEs && !matchEn && !matchCa) {
+        r._matchLang = 'es';
+      } else if (matchCa && !matchEn) {
+        r._matchLang = 'ca';
+      } else {
+        r._matchLang = 'en';
+      }
+    });
+  }
   if (dictSort === 'en') arr.sort((a,b) => a.en.localeCompare(b.en));
   else if (dictSort === 'ca') arr.sort((a,b) => a.ca.localeCompare(b.ca, 'ca'));
+  else if (dictSort === 'es') arr.sort((a,b) => (a.es||'').localeCompare(b.es||'', 'es'));
   else arr.sort((a,b) => a._orig - b._orig);
   return arr;
 }
@@ -1326,10 +1355,21 @@ function dictUpdate() {
 }
 function dictSetSort(s) {
   dictSort = s;
-  ['en','ca','orig'].forEach(k => {
-    const b = document.getElementById('dsort-' + k);
-    if (b) b.classList.toggle('active', k === s);
+  // Actualitza classes sort-col-active a les capçaleres
+  ['dictCol1','dictCol2'].forEach(c => {
+    const el = document.getElementById(c);
+    if (el) el.classList.remove('sort-col-active');
   });
+  const activeCol = (s==='en') ? 'dictCol1' : 'dictCol2';
+  const activeEl = document.getElementById(activeCol);
+  if (activeEl) activeEl.classList.add('sort-col-active');
+  // Actualitza colors de les fletxes de manera explícita
+  ['dictCol1','dictCol2'].forEach(c => {
+    const arrow = document.getElementById(c + 'Arrow');
+    if (arrow) arrow.style.color = 'rgba(255,255,255,.3)';
+  });
+  const activeArrow = document.getElementById(activeCol + 'Arrow');
+  if (activeArrow) activeArrow.style.color = '#fff';
   dictUpdate();
 }
 function dictSetPage(n) {
@@ -1348,9 +1388,13 @@ function dictGoPage(p) {
 
 function renderDict() {
   const di = {label:t('dictLabel'),h:t('dictH'),desc:t('dictDesc'),col1:t('dictCol1'),col2:t('dictCol2'),col3:t('dictCol3'),footer:t('dictFooter')};
-  ['dictLabel','dictH','dictDesc','dictCol1','dictCol2','dictCol3','dictFooter'].forEach((id,i)=>{
-    const el=document.getElementById(id); if(el) el.textContent=[di.label,di.h,di.desc,di.col1,di.col2,di.col3,di.footer][i];
+  // Use Lbl spans for col1/col2 to avoid destroying the arrow spans inside the header divs
+  ['dictLabel','dictH','dictDesc','dictCol3','dictFooter'].forEach((id,i)=>{
+    const vals=[di.label,di.h,di.desc,di.col3,di.footer];
+    const el=document.getElementById(id); if(el) el.textContent=vals[i];
   });
+  const lbl1=document.getElementById('dictCol1Lbl'); if(lbl1) lbl1.textContent=di.col1;
+  const lbl2=document.getElementById('dictCol2Lbl'); if(lbl2) lbl2.textContent=di.col2;
   // botons admin vs públic
   const addBtn = document.getElementById('dictAddBtn');
   const propBtn = document.getElementById('dictProposeBtn');
@@ -1363,16 +1407,24 @@ function renderDict() {
 
   const rows = document.getElementById('dictRows');
   if (!rows) return;
-  const transl = lang === 'en' ? 'eng' : lang;
   const filtered = dictGetFiltered();
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / dictPageSize));
   if (dictPageNum >= totalPages) dictPageNum = totalPages - 1;
   const page = filtered.slice(dictPageNum * dictPageSize, (dictPageNum + 1) * dictPageSize);
 
+  // Restaura classe sort activa (pot haver-se perdut si el DOM s'ha regenerat)
+  ['dictCol1','dictCol2'].forEach(c=>{const el=document.getElementById(c);if(el)el.classList.remove('sort-col-active');});
+  const _activeCol=(dictSort==='en')?'dictCol1':'dictCol2';
+  const _activeEl=document.getElementById(_activeCol);if(_activeEl)_activeEl.classList.add('sort-col-active');
+  // Restaura colors de les fletxes de manera explícita
+  ['dictCol1','dictCol2'].forEach(c=>{const arrow=document.getElementById(c+'Arrow');if(arrow)arrow.style.color='rgba(255,255,255,.3)';});
+  const _activeArrow=document.getElementById(_activeCol+'Arrow');if(_activeArrow)_activeArrow.style.color='#fff';
+
   rows.innerHTML = page.map((row, i) => {
     const bg = i%2===0?'var(--paper)':'var(--cream)';
     const origIdx = row._orig;
+    const transl = row._matchLang ? (row._matchLang === 'en' ? 'eng' : row._matchLang) : (lang === 'en' ? 'eng' : lang);
     const adminCols = isAdmin
       ? '<div style="display:flex;gap:4px;padding:0 12px;align-items:center">'
         + '<button class="dict-row-edit" onclick="dictOpenEdit(' + origIdx + ')">✏</button>'
@@ -1477,19 +1529,40 @@ async function dictAutoTranslate() {
   status.style.display = 'block';
   status.textContent = 'Consultant la IA…';
   try {
-    const res = await fetch('/.netlify/functions/translate', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ ca, eng, comment: document.getElementById('dmcomment').value.trim() })
-    });
-    if (!res.ok) throw new Error('Error ' + res.status);
-    const data = await res.json();
-    if (data.es) document.getElementById('dmes').value = data.es;
-    if (data.comment_es) document.getElementById('dmcomment_es').value = data.comment_es;
-    if (data.comment_en) document.getElementById('dmcomment_en').value = data.comment_en;
-    status.textContent = '✓ Traduccions generades — revisa-les abans de desar';
+    let res;
+    try {
+      res = await fetch('/.netlify/functions/translate', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ ca, eng, comment: document.getElementById('dmcomment').value.trim() })
+      });
+    } catch(err) {
+      console.error('Translate fetch error:', err);
+      btn.textContent = '✨ Traduir automàticament'; btn.disabled = false;
+      status.textContent = '⚠ Error xarxa: ' + err.message;
+      showToast('⚠ Error xarxa: ' + err.message);
+      return;
+    }
+    let data;
+    try { data = await res.json(); } catch(_) { data = {}; }
+    if (!res.ok) {
+      console.error('Translate error:', res.status, data);
+      status.textContent = '⚠ Error ' + res.status + ': ' + JSON.stringify(data).slice(0,200);
+      showToast('⚠ Error ' + res.status + ': ' + JSON.stringify(data).slice(0,200));
+    } else if (data.error) {
+      console.error('Translate error:', data);
+      status.textContent = '⚠ Error: ' + JSON.stringify(data).slice(0,200);
+      showToast('⚠ Error: ' + JSON.stringify(data).slice(0,200));
+    } else {
+      if (data.es) document.getElementById('dmes').value = data.es;
+      if (data.comment_es) document.getElementById('dmcomment_es').value = data.comment_es;
+      if (data.comment_en) document.getElementById('dmcomment_en').value = data.comment_en;
+      status.textContent = '✓ Traduccions generades — revisa-les abans de desar';
+    }
   } catch(e) {
-    status.textContent = '⚠ Error: ' + e.message;
+    console.error('Translate unexpected error:', e);
+    status.textContent = '⚠ Error inesperat: ' + e.message;
+    showToast('⚠ Error: ' + e.message);
   } finally {
     btn.disabled = false;
     btn.textContent = '✨ Traduir automàticament';
@@ -1598,6 +1671,121 @@ async function loadDict() {
   if (!error && data) { DICT = data; renderDict(); }
 }
 
+// ── MAPA FULLSCREEN (legacy, mantingut per compatibilitat) ───────────────────
+function toggleMapFullscreen() {
+  // En desktop, usem el float; en mòbil, el fullscreen clàssic
+  if (window.innerWidth >= 768) { openMapFloat(); return; }
+  const wrap = document.querySelector('.map-wrap');
+  const btn = document.getElementById('mapFsBtn');
+  const isFs = wrap.classList.toggle('map-fullscreen');
+  if (isFs) {
+    btn.textContent = '✕ ' + (lang==='en'?'Exit fullscreen':lang==='es'?'Salir':'Sortir');
+    document.body.style.overflow = 'hidden';
+  } else {
+    btn.textContent = '⛶ ' + (lang==='en'?'Full screen':'Pantalla completa');
+    document.body.style.overflow = '';
+  }
+  setTimeout(()=>{ if(window._map) window._map.invalidateSize(); }, 50);
+}
+
+// ── MAPA FLOTANT ─────────────────────────────────────────────────────────────
+let _mapFloatOpen = false;
+function openMapFloat() {
+  if (window.innerWidth < 768) { toggleMapFullscreen(); return; }
+  const floatEl = document.getElementById('mapFloat');
+  const mapaEl = document.getElementById('mapa');
+  const mapaFloatEl = document.getElementById('mapaFloat');
+  const wrap = document.querySelector('.map-wrap');
+  if (!floatEl || !mapaEl || !mapaFloatEl) return;
+  // Mou el div #mapa al panel flotant
+  mapaFloatEl.appendChild(mapaEl);
+  mapaEl.style.width = '100%';
+  mapaEl.style.height = '100%';
+  mapaEl.style.minHeight = '';
+  // Amaga el contenidor original
+  if (wrap) wrap.classList.add('map-content-hidden');
+  floatEl.style.display = 'flex';
+  _mapFloatOpen = true;
+  setTimeout(()=>{ if(window._map) window._map.invalidateSize(); }, 100);
+}
+function closeMapFloat() {
+  const floatEl = document.getElementById('mapFloat');
+  const mapaEl = document.getElementById('mapa');
+  const wrap = document.querySelector('.map-wrap');
+  if (!floatEl || !mapaEl) return;
+  // Retorna #mapa al seu lloc original (dins .map-wrap, després del .map-header)
+  mapaEl.style.height = '440px';
+  if (wrap) {
+    wrap.appendChild(mapaEl);
+    wrap.classList.remove('map-content-hidden');
+  }
+  floatEl.style.display = 'none';
+  _mapFloatOpen = false;
+  setTimeout(()=>{ if(window._map) window._map.invalidateSize(); }, 80);
+}
+
+// Drag del panel flotant
+(function() {
+  let dragging = false, ox = 0, oy = 0, startX = 0, startY = 0;
+  document.addEventListener('mousedown', function(e) {
+    const header = document.getElementById('mapFloatHeader');
+    if (!header) return;
+    if (header.contains(e.target) && e.target.tagName !== 'BUTTON') {
+      dragging = true;
+      const floatEl = document.getElementById('mapFloat');
+      const rect = floatEl.getBoundingClientRect();
+      ox = rect.left; oy = rect.top;
+      startX = e.clientX; startY = e.clientY;
+      floatEl.style.transform = 'none';
+      floatEl.style.left = ox + 'px';
+      floatEl.style.top = oy + 'px';
+      e.preventDefault();
+    }
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    const floatEl = document.getElementById('mapFloat');
+    if (!floatEl) return;
+    floatEl.style.left = (ox + e.clientX - startX) + 'px';
+    floatEl.style.top  = (oy + e.clientY - startY) + 'px';
+  });
+  document.addEventListener('mouseup', function() { dragging = false; });
+})();
+
+// Resize del panel flotant
+(function() {
+  let resizing = false, rx = 0, ry = 0, rw = 0, rh = 0;
+  document.addEventListener('mousedown', function(e) {
+    const handle = document.getElementById('mapFloatResize');
+    if (handle && handle.contains(e.target)) {
+      resizing = true;
+      const floatEl = document.getElementById('mapFloat');
+      rw = floatEl.offsetWidth; rh = floatEl.offsetHeight;
+      rx = e.clientX; ry = e.clientY;
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!resizing) return;
+    const floatEl = document.getElementById('mapFloat');
+    if (!floatEl) return;
+    const newW = Math.max(400, rw + e.clientX - rx);
+    const newH = Math.max(300, rh + e.clientY - ry);
+    floatEl.style.width = newW + 'px';
+    floatEl.style.height = newH + 'px';
+    if (window._map) window._map.invalidateSize();
+  });
+  document.addEventListener('mouseup', function() { resizing = false; });
+})();
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (_mapFloatOpen) { closeMapFloat(); return; }
+    if (document.querySelector('.map-wrap.map-fullscreen')) toggleMapFullscreen();
+  }
+});
+
 // ── LANG ───────────────────────────────────────────────────────────────────
 function setLang(l) {
   lang = l;
@@ -1629,10 +1817,11 @@ function applyLang(l) {
       if(opt&&T[l].catNames[cat])opt.textContent=T[l].catNames[cat];
     });
   }
-  // Botons de diccionari (sort)
-  const dse=document.getElementById('dsort-en');if(dse)dse.textContent=T[l].dictSortEn||'';
-  const dsc=document.getElementById('dsort-ca');if(dsc)dsc.textContent=T[l].dictSortCa||'';
-  const dso=document.getElementById('dsort-orig');if(dso)dso.textContent=T[l].dictSortOrig||'';
+  // Fix botó "Tots" — actualització directa
+  const fAllBtn=document.getElementById('fAll');if(fAllBtn){const sp=fAllBtn.querySelector('span');if(sp)sp.textContent=T[l].filterAll||'Tots';}
+  // Botó fullscreen/float mapa
+  const mapFsBtn=document.getElementById('mapFsBtn');
+  if(mapFsBtn){const isFs=document.querySelector('.map-wrap.map-fullscreen');mapFsBtn.textContent=isFs?'✕ '+(l==='en'?'Exit fullscreen':l==='es'?'Salir':'Sortir'):'⛶ '+(l==='en'?'Full screen':l==='es'?'Pantalla completa':'Pantalla completa');}
   // Category buttons text
   if (T[l].catNames) {
     ['cafeteria','restaurant','barberia','botiga','beaute','negoci','vehicle'].forEach(cat=>{
@@ -1664,6 +1853,7 @@ function doLogin() {
     document.getElementById('adminLoginBtn').style.display = 'none';
     loadPending();
     loadDictProposals();
+    setTimeout(()=>applyLang(lang), 50); // força re-render en l'idioma actiu
     renderPublic();
   } else {
     document.getElementById('loginErr').style.display = 'block';
@@ -1877,6 +2067,7 @@ async function init() {
   initPhotoUpload();
   await seedIfEmpty();
   await Promise.all([loadPublished(), loadVisitCounts(), loadDict()]);
+  dictSetSort('en'); // estableix columna activa per defecte
   applyLang(lang);
   // Realtime subscriptions
   sb.channel('entries-changes')
@@ -1987,6 +2178,18 @@ if ('serviceWorker' in navigator) {
 
 <!-- PWA Install Banner -->
 <div id="pwaBanner" class="hidden"></div>
+
+<!-- Map Float Panel -->
+<div id="mapFloat">
+  <div id="mapFloatHeader">
+    <span>🗺 Mapa de la Tonteria</span>
+    <button onclick="closeMapFloat()" style="background:none;border:1px solid rgba(255,255,255,.3);color:var(--paper);padding:2px 10px;cursor:pointer;font-size:13px;border-radius:2px;font-family:'DM Mono',monospace;">✕ Tancar</button>
+  </div>
+  <div id="mapFloatBody">
+    <div id="mapaFloat"></div>
+    <div id="mapFloatResize"></div>
+  </div>
+</div>
 
 </body>
 </html>
