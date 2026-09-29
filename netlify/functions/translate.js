@@ -49,7 +49,7 @@ Respon ÚNICAMENT amb JSON vàlid, sense cap text addicional:
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'claude-3-haiku-20240307',
         max_tokens: 300,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -57,7 +57,7 @@ Respon ÚNICAMENT amb JSON vàlid, sense cap text addicional:
 
     if (!response.ok) {
       const err = await response.text();
-      return { statusCode: 502, body: JSON.stringify({ error: 'Error API: ' + err }) };
+      return { statusCode: 502, body: JSON.stringify({ error: 'Error API (status ' + response.status + '): ' + err.slice(0,300) }) };
     }
 
     const data = await response.json();
