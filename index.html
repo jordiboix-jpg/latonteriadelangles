@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<!-- v44 build:20260930-1230 -->
+<!-- v45 build:20260930-1600 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>La Tonteria de l'Anglès</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#1a1209">
@@ -334,6 +337,122 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .entry-comment{font-size:14px}
   .entry-tag{font-size:9px}
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE APP — hidden on desktop, shown on mobile
+═══════════════════════════════════════════════════════════════ */
+#mobileApp{display:none;flex-direction:column;height:100dvh;height:100vh;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--paper);z-index:100}
+
+@media(max-width:767px){
+  /* Hide all desktop sections */
+  .masthead,.lang-bar,.admin-bar,.stats-bar,.section,.dict-section,.submit-section,.manifesto,footer,hr.rule,.carousel-wrap,#mapFloatAnchor,#mapFloat,#pwaBanner{display:none!important}
+  body{overflow:hidden}
+
+  /* Show mobile app */
+  #mobileApp{display:flex!important}
+
+  /* ── HEADER ── */
+  #mobileHeader{background:var(--ink);color:var(--paper);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:3px solid var(--rust)}
+  #mobileTitle{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;flex:1;letter-spacing:-.01em}
+  #mobileTitle em{font-style:italic;color:var(--rust)}
+  #mobileStats{font-family:'DM Mono',monospace;font-size:9px;color:#a09070;letter-spacing:.05em;flex:1;text-align:center}
+  .mStatSep{margin:0 4px;opacity:.5}
+  #mobileHeaderRight{display:flex;gap:4px;flex-shrink:0}
+  #mDarkBtn,#mLangBtn{background:transparent;border:1px solid #4a3a28;color:#a09070;padding:5px 8px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;border-radius:2px;transition:all .15s}
+  #mDarkBtn:hover,#mLangBtn:hover{color:var(--paper);border-color:var(--paper)}
+
+  /* ── CONTENT AREA ── */
+  #mobileContent{flex:1;overflow:hidden;position:relative}
+  .mTab{display:none;height:100%;overflow-y:auto;padding-bottom:8px}
+  .mTab.active{display:flex;flex-direction:column}
+
+  /* ── TAB: CASOS ── */
+  #mCasosSearch{background:var(--paper);padding:10px 14px;border-bottom:var(--border);flex-shrink:0;position:sticky;top:0;z-index:10}
+  #mCasosQ{width:100%;font-family:'DM Mono',monospace;font-size:13px;padding:8px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:2px}
+  #mCasosQ:focus{outline:none;border-color:var(--rust)}
+  #mCatFilter{display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  #mCatFilter::-webkit-scrollbar{display:none}
+  .mCatBtn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em;white-space:nowrap;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:4px 10px;cursor:pointer;border-radius:12px;flex-shrink:0;transition:all .15s}
+  .mCatBtn.active{background:var(--rust);border-color:var(--rust);color:var(--paper)}
+  #mCasosList{flex:1;overflow-y:auto}
+
+  /* Mobile case card */
+  .mCaseCard{padding:14px 16px;border-bottom:var(--border);cursor:pointer;transition:background .15s;position:relative}
+  .mCaseCard:active{background:var(--cream)}
+  .mCaseCardHeader{display:flex;align-items:flex-start;gap:10px}
+  .mCaseNum{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0;margin-top:2px}
+  .mCaseTitle{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--ink);line-height:1.2;flex:1}
+  .mCaseAddr{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .mCaseTindex{display:flex;align-items:center;gap:4px;margin-top:6px}
+  .mCaseTindexDots{font-size:12px;letter-spacing:1px}
+  .mCaseTag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--rule);padding:1px 6px;border-radius:10px}
+  .mCaseBody{display:none;padding-top:10px;font-size:14px;line-height:1.6;color:var(--ink)}
+  .mCaseBody.open{display:block}
+  .mCaseDesc{color:var(--ink);margin-bottom:8px}
+  .mCaseComment{font-style:italic;color:var(--muted);font-size:13px;padding-left:10px;border-left:3px solid var(--rule)}
+  .mCaseTransl{font-family:'DM Mono',monospace;font-size:11px;color:var(--rust);margin-bottom:6px}
+  .mCaseMapLink{display:inline-block;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--rust);text-decoration:none;border:1px solid var(--rust);padding:4px 10px;border-radius:2px}
+
+  /* ── TAB: DICCIONARI ── */
+  #mDictSearch{background:var(--paper);padding:10px 14px;border-bottom:var(--border);flex-shrink:0;position:sticky;top:0;z-index:10}
+  #mDictQ{width:100%;font-family:'DM Mono',monospace;font-size:13px;padding:8px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:2px}
+  #mDictQ:focus{outline:none;border-color:var(--rust)}
+  #mDictList{flex:1;overflow-y:auto}
+  .mDictRow{padding:12px 16px;border-bottom:var(--border);cursor:pointer;transition:background .15s}
+  .mDictRow:active{background:var(--cream)}
+  .mDictEng{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--rust);margin-bottom:3px}
+  .mDictCa{font-size:14px;color:var(--ink);margin-bottom:2px}
+  .mDictComment{display:none;font-size:13px;font-style:italic;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--rule)}
+  .mDictComment.open{display:block}
+
+  /* ── TAB: MAPA ── */
+  #mTabMapa{padding:0}
+  #mMapContainer{width:100%;height:100%;min-height:400px}
+
+  /* ── TAB: REPORTAR ── */
+  #mTabReportar{padding:0 0 16px}
+  #mReportarForm{padding:16px}
+
+  /* Step bar */
+  #mStepBar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:20px;padding:4px 0}
+  .mStep{width:28px;height:28px;border-radius:50%;background:var(--rule);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;transition:all .3s}
+  .mStep.active{background:var(--rust);color:var(--paper)}
+  .mStep.done{background:var(--green);color:var(--paper)}
+  .mStepLine{flex:1;height:2px;background:var(--rule);max-width:40px;transition:background .3s}
+  .mStepLine.done{background:var(--green)}
+
+  /* Form steps */
+  .mFormStep{display:none}
+  .mFormStep.active{display:block}
+  .mFormTitle{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:16px;color:var(--ink)}
+  .mField{margin-bottom:14px}
+  .mField label{display:block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .mField input,.mField select,.mField textarea{width:100%;font-family:'Source Serif 4',Georgia,serif;font-size:15px;padding:10px 12px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:2px;transition:border-color .15s;appearance:none;-webkit-appearance:none}
+  .mField select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b5e4a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+  .mField input:focus,.mField select:focus,.mField textarea:focus{outline:none;border-color:var(--rust)}
+  .mField textarea{resize:vertical;min-height:80px}
+  .mNextBtn{width:100%;background:var(--rust);color:var(--paper);border:none;padding:14px;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .15s;margin-top:4px}
+  .mNextBtn:hover{background:#d4562a}
+  .mBackBtn{flex:1;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:12px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.1em;cursor:pointer;border-radius:2px;transition:all .15s}
+  .mBackBtn:hover{border-color:var(--ink);color:var(--ink)}
+  .mSubmitBtn{flex:2;background:var(--green);color:var(--paper);border:none;padding:12px;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .15s}
+  .mSubmitBtn:hover{background:#3a8050}
+  .mPhotoBtn,.mGpsBtn{background:var(--cream);border:var(--border);color:var(--ink);padding:10px 16px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.05em;cursor:pointer;border-radius:2px;transition:all .15s}
+  .mPhotoBtn:active,.mGpsBtn:active{background:var(--rule)}
+  .mGpsBtn{width:100%;margin-top:4px;font-size:14px;padding:12px}
+  .mSummaryBox{background:var(--cream);border:var(--border);padding:12px;border-radius:4px;margin-bottom:14px;font-size:13px;line-height:1.7}
+  .mSummaryBox strong{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block}
+
+  /* ── BOTTOM NAV ── */
+  #mBottomNav{display:flex;background:var(--ink);border-top:3px solid var(--rust);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0)}
+  .mNavBtn{flex:1;background:transparent;border:none;color:#a09070;padding:10px 4px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s;font-family:'DM Mono',monospace}
+  .mNavBtn.active{color:var(--paper)}
+  .mNavBtn.active .mNavIcon{transform:scale(1.1)}
+  .mNavIcon{font-size:20px;display:block;line-height:1;transition:transform .2s}
+  .mNavLabel{font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+  .mNavBtnReport .mNavIcon{font-size:22px;background:var(--rust);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--paper);margin-bottom:1px}
+  .mNavBtnReport.active .mNavIcon{background:#d4562a}
+}
 </style>
 </head>
 <body>
@@ -625,6 +744,188 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   </div>
 </div>
 
+<!-- MOBILE APP -->
+<div id="mobileApp">
+  <!-- Compact header -->
+  <div id="mobileHeader">
+    <div id="mobileTitle">La Tonteria de <em>l'Anglès</em></div>
+    <div id="mobileStats">
+      <span id="mStatCount">…</span> casos
+      <span class="mStatSep">·</span>
+      <span id="mStatCities">…</span> municipis
+    </div>
+    <div id="mobileHeaderRight">
+      <button id="mDarkBtn" onclick="toggleDark()">🌙</button>
+      <button id="mLangBtn" onclick="cycleLangMobile()">CA</button>
+    </div>
+  </div>
+
+  <!-- Tab content area -->
+  <div id="mobileContent">
+    <!-- TAB: Casos -->
+    <div id="mTabCasos" class="mTab active">
+      <div id="mCasosSearch">
+        <input type="text" id="mCasosQ" placeholder="🔍 Cercar..." oninput="mRenderCasos()">
+        <div id="mCatFilter">
+          <button class="mCatBtn active" data-cat="all" onclick="mSetCat(this,'all')">Tots</button>
+          <button class="mCatBtn" data-cat="cafeteria" onclick="mSetCat(this,'cafeteria')">☕ Cafè</button>
+          <button class="mCatBtn" data-cat="restaurant" onclick="mSetCat(this,'restaurant')">🍽 Rest.</button>
+          <button class="mCatBtn" data-cat="barberia" onclick="mSetCat(this,'barberia')">✂️ Barb.</button>
+          <button class="mCatBtn" data-cat="botiga" onclick="mSetCat(this,'botiga')">🛍 Botiga</button>
+          <button class="mCatBtn" data-cat="beaute" onclick="mSetCat(this,'beaute')">💅 Bellesa</button>
+        </div>
+      </div>
+      <div id="mCasosList"></div>
+    </div>
+
+    <!-- TAB: Diccionari -->
+    <div id="mTabDiccionari" class="mTab">
+      <div id="mDictSearch">
+        <input type="text" id="mDictQ" placeholder="🔍 Cercar al diccionari..." oninput="mRenderDict()">
+      </div>
+      <div id="mDictList"></div>
+    </div>
+
+    <!-- TAB: Mapa -->
+    <div id="mTabMapa" class="mTab">
+      <div id="mMapContainer"></div>
+    </div>
+
+    <!-- TAB: Reportar -->
+    <div id="mTabReportar" class="mTab">
+      <div id="mReportarForm">
+        <!-- Step indicator -->
+        <div id="mStepBar">
+          <div class="mStep active" id="mStep1dot">1</div>
+          <div class="mStepLine"></div>
+          <div class="mStep" id="mStep2dot">2</div>
+          <div class="mStepLine"></div>
+          <div class="mStep" id="mStep3dot">3</div>
+          <div class="mStepLine"></div>
+          <div class="mStep" id="mStep4dot">4</div>
+        </div>
+
+        <!-- Step 1: Nom i tipus -->
+        <div id="mFormStep1" class="mFormStep active">
+          <h3 class="mFormTitle">El negoci</h3>
+          <div class="mField">
+            <label>Nom del negoci (tal com apareix al rètol)</label>
+            <input type="text" id="mfName" placeholder="p. ex: The Cozy Corner">
+          </div>
+          <div class="mField">
+            <label>Tipus de negoci</label>
+            <select id="mfCat">
+              <option value="">-- Selecciona --</option>
+              <option value="cafeteria">☕ Cafeteria / Cafè</option>
+              <option value="restaurant">🍽 Restaurant / Brunch</option>
+              <option value="barberia">✂️ Barberia / Perruqueria</option>
+              <option value="botiga">🛍 Botiga / Comerç</option>
+              <option value="beaute">💅 Estètica / Bellesa</option>
+              <option value="negoci">🏢 Oficina / Serveis</option>
+              <option value="vehicle">🚗 Vehicle / Mobilitat</option>
+              <option value="altre">📦 Altre</option>
+            </select>
+          </div>
+          <div class="mField">
+            <label>Descripció breu (per què és una tonteria?)</label>
+            <textarea id="mfDesc" placeholder="Explica per què et sembla absurd…" rows="3"></textarea>
+          </div>
+          <button class="mNextBtn" onclick="mStepNext(1)">Continuar →</button>
+        </div>
+
+        <!-- Step 2: Adreça -->
+        <div id="mFormStep2" class="mFormStep">
+          <h3 class="mFormTitle">On és?</h3>
+          <div class="mField">
+            <label>Adreça (carrer i número)</label>
+            <input type="text" id="mfAddr" placeholder="Carrer, número, barri">
+          </div>
+          <div class="mField">
+            <label>Província</label>
+            <select id="mfProv" onchange="mLoadMunicipis()">
+              <option value="">-- Selecciona --</option>
+              <option value="08">Barcelona</option>
+              <option value="17">Girona</option>
+              <option value="25">Lleida</option>
+              <option value="43">Tarragona</option>
+            </select>
+          </div>
+          <div class="mField">
+            <label>Municipi</label>
+            <select id="mfMuni" disabled>
+              <option value="">-- Primer selecciona la província --</option>
+            </select>
+            <div id="mMuniLoading" style="display:none;font-size:12px;color:var(--muted);margin-top:4px">Carregant municipis…</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="mBackBtn" onclick="mStepBack(2)">← Enrere</button>
+            <button class="mNextBtn" onclick="mStepNext(2)">Continuar →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Foto i ubicació -->
+        <div id="mFormStep3" class="mFormStep">
+          <h3 class="mFormTitle">Foto i ubicació</h3>
+          <div class="mField">
+            <label>Foto del rètol</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="mPhotoBtn" onclick="document.getElementById('mfPhotoCam').click()">📷 Fer foto</button>
+              <button type="button" class="mPhotoBtn" onclick="document.getElementById('mfPhoto').click()">🖼 Galeria</button>
+            </div>
+            <input type="file" id="mfPhoto" accept="image/*" style="display:none" onchange="mPreviewPhoto(this)">
+            <input type="file" id="mfPhotoCam" accept="image/*" capture="environment" style="display:none" onchange="mPreviewPhoto(this)">
+            <img id="mPhotoPreview" style="display:none;max-width:100%;margin-top:10px;border-radius:4px;border:var(--border)">
+          </div>
+          <div class="mField">
+            <label>Ubicació GPS</label>
+            <button type="button" class="mGpsBtn" id="mGpsBtn" onclick="mCaptureGPS()">📍 Capturar ubicació</button>
+            <div id="mGpsStatus" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="mBackBtn" onclick="mStepBack(3)">← Enrere</button>
+            <button class="mNextBtn" onclick="mStepNext(3)">Continuar →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Email i enviar -->
+        <div id="mFormStep4" class="mFormStep">
+          <h3 class="mFormTitle">Gairebé llest!</h3>
+          <div class="mSummaryBox" id="mSummaryBox"></div>
+          <div class="mField">
+            <label>El teu email (opcional)</label>
+            <input type="email" id="mfEmail" placeholder="correu@exemple.com">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="mBackBtn" onclick="mStepBack(4)">← Enrere</button>
+            <button class="mSubmitBtn" id="mSubmitBtn" onclick="mSubmitCase()">Enviar cas →</button>
+          </div>
+          <div id="mFormMsg" style="display:none;margin-top:12px;padding:12px;border-radius:4px;font-family:'DM Mono',monospace;font-size:12px;text-align:center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom tab bar -->
+  <nav id="mBottomNav">
+    <button class="mNavBtn active" data-tab="Casos" onclick="mSwitchTab('Casos',this)">
+      <span class="mNavIcon">📋</span>
+      <span class="mNavLabel" id="mNavCasosLabel">Casos</span>
+    </button>
+    <button class="mNavBtn" data-tab="Diccionari" onclick="mSwitchTab('Diccionari',this)">
+      <span class="mNavIcon">📖</span>
+      <span class="mNavLabel" id="mNavDictLabel">Diccionari</span>
+    </button>
+    <button class="mNavBtn" data-tab="Mapa" onclick="mSwitchTab('Mapa',this)">
+      <span class="mNavIcon">🗺</span>
+      <span class="mNavLabel" id="mNavMapaLabel">Mapa</span>
+    </button>
+    <button class="mNavBtn mNavBtnReport" data-tab="Reportar" onclick="mSwitchTab('Reportar',this)">
+      <span class="mNavIcon">＋</span>
+      <span class="mNavLabel" id="mNavReportarLabel">Reportar</span>
+    </button>
+  </nav>
+</div>
+
 <footer>
   <div class="fl">La Tonteria de l'<em style="color:var(--gold)">Anglès</em></div>
   <p id="footerDesc">Un arxiu satíric del paisatge comercial de Catalunya · Espanya</p>
@@ -791,6 +1092,8 @@ async function loadPublished() {
   publishedEntries.forEach((e,i) => { e.num = String(i+1).padStart(2,'0'); });
   renderPublic();
   updateStats();
+  mUpdateStats();
+  if (isMobile()) mRenderCasos();
 }
 
 async function loadPending() {
@@ -1846,6 +2149,7 @@ function applyLang(l) {
   }
   renderLegend(); renderDict(); renderPublic(); renderMap();
   if (isAdmin) { if(adminView==='pending')renderPending(); if(adminView==='all')renderAll(); }
+  if (isMobile()) { mUpdateLangBtn(); mRenderCasos(); mRenderDict(); }
 }
 
 // ── ADMIN LOGIN ─────────────────────────────────────────────────────────────
@@ -2083,6 +2387,7 @@ async function init() {
   await Promise.all([loadPublished(), loadVisitCounts(), loadDict()]);
   dictSetSort('en'); // estableix columna activa per defecte
   applyLang(lang);
+  if (isMobile()) mInit();
   // Realtime subscriptions
   sb.channel('entries-changes')
     .on('postgres_changes', {event:'*', schema:'public', table:'entries'}, () => {
@@ -2093,6 +2398,369 @@ async function init() {
 }
 
 init();
+
+// ═══════════════════════════════════════════════════════════════
+// MOBILE APP
+// ═══════════════════════════════════════════════════════════════
+let mActiveCat = 'all';
+let mActiveMunicipis = [];
+let mMobileMap = null;
+let mCurrentStep = 1;
+let mPendingPhotoB64 = null;
+let mPendingLat = null, mPendingLng = null;
+
+function isMobile() { return window.innerWidth <= 767; }
+
+function mInit() {
+  if (!isMobile()) return;
+  mUpdateStats();
+  mRenderCasos();
+  mRenderDict();
+  // Update dark btn
+  const btn = document.getElementById('mDarkBtn');
+  if (btn) btn.textContent = darkMode ? '☀️' : '🌙';
+  // Update lang btn
+  mUpdateLangBtn();
+}
+
+function mUpdateStats() {
+  const entries = publishedEntries.length > 0 ? publishedEntries : SEED;
+  const count = entries.length;
+  const cities = new Set(entries.map(e => {
+    const addr = e.addr || '';
+    const parts = addr.split('·');
+    return parts.length > 1 ? parts[parts.length-1].trim().split(',')[0].trim() : '';
+  }).filter(Boolean)).size;
+  const el1 = document.getElementById('mStatCount');
+  const el2 = document.getElementById('mStatCities');
+  if (el1) el1.textContent = count;
+  if (el2) el2.textContent = cities || '—';
+}
+
+function cycleLangMobile() {
+  const langs = ['ca','es','en'];
+  const idx = langs.indexOf(lang);
+  applyLang(langs[(idx+1)%3]);
+  mUpdateLangBtn();
+  mRenderCasos();
+  mRenderDict();
+}
+
+function mUpdateLangBtn() {
+  const btn = document.getElementById('mLangBtn');
+  if (btn) btn.textContent = lang.toUpperCase();
+}
+
+function mSwitchTab(tabName, btn) {
+  // Update tab buttons
+  document.querySelectorAll('.mNavBtn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  // Update tab content
+  document.querySelectorAll('.mTab').forEach(t => t.classList.remove('active'));
+  const tabEl = document.getElementById('mTab' + tabName);
+  if (tabEl) tabEl.classList.add('active');
+  // If mapa tab, init map
+  if (tabName === 'Mapa') mInitMobileMap();
+}
+
+function mInitMobileMap() {
+  const container = document.getElementById('mMapContainer');
+  if (!container || mMobileMap) {
+    if (mMobileMap) mMobileMap.invalidateSize();
+    return;
+  }
+  mMobileMap = L.map('mMapContainer', {zoomControl:true}).setView([41.65, 1.8], 8);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 18
+  }).addTo(mMobileMap);
+  // Add markers
+  const entries = publishedEntries.length > 0 ? publishedEntries : SEED;
+  entries.forEach(e => {
+    const lat = e.lat || (window.COORDS_BY_ID && COORDS_BY_ID[e.id] && COORDS_BY_ID[e.id].lat);
+    const lng = e.lng || (window.COORDS_BY_ID && COORDS_BY_ID[e.id] && COORDS_BY_ID[e.id].lng);
+    if (!lat || !lng) return;
+    const marker = L.marker([lat, lng]).addTo(mMobileMap);
+    const nameEsc = (e.name||'').replace(/'/g,"'");
+    marker.bindPopup('<strong>' + nameEsc + '</strong><br><span style="font-size:12px;color:#666">' + (e.addr||'') + '</span>');
+  });
+  setTimeout(() => mMobileMap.invalidateSize(), 300);
+}
+
+function mSetCat(btn, cat) {
+  mActiveCat = cat;
+  document.querySelectorAll('.mCatBtn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  mRenderCasos();
+}
+
+function mRenderCasos() {
+  const container = document.getElementById('mCasosList');
+  if (!container) return;
+  const q = (document.getElementById('mCasosQ') ? document.getElementById('mCasosQ').value : '').toLowerCase().trim();
+  const entries = publishedEntries.length > 0 ? publishedEntries : SEED;
+  let filtered = entries;
+  if (mActiveCat !== 'all') filtered = filtered.filter(e => e.category === mActiveCat);
+  if (q) filtered = filtered.filter(e => {
+    const name = (e.name||'').toLowerCase();
+    const addr = (e.addr||'').toLowerCase();
+    const desc = (e[lang] && e[lang].desc ? e[lang].desc : '').toLowerCase();
+    return name.includes(q) || addr.includes(q) || desc.includes(q);
+  });
+  if (!filtered.length) {
+    container.innerHTML = '<div style="padding:30px;text-align:center;font-family:\'DM Mono\',monospace;font-size:12px;color:var(--muted)">Cap resultat</div>';
+    return;
+  }
+  container.innerHTML = filtered.map(function(e, i) {
+    const tIdx = TINDEX[e.tonteriaIndex] || TINDEX[3];
+    const dots = Array(5).fill(0).map(function(_,d){ return d < e.tonteriaIndex ? tIdx.emoji : '⬜'; }).join('');
+    const eData = e[lang] || e.ca || {};
+    const googleUrl = e.mapUrl || 'https://maps.google.com/?q=' + encodeURIComponent(e.name);
+    return '<div class="mCaseCard" onclick="mToggleCase(\'mcase_' + i + '\')">'
+      + '<div class="mCaseCardHeader">'
+      + '<div class="mCaseNum">' + escHtml(e.num || String(i+1).padStart(2,'0')) + '</div>'
+      + '<div style="flex:1">'
+      + '<div class="mCaseTitle">' + escHtml(e.name||'') + '</div>'
+      + '<div class="mCaseAddr">' + escHtml(e.addr||'') + '</div>'
+      + '<div class="mCaseTindex">'
+      + '<span class="mCaseTindexDots">' + dots + '</span>'
+      + '<span class="mCaseTag">' + escHtml(e.tag||'') + '</span>'
+      + '</div>'
+      + '</div>'
+      + '</div>'
+      + '<div class="mCaseBody" id="mcase_' + i + '">'
+      + '<div class="mCaseTransl">→ ' + escHtml(eData.transl||'') + '</div>'
+      + '<div class="mCaseDesc">' + escHtml(eData.desc||'') + '</div>'
+      + '<div class="mCaseComment">' + escHtml(eData.comment||'') + '</div>'
+      + '<a class="mCaseMapLink" href="' + escHtml(googleUrl) + '" target="_blank" onclick="event.stopPropagation()">📍 Veure al mapa ↗</a>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function mToggleCase(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+}
+
+function mRenderDict() {
+  const container = document.getElementById('mDictList');
+  if (!container) return;
+  const q = (document.getElementById('mDictQ') ? document.getElementById('mDictQ').value : '').toLowerCase().trim();
+  let rows = DICT.length > 0 ? DICT : [];
+  if (q) rows = rows.filter(function(r) {
+    return (r.eng||'').toLowerCase().includes(q) ||
+           (r.ca||'').toLowerCase().includes(q) ||
+           (r.es||'').toLowerCase().includes(q) ||
+           (r.en||'').toLowerCase().includes(q);
+  });
+  if (!rows.length) {
+    container.innerHTML = '<div style="padding:30px;text-align:center;font-family:\'DM Mono\',monospace;font-size:12px;color:var(--muted)">Cap entrada al diccionari</div>';
+    return;
+  }
+  container.innerHTML = rows.map(function(r, i) {
+    const translation = lang === 'ca' ? r.ca : lang === 'es' ? r.es : r.en || r.ca;
+    const comment = lang === 'ca' ? r.comment : lang === 'es' ? r.comment_es : r.comment_en || r.comment;
+    return '<div class="mDictRow" onclick="mToggleDict(\'mdict_' + i + '\')">'
+      + '<div class="mDictEng">' + escHtml(r.eng||'') + '</div>'
+      + '<div class="mDictCa">' + escHtml(translation||'') + '</div>'
+      + '<div class="mDictComment" id="mdict_' + i + '">' + escHtml(comment||'') + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function mToggleDict(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+// ── STEP FORM ──
+function mStepNext(step) {
+  if (step === 1) {
+    const mfName = document.getElementById('mfName');
+    if (!mfName || !mfName.value.trim()) { alert('Cal indicar el nom del negoci'); return; }
+  }
+  if (step === 2) {
+    const mfProv = document.getElementById('mfProv');
+    if (!mfProv || !mfProv.value) { alert('Cal seleccionar la província'); return; }
+  }
+  if (step === 4) return;
+  mGoToStep(step + 1);
+  if (step + 1 === 4) mBuildSummary();
+}
+
+function mStepBack(step) {
+  if (step <= 1) return;
+  mGoToStep(step - 1);
+}
+
+function mGoToStep(n) {
+  mCurrentStep = n;
+  document.querySelectorAll('.mFormStep').forEach(function(el, i) {
+    el.classList.toggle('active', i + 1 === n);
+  });
+  document.querySelectorAll('.mStep').forEach(function(el, i) {
+    el.classList.remove('active', 'done');
+    if (i + 1 === n) el.classList.add('active');
+    else if (i + 1 < n) el.classList.add('done');
+  });
+  document.querySelectorAll('.mStepLine').forEach(function(el, i) {
+    el.classList.toggle('done', i + 1 < n);
+  });
+  const tabReportar = document.getElementById('mTabReportar');
+  if (tabReportar) tabReportar.scrollTo(0, 0);
+}
+
+function mBuildSummary() {
+  const mfName = document.getElementById('mfName');
+  const name = mfName ? mfName.value : '—';
+  const mfCat = document.getElementById('mfCat');
+  const catVal = mfCat ? mfCat.value : '';
+  const catNames = {cafeteria:'Cafeteria',restaurant:'Restaurant',barberia:'Barberia',botiga:'Botiga',beaute:'Estètica',negoci:'Oficina',vehicle:'Vehicle',altre:'Altre'};
+  const cat = catNames[catVal] || catVal || '—';
+  const mfProv = document.getElementById('mfProv');
+  const prov = mfProv && mfProv.selectedOptions[0] ? mfProv.selectedOptions[0].text : '—';
+  const mfMuni = document.getElementById('mfMuni');
+  const muni = mfMuni && mfMuni.selectedOptions[0] ? mfMuni.selectedOptions[0].text : '—';
+  const mfAddr = document.getElementById('mfAddr');
+  const addr = mfAddr ? mfAddr.value : '';
+  const hasPhoto = mPendingPhotoB64 ? '✓ Foto adjunta' : '(sense foto)';
+  const hasGps = (mPendingLat && mPendingLng) ? '✓ GPS: ' + mPendingLat.toFixed(4) + ', ' + mPendingLng.toFixed(4) : '(sense GPS)';
+  const box = document.getElementById('mSummaryBox');
+  if (box) box.innerHTML = '<strong>Negoci</strong>' + escHtml(name) + '<br>'
+    + '<strong>Tipus</strong>' + cat + '<br>'
+    + '<strong>Ubicació</strong>' + prov + ' · ' + muni + (addr ? ' · ' + escHtml(addr) : '') + '<br>'
+    + '<strong>Foto</strong>' + hasPhoto + '<br>'
+    + '<strong>GPS</strong>' + hasGps;
+}
+
+async function mSubmitCase() {
+  const mfName = document.getElementById('mfName');
+  const name = mfName ? mfName.value.trim() : '';
+  const mfCat = document.getElementById('mfCat');
+  const cat = mfCat ? mfCat.value : '';
+  const mfDesc = document.getElementById('mfDesc');
+  const desc = mfDesc ? mfDesc.value.trim() : '';
+  const mfAddr = document.getElementById('mfAddr');
+  const addr = mfAddr ? mfAddr.value.trim() : '';
+  const mfProv = document.getElementById('mfProv');
+  const prov = mfProv && mfProv.selectedOptions[0] ? mfProv.selectedOptions[0].text : '';
+  const mfMuni = document.getElementById('mfMuni');
+  const muni = mfMuni && mfMuni.selectedOptions[0] ? mfMuni.selectedOptions[0].text : '';
+  const mfEmail = document.getElementById('mfEmail');
+  const email = mfEmail ? mfEmail.value.trim() : '';
+
+  const btn = document.getElementById('mSubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Enviant…'; }
+
+  const payload = {
+    name: name, category: cat, addr: [addr, muni, prov].filter(Boolean).join(', '),
+    prov_text: prov, muni_text: muni,
+    ca: { desc: desc, transl: '', comment: '' },
+    es: { desc: '', transl: '', comment: '' },
+    en: { desc: '', transl: '', comment: '' },
+    tonteriaIndex: 3, status: 'pending',
+    email: email || null,
+    photo: mPendingPhotoB64 || null,
+    lat: mPendingLat || null, lng: mPendingLng || null,
+    submitted_via: 'mobile'
+  };
+
+  try {
+    const result = await sb.from('entries').insert([payload]);
+    const error = result.error;
+    const msgEl = document.getElementById('mFormMsg');
+    if (error) {
+      if (msgEl) { msgEl.style.display='block'; msgEl.style.background='#feeaea'; msgEl.style.color='#cc2200'; msgEl.textContent = 'Error en enviar. Torna-ho a intentar.'; }
+    } else {
+      if (msgEl) { msgEl.style.display='block'; msgEl.style.background='#eafff0'; msgEl.style.color='#2d6a3f'; msgEl.textContent = '✓ Cas rebut! El revisarem aviat.'; }
+      // Reset form
+      setTimeout(function() {
+        mGoToStep(1);
+        ['mfName','mfAddr','mfDesc','mfEmail'].forEach(function(id) { const el = document.getElementById(id); if(el) el.value=''; });
+        ['mfCat','mfProv'].forEach(function(id) { const el = document.getElementById(id); if(el) el.value=''; });
+        mPendingPhotoB64 = null; mPendingLat = null; mPendingLng = null;
+        const prev = document.getElementById('mPhotoPreview');
+        if (prev) { prev.style.display='none'; prev.src=''; }
+        const gStat = document.getElementById('mGpsStatus');
+        if (gStat) gStat.textContent = '';
+        const muniEl = document.getElementById('mfMuni');
+        if (muniEl) { muniEl.innerHTML='<option value="">-- Primer selecciona la província --</option>'; muniEl.disabled=true; }
+        if (msgEl) msgEl.style.display='none';
+      }, 2500);
+    }
+  } catch(err) {
+    const msgEl = document.getElementById('mFormMsg');
+    if (msgEl) { msgEl.style.display='block'; msgEl.style.background='#feeaea'; msgEl.style.color='#cc2200'; msgEl.textContent = 'Error: ' + err.message; }
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Enviar cas →'; }
+}
+
+async function mLoadMunicipis() {
+  const mfProv = document.getElementById('mfProv');
+  const provCode = mfProv ? mfProv.value : '';
+  const muniSel = document.getElementById('mfMuni');
+  const loading = document.getElementById('mMuniLoading');
+  if (!muniSel || !provCode) return;
+  muniSel.disabled = true;
+  muniSel.innerHTML = '<option value="">Carregant…</option>';
+  if (loading) loading.style.display = 'block';
+  try {
+    const res = await fetch('https://servicios.ine.es/wstempus/js/ES/MUNICIPIOS_PROVINCIA/' + provCode + '?det=0');
+    const data = await res.json();
+    const munis = data.sort(function(a,b){ return a.Nombre.localeCompare(b.Nombre, 'ca'); });
+    muniSel.innerHTML = '<option value="">-- Selecciona municipi --</option>' +
+      munis.map(function(m){ return '<option value="' + m.Cod_ine + '">' + escHtml(m.Nombre) + '</option>'; }).join('');
+    muniSel.disabled = false;
+  } catch(e) {
+    muniSel.innerHTML = '<option value="">Error carregant. Escriu el municipi manualment.</option>';
+    muniSel.disabled = false;
+    const field = muniSel.parentElement;
+    if (field && !document.getElementById('mfMuniText')) {
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.id = 'mfMuniText'; inp.placeholder = 'Municipi (manual)';
+      inp.style.cssText = 'width:100%;margin-top:6px;font-size:15px;padding:10px 12px;border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink)';
+      field.appendChild(inp);
+    }
+  }
+  if (loading) loading.style.display = 'none';
+}
+
+function mPreviewPhoto(input) {
+  const file = input && input.files ? input.files[0] : null;
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    mPendingPhotoB64 = e.target.result;
+    const prev = document.getElementById('mPhotoPreview');
+    if (prev) { prev.src = e.target.result; prev.style.display='block'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+function mCaptureGPS() {
+  const btn = document.getElementById('mGpsBtn');
+  const status = document.getElementById('mGpsStatus');
+  if (!navigator.geolocation) {
+    if (status) status.textContent = 'GPS no disponible en aquest dispositiu';
+    return;
+  }
+  if (btn) btn.textContent = '⏳ Capturant…';
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      mPendingLat = pos.coords.latitude;
+      mPendingLng = pos.coords.longitude;
+      if (btn) btn.textContent = '✓ Ubicació capturada';
+      if (status) status.textContent = mPendingLat.toFixed(5) + ', ' + mPendingLng.toFixed(5);
+    },
+    function(err) {
+      if (btn) btn.textContent = '📍 Capturar ubicació';
+      if (status) status.textContent = 'No s\'ha pogut obtenir la ubicació. Ves a Ajustos > Privacitat > Ubicació.';
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
 
 // ── PWA SERVICE WORKER ──────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
