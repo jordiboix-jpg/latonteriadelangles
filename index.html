@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v44 build:20260929-1500 -->
+<!-- v44 build:20260930-1230 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -885,10 +885,10 @@ function openEnunciatEdit(id) {
   if (provEl) provEl.value = entry.provincia || 'barcelona';
   if (muniEl) muniEl.value = entry.municipi || '';
   const latEl = document.getElementById('enunciat-lat-' + id);
-  const lngEl = document.getElementById('enunciat-lng-' + id);
   const coords = COORDS_BY_ID[id] || {};
-  if (latEl) latEl.value = (entry.lat != null ? entry.lat : (coords.lat || ''));
-  if (lngEl) lngEl.value = (entry.lng != null ? entry.lng : (coords.lng || ''));
+  const lat = entry.lat != null ? entry.lat : (coords.lat || '');
+  const lng = entry.lng != null ? entry.lng : (coords.lng || '');
+  if (latEl) latEl.value = (lat && lng) ? lat + ', ' + lng : (lat || '');
 }
 function closeEnunciatEdit(id) {
   const panel = document.getElementById('enunciat-edit-' + id);
@@ -960,12 +960,26 @@ async function saveEnunciat(id) {
   showToast('✓ Enunciat desat');
 }
 
+function parseGmapsCoords(event, id) {
+  // Permet pegar "41.3851, 2.1734" o "41.3851 2.1734" directament des de Google Maps
+  setTimeout(() => {
+    const latEl = document.getElementById('enunciat-lat-' + id);
+    if (!latEl) return;
+    const val = latEl.value.trim();
+    const parts = val.split(/[\s,]+/).filter(Boolean);
+    if (parts.length === 2) {
+      const a = parseFloat(parts[0]), b = parseFloat(parts[1]);
+      if (!isNaN(a) && !isNaN(b)) latEl.value = a + ', ' + b;
+    }
+  }, 10);
+}
 async function saveAdminCoords(id) {
   const latEl = document.getElementById('enunciat-lat-' + id);
-  const lngEl = document.getElementById('enunciat-lng-' + id);
-  const lat = latEl ? parseFloat(latEl.value) : NaN;
-  const lng = lngEl ? parseFloat(lngEl.value) : NaN;
-  if (isNaN(lat) || isNaN(lng)) { showToast('Introdueix lat i lng vàlids'); return; }
+  const val = latEl ? latEl.value.trim() : '';
+  const parts = val.split(/[\s,]+/).filter(Boolean);
+  const lat = parts.length >= 1 ? parseFloat(parts[0]) : NaN;
+  const lng = parts.length >= 2 ? parseFloat(parts[1]) : NaN;
+  if (isNaN(lat) || isNaN(lng)) { showToast('Introdueix lat i lng vàlids (p.ex: 41.3851, 2.1734)'); return; }
   const { error } = await sb.from('entries').update({ lat, lng }).eq('id', id);
   if (error) { showToast('Error desant coords: ' + error.message); return; }
   // Actualitzar COORDS_BY_ID en memòria per reflectir-ho al mapa
@@ -1095,7 +1109,7 @@ function renderCard(e, showAdminActions) {
   }
   const googleMapsUrl = e.name ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.name+(e.addr?', '+e.addr:''))}` : (e.mapUrl||'');
   const clickUrl = googleMapsUrl.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  return `<article class="entry" data-entry-id="${e.id}" onclick="incrementVisit('${e.id}','${clickUrl}')" title="Obrir ${nameEsc} →">
+  return `<article class="entry" data-entry-id="${e.id}" ${isAdmin?'':`onclick="incrementVisit('${e.id}','${clickUrl}')" title="Obrir ${nameEsc} →"`}>
     ${photoHtml}
     <div class="entry-num">${e.num||'??'}</div>
     <span class="${tagClass}">${displayTag}</span>
@@ -1108,7 +1122,7 @@ function renderCard(e, showAdminActions) {
     <p class="entry-desc">${escHtml(desc)}</p>
     ${renderCommentBlock(e, comment, isAdmin)}
     ${e.email&&isAdmin?`<p style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px">${t('submittedBy')}: ${escHtml(e.email)}</p>`:''}
-    ${e.name?`<a class="map-btn" href="${escHtml(googleMapsUrl)}" target="_blank" onclick="event.stopPropagation()">${t('mapBtn')}</a>`:''}
+    ${e.name&&!isAdmin?`<a class="map-btn" href="${escHtml(googleMapsUrl)}" target="_blank" onclick="event.stopPropagation()">${t('mapBtn')}</a>`:''}
     ${shareHtml}
     ${adminHtml}
   </article>`;
@@ -1151,8 +1165,8 @@ function renderEnunciatBlock(e, isAdmin) {
   html += '<div style="flex:2"><label>Municipi</label><input type="text" id="enunciat-muni-' + id + '" placeholder="p. ex: Sabadell" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()"></div>';
   html += '</div>';
   html += '<div style="display:flex;gap:8px;margin-top:4px">';
-  html += '<div style="flex:1"><label>Lat</label><input type="number" step="any" id="enunciat-lat-' + id + '" placeholder="41.3851" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()" style="width:100%"></div>';
-  html += '<div style="flex:1"><label>Lng</label><input type="number" step="any" id="enunciat-lng-' + id + '" placeholder="2.1734" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()" style="width:100%"></div>';
+  html += '<div style="flex:2"><label>Lat, Lng <span style="font-family:\'DM Mono\',monospace;font-size:10px;opacity:.6">(pega directament des de Google Maps)</span></label><input type="text" id="enunciat-lat-' + id + '" placeholder="41.3851, 2.1734" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()" onpaste="parseGmapsCoords(event,\'' + id + '\')" style="width:100%"></div>';
+  html += '<div style="display:none"><input type="text" id="enunciat-lng-' + id + '"></div>';
   html += '<div style="display:flex;align-items:flex-end"><button class="enunciat-save-btn" style="white-space:nowrap" onclick="saveAdminCoords(\'' + id + '\');event.stopPropagation()">📍 Desar coords</button></div>';
   html += '</div>';
   html += '<div class="enunciat-lang-tabs">';
