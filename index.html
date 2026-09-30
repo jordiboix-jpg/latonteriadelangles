@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v46 build:20260930-1850 -->
+<!-- v47 build:20260930-1924 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -354,7 +354,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   /* ── HEADER ── */
   #mobileHeader{background:var(--ink);color:var(--paper);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-bottom:3px solid var(--rust)}
   #mobileTitle{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;flex:0 0 auto;letter-spacing:-.01em;line-height:1.15}
-  #mobileTitle em{font-style:italic;color:var(--rust);display:block}
+  #mobileTitle em{font-style:italic;color:var(--paper);display:block}
   #mobileStats{font-family:'DM Mono',monospace;font-size:9px;color:#a09070;letter-spacing:.03em;flex:1;text-align:center;line-height:1.6}
   .mStatSep{display:block;height:2px}
   #mobileHeaderRight{display:flex;gap:4px;flex-shrink:0;align-items:center}
@@ -408,6 +408,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .mDictLabel{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
   .mDictComment{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--rule)}
   .mDictComment.open{display:block}
+  .mDictCommentText{font-family:'EB Garamond',serif;font-size:14px;line-height:1.55;color:var(--ink);margin-top:2px;padding-bottom:4px}
   .mDictComment .mDictLabel{margin-bottom:2px}
   .mDictCommentText{font-size:13px;font-style:italic;color:var(--muted)}
 
@@ -762,9 +763,9 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
     </div>
     <div id="mobileHeaderRight">
       <button id="mDarkBtn" onclick="toggleDark()">🌙</button>
-      <button class="mLangBtn2" onclick="applyLang('ca');mUpdateLangBtn()">CA</button>
-      <button class="mLangBtn2" onclick="applyLang('es');mUpdateLangBtn()">ES</button>
-      <button class="mLangBtn2" onclick="applyLang('en');mUpdateLangBtn()">EN</button>
+      <button class="mLangBtn2" onclick="setLang('ca')">CA</button>
+      <button class="mLangBtn2" onclick="setLang('es')">ES</button>
+      <button class="mLangBtn2" onclick="setLang('en')">EN</button>
     </div>
   </div>
 
@@ -2419,8 +2420,31 @@ let mPendingLat = null, mPendingLng = null;
 
 function isMobile() { return window.innerWidth <= 767; }
 
+function mHideNetlifyBadge() {
+  // El badge és un iframe injectat dinàmicament; el CSS no el pot agafar
+  function killBadge() {
+    document.querySelectorAll('iframe').forEach(function(fr) {
+      if ((fr.src||'').includes('netlify') || (fr.title||'').toLowerCase().includes('netlify')) {
+        fr.style.setProperty('display','none','important');
+      }
+    });
+    // també elements <a> o <div> amb href/src de netlify en posició fixa
+    document.querySelectorAll('a[href*="netlify.com"],div[class*="netlify"],div[id*="netlify"]').forEach(function(el) {
+      var s = window.getComputedStyle(el);
+      if (s.position === 'fixed' || s.position === 'absolute') {
+        el.style.setProperty('display','none','important');
+      }
+    });
+  }
+  killBadge();
+  // Observador per si s'injecta més tard
+  var obs = new MutationObserver(killBadge);
+  obs.observe(document.body, {childList:true, subtree:true});
+}
+
 function mInit() {
   if (!isMobile()) return;
+  mHideNetlifyBadge();
   mUpdateStats();
   mRenderCasos();
   mRenderDict();
@@ -2577,14 +2601,13 @@ function mRenderDict() {
   container.innerHTML = rows.map(function(r, i) {
     const translation = lang === 'ca' ? r.ca : lang === 'es' ? r.es : r.en || r.ca;
     const comment = lang === 'ca' ? r.comment : lang === 'es' ? r.comment_es : r.comment_en || r.comment;
-    return '<div class="mDictRow" onclick="mToggleDict(\'mdict_' + i + '\')">'
+    return '<div class="mDictRow">'
       + '<div class="mDictLabel">' + col1lbl + '</div>'
       + '<div class="mDictEng">' + escHtml(r.eng||'') + '</div>'
-      + '<div class="mDictLabel" style="margin-top:6px">' + col2lbl + '</div>'
-      + '<div class="mDictCa">' + escHtml(translation||'') + '</div>'
-      + '<div class="mDictComment" id="mdict_' + i + '">'
-      + '<div class="mDictLabel">' + col3lbl + '</div>'
-      + escHtml(comment||'—') + '</div>'
+      + '<div class="mDictLabel" style="margin-top:8px">' + col2lbl + '</div>'
+      + '<div class="mDictCa">→ ' + escHtml(translation||'') + '</div>'
+      + (comment ? '<div class="mDictLabel" style="margin-top:8px">' + col3lbl + '</div>'
+        + '<div class="mDictCommentText">' + escHtml(comment) + '</div>' : '')
       + '</div>';
   }).join('');
 }
