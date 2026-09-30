@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v47 build:20260930-1924 -->
+<!-- v48 build:20260930-2000 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -354,7 +354,8 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   /* ── HEADER ── */
   #mobileHeader{background:var(--ink);color:var(--paper);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-bottom:3px solid var(--rust)}
   #mobileTitle{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;flex:0 0 auto;letter-spacing:-.01em;line-height:1.15}
-  #mobileTitle em{font-style:italic;color:var(--paper);display:block}
+  #mobileTitle .mTitleLine2{display:block;color:var(--paper)}
+  #mobileTitle em{font-style:italic;color:var(--rust)}
   #mobileStats{font-family:'DM Mono',monospace;font-size:9px;color:#a09070;letter-spacing:.03em;flex:1;text-align:center;line-height:1.6}
   .mStatSep{display:block;height:2px}
   #mobileHeaderRight{display:flex;gap:4px;flex-shrink:0;align-items:center}
@@ -757,7 +758,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
 <div id="mobileApp">
   <!-- Compact header -->
   <div id="mobileHeader">
-    <div id="mobileTitle">La Tonteria<em>de l'Anglès</em></div>
+    <div id="mobileTitle">La Tonteria<span class="mTitleLine2">de l'<em>Anglès</em></span></div>
     <div id="mobileStats">
       <span id="mStatCount">…</span> casos<span class="mStatSep"></span><span id="mStatCities">…</span> municipis
     </div>
@@ -2598,14 +2599,18 @@ function mRenderDict() {
   const col1lbl = lang==='ca'?'Anglès misteriós':lang==='es'?'Inglés misterioso':'Mysterious English';
   const col2lbl = lang==='ca'?'Traducció revolucionària':lang==='es'?'Traducción revolucionaria':'Revolutionary translation';
   const col3lbl = lang==='ca'?'Comentari editorial':lang==='es'?'Comentario editorial':'Editorial comment';
-  container.innerHTML = rows.map(function(r, i) {
+  container.innerHTML = rows.map(function(r) {
+    // Col 1: terme anglès original del rètol (camp "eng")
+    // Col 2: traducció en l'idioma actiu (ca/es/en)
+    // Col 3: comentari editorial
+    const terme = r.eng || r.en || '';
     const translation = lang === 'ca' ? r.ca : lang === 'es' ? r.es : r.en || r.ca;
-    const comment = lang === 'ca' ? r.comment : lang === 'es' ? r.comment_es : r.comment_en || r.comment;
+    const comment = lang === 'ca' ? r.comment : lang === 'es' ? r.comment_es : (r.comment_en || r.comment);
     return '<div class="mDictRow">'
       + '<div class="mDictLabel">' + col1lbl + '</div>'
-      + '<div class="mDictEng">' + escHtml(r.eng||'') + '</div>'
+      + '<div class="mDictEng">' + escHtml(terme) + '</div>'
       + '<div class="mDictLabel" style="margin-top:8px">' + col2lbl + '</div>'
-      + '<div class="mDictCa">→ ' + escHtml(translation||'') + '</div>'
+      + '<div class="mDictCa"><span style="color:var(--green);font-weight:600">→</span> ' + escHtml(translation||'') + '</div>'
       + (comment ? '<div class="mDictLabel" style="margin-top:8px">' + col3lbl + '</div>'
         + '<div class="mDictCommentText">' + escHtml(comment) + '</div>' : '')
       + '</div>';
