@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v45 build:20260930-1600 -->
+<!-- v46 build:20260930-1850 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -352,14 +352,17 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   #mobileApp{display:flex!important}
 
   /* ── HEADER ── */
-  #mobileHeader{background:var(--ink);color:var(--paper);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:3px solid var(--rust)}
-  #mobileTitle{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;flex:1;letter-spacing:-.01em}
-  #mobileTitle em{font-style:italic;color:var(--rust)}
-  #mobileStats{font-family:'DM Mono',monospace;font-size:9px;color:#a09070;letter-spacing:.05em;flex:1;text-align:center}
-  .mStatSep{margin:0 4px;opacity:.5}
-  #mobileHeaderRight{display:flex;gap:4px;flex-shrink:0}
-  #mDarkBtn,#mLangBtn{background:transparent;border:1px solid #4a3a28;color:#a09070;padding:5px 8px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;border-radius:2px;transition:all .15s}
+  #mobileHeader{background:var(--ink);color:var(--paper);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-bottom:3px solid var(--rust)}
+  #mobileTitle{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;flex:0 0 auto;letter-spacing:-.01em;line-height:1.15}
+  #mobileTitle em{font-style:italic;color:var(--rust);display:block}
+  #mobileStats{font-family:'DM Mono',monospace;font-size:9px;color:#a09070;letter-spacing:.03em;flex:1;text-align:center;line-height:1.6}
+  .mStatSep{display:block;height:2px}
+  #mobileHeaderRight{display:flex;gap:4px;flex-shrink:0;align-items:center}
+  #mDarkBtn,#mLangBtn{background:transparent;border:1px solid #4a3a28;color:#a09070;padding:4px 7px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;border-radius:2px;transition:all .15s;line-height:1}
   #mDarkBtn:hover,#mLangBtn:hover{color:var(--paper);border-color:var(--paper)}
+  .mLangBtn2{background:transparent;border:1px solid #4a3a28;color:#a09070;padding:4px 6px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;cursor:pointer;border-radius:2px;transition:all .15s;line-height:1}
+  .mLangBtn2:hover{color:var(--paper);border-color:var(--paper)}
+  .mLangBtn2.active{background:var(--rust);border-color:var(--rust);color:var(--paper)}
 
   /* ── CONTENT AREA ── */
   #mobileContent{flex:1;overflow:hidden;position:relative}
@@ -402,8 +405,11 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .mDictRow:active{background:var(--cream)}
   .mDictEng{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--rust);margin-bottom:3px}
   .mDictCa{font-size:14px;color:var(--ink);margin-bottom:2px}
-  .mDictComment{display:none;font-size:13px;font-style:italic;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--rule)}
+  .mDictLabel{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+  .mDictComment{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--rule)}
   .mDictComment.open{display:block}
+  .mDictComment .mDictLabel{margin-bottom:2px}
+  .mDictCommentText{font-size:13px;font-style:italic;color:var(--muted)}
 
   /* ── TAB: MAPA ── */
   #mTabMapa{padding:0}
@@ -444,14 +450,16 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .mSummaryBox strong{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block}
 
   /* ── BOTTOM NAV ── */
-  #mBottomNav{display:flex;background:var(--ink);border-top:3px solid var(--rust);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0)}
+  /* Amaga el badge "Powered by Netlify" que apareix per defecte */
+  [data-netlify-badge],[class*="netlify-badge"],[id*="netlify-badge"],a[href*="netlify.com"][style*="position:fixed"],a[href*="netlify.com"][style*="position: fixed"]{display:none!important}
+  #mBottomNav{display:flex;background:var(--ink);border-top:3px solid var(--rust);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0);position:relative;z-index:200}
   .mNavBtn{flex:1;background:transparent;border:none;color:#a09070;padding:10px 4px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s;font-family:'DM Mono',monospace}
   .mNavBtn.active{color:var(--paper)}
   .mNavBtn.active .mNavIcon{transform:scale(1.1)}
   .mNavIcon{font-size:20px;display:block;line-height:1;transition:transform .2s}
   .mNavLabel{font-size:9px;letter-spacing:.08em;text-transform:uppercase}
-  .mNavBtnReport .mNavIcon{font-size:22px;background:var(--rust);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--paper);margin-bottom:1px}
-  .mNavBtnReport.active .mNavIcon{background:#d4562a}
+  .mNavBtnReport .mNavIcon{font-size:22px;background:var(--rust);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--paper);margin-bottom:1px;box-shadow:0 2px 8px rgba(184,57,14,.5)}
+  .mNavBtnReport.active .mNavIcon,.mNavBtnReport:active .mNavIcon{background:#d4562a}
 }
 </style>
 </head>
@@ -748,15 +756,15 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
 <div id="mobileApp">
   <!-- Compact header -->
   <div id="mobileHeader">
-    <div id="mobileTitle">La Tonteria de <em>l'Anglès</em></div>
+    <div id="mobileTitle">La Tonteria<em>de l'Anglès</em></div>
     <div id="mobileStats">
-      <span id="mStatCount">…</span> casos
-      <span class="mStatSep">·</span>
-      <span id="mStatCities">…</span> municipis
+      <span id="mStatCount">…</span> casos<span class="mStatSep"></span><span id="mStatCities">…</span> municipis
     </div>
     <div id="mobileHeaderRight">
       <button id="mDarkBtn" onclick="toggleDark()">🌙</button>
-      <button id="mLangBtn" onclick="cycleLangMobile()">CA</button>
+      <button class="mLangBtn2" onclick="applyLang('ca');mUpdateLangBtn()">CA</button>
+      <button class="mLangBtn2" onclick="applyLang('es');mUpdateLangBtn()">ES</button>
+      <button class="mLangBtn2" onclick="applyLang('en');mUpdateLangBtn()">EN</button>
     </div>
   </div>
 
@@ -2438,17 +2446,21 @@ function mUpdateStats() {
 }
 
 function cycleLangMobile() {
+  // Mantenim per compatibilitat però ja no s'usa
   const langs = ['ca','es','en'];
   const idx = langs.indexOf(lang);
   applyLang(langs[(idx+1)%3]);
   mUpdateLangBtn();
-  mRenderCasos();
-  mRenderDict();
 }
 
 function mUpdateLangBtn() {
-  const btn = document.getElementById('mLangBtn');
-  if (btn) btn.textContent = lang.toUpperCase();
+  // Ressalta el botó de llengua actiu
+  document.querySelectorAll('.mLangBtn2').forEach(function(btn) {
+    btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang);
+  });
+  // Re-renderitza si estem al diccionari
+  mRenderDict();
+  mRenderCasos();
 }
 
 function mSwitchTab(tabName, btn) {
@@ -2559,13 +2571,20 @@ function mRenderDict() {
     container.innerHTML = '<div style="padding:30px;text-align:center;font-family:\'DM Mono\',monospace;font-size:12px;color:var(--muted)">Cap entrada al diccionari</div>';
     return;
   }
+  const col1lbl = lang==='ca'?'Anglès misteriós':lang==='es'?'Inglés misterioso':'Mysterious English';
+  const col2lbl = lang==='ca'?'Traducció revolucionària':lang==='es'?'Traducción revolucionaria':'Revolutionary translation';
+  const col3lbl = lang==='ca'?'Comentari editorial':lang==='es'?'Comentario editorial':'Editorial comment';
   container.innerHTML = rows.map(function(r, i) {
     const translation = lang === 'ca' ? r.ca : lang === 'es' ? r.es : r.en || r.ca;
     const comment = lang === 'ca' ? r.comment : lang === 'es' ? r.comment_es : r.comment_en || r.comment;
     return '<div class="mDictRow" onclick="mToggleDict(\'mdict_' + i + '\')">'
+      + '<div class="mDictLabel">' + col1lbl + '</div>'
       + '<div class="mDictEng">' + escHtml(r.eng||'') + '</div>'
+      + '<div class="mDictLabel" style="margin-top:6px">' + col2lbl + '</div>'
       + '<div class="mDictCa">' + escHtml(translation||'') + '</div>'
-      + '<div class="mDictComment" id="mdict_' + i + '">' + escHtml(comment||'') + '</div>'
+      + '<div class="mDictComment" id="mdict_' + i + '">'
+      + '<div class="mDictLabel">' + col3lbl + '</div>'
+      + escHtml(comment||'—') + '</div>'
       + '</div>';
   }).join('');
 }
