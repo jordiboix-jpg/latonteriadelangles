@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v53 build:20261001-1520 -->
+<!-- v54 build:20261001-1320 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -2604,17 +2604,17 @@ function mRenderDict() {
   const col2lbl = lang==='ca'?'Traducció revolucionària':lang==='es'?'Traducción revolucionaria':'Revolutionary translation';
   const col3lbl = lang==='ca'?'Comentari editorial':lang==='es'?'Comentario editorial':'Editorial comment';
   container.innerHTML = rows.map(function(r) {
-    // Camps reals de dict_entries:
-    // r.eng = paraula del rètol ("Take Away", "Bakery")     → ANGLÈS MISTERIÓS
+    // Camps reals de dict_entries (confirmats per BD):
+    // r.en  = paraula del rètol ("Take Away", "Bakery")     → ANGLÈS MISTERIÓS
     // r.ca  = traducció catalana ("Per emportar", "Fleca")  → TRADUCCIÓ REVOLUCIONÀRIA
     // r.es  = traducció castellana
+    // r.eng = frase descriptiva anglesa ("I'll take it home") → REVOLUTIONARY TRANSLATION (mode EN)
     // r.comment / r.comment_es / r.comment_en               → COMENTARI EDITORIAL
-    const terme = r.eng || '';
-    const translation = lang === 'es' ? (r.es || r.ca) : lang === 'en' ? (r.en || r.ca) : r.ca;
+    const translation = lang === 'es' ? (r.es || r.ca) : lang === 'en' ? (r.eng || r.ca) : r.ca;
     const comment = lang === 'ca' ? r.comment : lang === 'es' ? (r.comment_es || r.comment) : (r.comment_en || r.comment);
     return '<div class="mDictRow">'
       + '<div class="mDictLabel">' + col1lbl + '</div>'
-      + '<div class="mDictEng">' + escHtml(r.eng || '') + '</div>'
+      + '<div class="mDictEng">' + escHtml(r.en || '') + '</div>'
       + '<div class="mDictLabel" style="margin-top:8px">' + col2lbl + '</div>'
       + '<div class="mDictCa"><span style="color:var(--green);font-weight:600">→</span> ' + escHtml(translation||'') + '</div>'
       + (comment ? '<div class="mDictLabel" style="margin-top:8px">' + col3lbl + '</div>'
