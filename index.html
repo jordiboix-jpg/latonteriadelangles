@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v51 build:20261001-1201 -->
+<!-- v52 build:20261001-1237 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1656,7 +1656,7 @@ function dictGetFiltered() {
   const q = (document.getElementById('dictSearch')||{value:''}).value.trim().toLowerCase();
   let arr = DICT.map((r,i) => ({...r, _orig: i, _matchLang: null}));
   if (q) {
-    arr = arr.filter(r => r.en.toLowerCase().includes(q) || r.ca.toLowerCase().includes(q) || (r.es||'').toLowerCase().includes(q));
+    arr = arr.filter(r => (r.eng||'').toLowerCase().includes(q) || r.en.toLowerCase().includes(q) || r.ca.toLowerCase().includes(q) || (r.es||'').toLowerCase().includes(q));
     arr.forEach(r => {
       const matchEn = r.en.toLowerCase().includes(q);
       const matchCa = r.ca.toLowerCase().includes(q);
@@ -1751,7 +1751,7 @@ function renderDict() {
   rows.innerHTML = page.map((row, i) => {
     const bg = i%2===0?'var(--paper)':'var(--cream)';
     const origIdx = row._orig;
-    const transl = row._matchLang ? (row._matchLang === 'en' ? 'eng' : row._matchLang) : (lang === 'en' ? 'eng' : lang);
+    const transl = lang === 'en' ? 'eng' : lang; // sempre basat en lang actiu, mai en _matchLang
     const adminCols = isAdmin
       ? '<div style="display:flex;gap:4px;padding:0 12px;align-items:center">'
         + '<button class="dict-row-edit" onclick="dictOpenEdit(' + origIdx + ')">✏</button>'
