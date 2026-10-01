@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v52 build:20261001-1237 -->
+<!-- v53 build:20261001-1520 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -2610,11 +2610,11 @@ function mRenderDict() {
     // r.es  = traducció castellana
     // r.comment / r.comment_es / r.comment_en               → COMENTARI EDITORIAL
     const terme = r.eng || '';
-    const translation = lang === 'es' ? (r.es || r.ca) : r.ca;
+    const translation = lang === 'es' ? (r.es || r.ca) : lang === 'en' ? (r.en || r.ca) : r.ca;
     const comment = lang === 'ca' ? r.comment : lang === 'es' ? (r.comment_es || r.comment) : (r.comment_en || r.comment);
     return '<div class="mDictRow">'
       + '<div class="mDictLabel">' + col1lbl + '</div>'
-      + '<div class="mDictEng">' + escHtml(terme || r.en || '') + '</div>'
+      + '<div class="mDictEng">' + escHtml(r.eng || '') + '</div>'
       + '<div class="mDictLabel" style="margin-top:8px">' + col2lbl + '</div>'
       + '<div class="mDictCa"><span style="color:var(--green);font-weight:600">→</span> ' + escHtml(translation||'') + '</div>'
       + (comment ? '<div class="mDictLabel" style="margin-top:8px">' + col3lbl + '</div>'
