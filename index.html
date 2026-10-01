@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v56 build:20261001-1534 -->
+<!-- v57 build:20261001-1600 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -352,12 +352,28 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
 /* ═══════════════════════════════════════════════════════════════
    MOBILE APP — hidden on desktop, shown on mobile
 ═══════════════════════════════════════════════════════════════ */
+#mSplash{display:none}
 #mobileApp{display:none;flex-direction:column;height:100dvh;height:100vh;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--paper);z-index:100}
 
 @media(max-width:767px){
   /* Hide all desktop sections */
   .masthead,.lang-bar,.admin-bar,.stats-bar,.section,.dict-section,.submit-section,.manifesto,footer,hr.rule,.carousel-wrap,#mapFloatAnchor,#mapFloat,#pwaBanner{display:none!important}
   body{overflow:hidden}
+
+  /* Splash screen */
+  #mSplash{position:fixed;inset:0;background:var(--ink);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+  #mSplash.hidden{display:none}
+  #mSplashInner{display:flex;flex-direction:column;align-items:center;padding:32px 24px;max-width:340px;text-align:center}
+  #mSplashLogo{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:var(--paper);line-height:1.1;letter-spacing:-.02em}
+  #mSplashLogo span{display:block;font-size:22px;color:var(--paper)}
+  #mSplashLogo em{font-style:italic;color:var(--rust)}
+  #mSplashTagline{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#a09070;margin-top:12px;line-height:1.6}
+  #mSplashScale{display:flex;gap:8px;margin-top:24px;align-items:center;justify-content:center}
+  .mSplashDot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.2);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+  #mSplashScaleLbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#6a5a40;margin-top:8px}
+  #mSplashStatus{font-family:'DM Mono',monospace;font-size:11px;color:#a09070;margin-top:28px;letter-spacing:.05em}
+  #mSplashBtn{margin-top:20px;background:var(--rust);color:var(--paper);border:none;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.12em;text-transform:uppercase;padding:12px 32px;cursor:pointer;transition:background .2s}
+  #mSplashBtn:active{background:#9a2e08}
 
   /* Show mobile app */
   #mobileApp{display:flex!important}
@@ -521,6 +537,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   <button class="admin-tab" id="tabPending" onclick="switchAdminTab('pending')">Submissions pendents</button>
   <button class="admin-tab" id="tabAll" onclick="switchAdminTab('all')">Tots els casos</button>
   <button class="admin-tab" id="tabDictProposals" onclick="switchAdminTab('dictProposals')">💡 Propostes diccionari <span id="dictPropCount" style="display:none;background:var(--rust);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;margin-left:4px">0</span></button>
+  <button class="admin-tab" onclick="geocodeAll()" title="Geocodifica automàticament tots els casos publicats sense coordenades via Nominatim (OpenStreetMap). Pot trigar uns minuts.">🌍 Geocodificar tots</button>
   <button class="admin-tab" onclick="adminLogout()" style="margin-left:auto">Tancar sessió</button>
 </div>
 
@@ -780,8 +797,27 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   </div>
 </div>
 
+<!-- MOBILE SPLASH SCREEN -->
+<div id="mSplash">
+  <div id="mSplashInner">
+    <div id="mSplashLogo">La Tonteria<span>de l'<em>Anglès</em></span></div>
+    <div id="mSplashTagline">Guia satírica dels rètols en anglès de Catalunya</div>
+    <div id="mSplashScale">
+      <div class="mSplashDot" style="background:#4caf50">0</div>
+      <div class="mSplashDot" style="background:#a8c61b">1</div>
+      <div class="mSplashDot" style="background:#f0a500">2</div>
+      <div class="mSplashDot" style="background:#e07000">3</div>
+      <div class="mSplashDot" style="background:#d03020">4</div>
+      <div class="mSplashDot" style="background:#8b0000">5</div>
+    </div>
+    <div id="mSplashScaleLbl">Índex de Tonteria Anglesa™</div>
+    <div id="mSplashStatus">Carregant dades…</div>
+    <button id="mSplashBtn" onclick="mSplashEnter()" style="display:none">Entrar →</button>
+  </div>
+</div>
+
 <!-- MOBILE APP -->
-<div id="mobileApp">
+<div id="mobileApp" style="display:none">
   <!-- Compact header -->
   <div id="mobileHeader">
     <div id="mobileTitle">La Tonteria<span class="mTitleLine2">de l'<em>Anglès</em></span></div>
@@ -2302,10 +2338,61 @@ function switchAdminTab(tab) {
 }
 
 // ── ADMIN ACTIONS ──────────────────────────────────────────────────────────
+// ── GEOCODIFICACIÓ (Nominatim / OpenStreetMap) ──────────────────────────────
+async function geocodeEntry(entry) {
+  const name = (entry.name || '').trim();
+  const addr = (entry.addr || '').trim();
+  const muni = (entry.municipi || 'Barcelona').trim();
+  if (!name && !addr) return null;
+  const q = [name, addr, muni, 'Catalunya'].filter(Boolean).join(', ');
+  try {
+    const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+    const resp = await fetch(url, { headers: { 'Accept-Language': 'ca,es', 'User-Agent': 'LaTonteriadAngles/1.0' } });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    if (!data || !data.length) return null;
+    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+  } catch(e) { console.warn('geocodeEntry error:', e); return null; }
+}
+
+async function geocodeAndSave(entry) {
+  if (entry.lat && entry.lng) return false; // ja té coords
+  const coords = await geocodeEntry(entry);
+  if (!coords) return false;
+  const { error } = await sb.from('entries').update({ lat: coords.lat, lng: coords.lng }).eq('id', entry.id);
+  if (!error) {
+    entry.lat = coords.lat; entry.lng = coords.lng;
+    COORDS_BY_ID[entry.id] = { lat: coords.lat, lng: coords.lng };
+    return true;
+  }
+  return false;
+}
+
+async function geocodeAll() {
+  const missing = publishedEntries.filter(e => !e.lat || !e.lng);
+  if (!missing.length) { showToast('Tots els casos ja tenen coordenades ✓'); return; }
+  showToast('Geocodificant ' + missing.length + ' casos…');
+  let ok = 0, fail = 0;
+  for (const e of missing) {
+    const saved = await geocodeAndSave(e);
+    if (saved) ok++; else fail++;
+    await new Promise(r => setTimeout(r, 1100)); // respectar rate limit Nominatim (1 req/s)
+  }
+  showToast(`Geocodificació: ${ok} OK, ${fail} no trobats`);
+  renderMap();
+  if (isMobile() && mMobileMap) mInitMobileMap();
+}
+
 async function approveEntry(id) {
   const nextNum = String(publishedEntries.length + 1).padStart(2,'0');
   await sb.from('entries').update({status:'published',num:nextNum}).eq('id',id);
   await loadPublished(); await loadPending();
+  // Geocodificar automàticament si no té coords
+  const entry = publishedEntries.find(e => e.id === id);
+  if (entry && (!entry.lat || !entry.lng)) {
+    const saved = await geocodeAndSave(entry);
+    if (saved) { showToast('📍 Coordenades geocodificades automàticament'); renderMap(); }
+  }
 }
 async function rejectEntry(id) {
   await sb.from('entries').update({status:'rejected'}).eq('id',id);
@@ -2483,7 +2570,8 @@ async function init() {
   await Promise.all([loadPublished(), loadVisitCounts(), loadDict()]);
   dictSetSort('en'); // estableix columna activa per defecte
   applyLang(lang);
-  if (isMobile()) mInit();
+  if (isMobile()) mSplashReady(); // mostra botó Entrar quan les dades estan llestes
+  else mInit && mInit(); // desktop: mInit no aplica però no fa res
   // Realtime subscriptions
   sb.channel('entries-changes')
     .on('postgres_changes', {event:'*', schema:'public', table:'entries'}, () => {
@@ -2527,6 +2615,22 @@ function mHideNetlifyBadge() {
   // Observador per si s'injecta més tard
   var obs = new MutationObserver(killBadge);
   obs.observe(document.body, {childList:true, subtree:true});
+}
+
+let _mSplashReady = false;
+function mSplashReady() {
+  _mSplashReady = true;
+  const statusEl = document.getElementById('mSplashStatus');
+  const btnEl = document.getElementById('mSplashBtn');
+  if (statusEl) statusEl.textContent = 'Llest! ' + publishedEntries.length + ' casos carregats.';
+  if (btnEl) btnEl.style.display = 'inline-block';
+}
+function mSplashEnter() {
+  const splash = document.getElementById('mSplash');
+  const app = document.getElementById('mobileApp');
+  if (splash) splash.classList.add('hidden');
+  if (app) app.style.display = '';
+  mInit();
 }
 
 function mInit() {
