@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v57 build:20261001-1600 -->
+<!-- v58 build:20261001-1700 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1365,6 +1365,17 @@ async function saveAdminCoords(id) {
   renderMap();
 }
 
+function verifyOnGoogleMaps(entryId) {
+  const nameEl = document.getElementById('enunciat-name-' + entryId);
+  const addrEl = document.getElementById('enunciat-addr-' + entryId);
+  const muniEl = document.getElementById('enunciat-muni-' + entryId);
+  const name = (nameEl && nameEl.value) || '';
+  const addr = (addrEl && addrEl.value) || '';
+  const muni = (muniEl && muniEl.value) || 'Barcelona';
+  const q = [name, addr, muni, 'Catalunya'].filter(Boolean).join(', ');
+  window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q), '_blank');
+}
+
 // ── COORD PICKER MODAL ─────────────────────────────────────────────────────
 let _coordPickerMap = null, _coordPickerMarker = null, _coordPickerEntryId = null, _coordPickerLat = null, _coordPickerLng = null;
 
@@ -1588,7 +1599,7 @@ function renderEnunciatBlock(e, isAdmin) {
   html += '<div class="enunciat-edit-panel" id="enunciat-edit-' + id + '">';
   html += '<label>Nom del local</label>';
   html += '<input type="text" id="enunciat-name-' + id + '" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()">';
-  html += '<label>Adreça</label>';
+  html += '<label>Adreça <button class="enunciat-map-btn" style="margin-left:8px;vertical-align:middle" onclick="verifyOnGoogleMaps(\'' + id + '\');event.stopPropagation()">🗺 Verificar a Google Maps</button></label>';
   html += '<input type="text" id="enunciat-addr-' + id + '" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()">';
   html += '<div style="display:flex;gap:8px;margin-top:4px">';
   html += '<div style="flex:1"><label>Província</label><select id="enunciat-prov-' + id + '" onclick="event.stopPropagation()"><option value="barcelona">Barcelona</option><option value="girona">Girona</option><option value="lleida">Lleida</option><option value="tarragona">Tarragona</option></select></div>';
