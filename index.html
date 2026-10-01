@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v54 build:20261001-1320 -->
+<!-- v55 build:20261001-1510 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -404,7 +404,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   #mDictList{flex:1;overflow-y:auto}
   .mDictRow{padding:12px 16px;border-bottom:var(--border);cursor:pointer;transition:background .15s}
   .mDictRow:active{background:var(--cream)}
-  .mDictEng{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--rust);margin-bottom:3px}
+  .mDictEng{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--rust);margin-bottom:3px}
   .mDictCa{font-size:14px;color:var(--ink);margin-bottom:2px}
   .mDictLabel{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
   .mDictComment{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--rule)}
@@ -1573,6 +1573,7 @@ function updateStats() {
   const el = document.getElementById('statCount');
   if (el) el.textContent = publishedEntries.length;
   renderMap();
+  if (isMobile() && mMobileMap) mInitMobileMap();
 }
 
 // ── MAPA LEAFLET ────────────────────────────────────────────────────────────
@@ -2163,7 +2164,7 @@ function applyLang(l) {
   }
   renderLegend(); renderDict(); renderPublic(); renderMap();
   if (isAdmin) { if(adminView==='pending')renderPending(); if(adminView==='all')renderAll(); }
-  if (isMobile()) { mUpdateLangBtn(); mRenderCasos(); mRenderDict(); }
+  if (isMobile()) { mUpdateLangBtn(); mRenderCasos(); mRenderDict(); if(mMobileMap) mInitMobileMap(); }
 }
 
 // ── ADMIN LOGIN ─────────────────────────────────────────────────────────────
@@ -2506,25 +2507,47 @@ function mSwitchTab(tabName, btn) {
 
 function mInitMobileMap() {
   const container = document.getElementById('mMapContainer');
-  if (!container || mMobileMap) {
-    if (mMobileMap) mMobileMap.invalidateSize();
-    return;
+  if (!container) return;
+  const colors = ['#4caf50','#a8c61b','#f0a500','#e07000','#d03020','#8b0000'];
+  // Prepare entries with coords fallback
+  const entries = (publishedEntries.length > 0 ? publishedEntries : SEED).map(e => ({
+    ...e,
+    lat: e.lat || (window.COORDS_BY_ID && COORDS_BY_ID[e.id] ? COORDS_BY_ID[e.id].lat : null),
+    lng: e.lng || (window.COORDS_BY_ID && COORDS_BY_ID[e.id] ? COORDS_BY_ID[e.id].lng : null),
+  })).filter(e => e.lat && e.lng);
+  if (!mMobileMap) {
+    mMobileMap = L.map('mMapContainer', {zoomControl:true}).setView([41.392, 2.168], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 18
+    }).addTo(mMobileMap);
+  } else {
+    // Remove existing markers before re-adding
+    mMobileMap.eachLayer(layer => { if (layer instanceof L.Marker) mMobileMap.removeLayer(layer); });
+    mMobileMap.invalidateSize();
   }
-  mMobileMap = L.map('mMapContainer', {zoomControl:true}).setView([41.65, 1.8], 8);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap',
-    maxZoom: 18
-  }).addTo(mMobileMap);
-  // Add markers
-  const entries = publishedEntries.length > 0 ? publishedEntries : SEED;
+  // Add colour-coded markers like desktop
   entries.forEach(e => {
-    const lat = e.lat || (window.COORDS_BY_ID && COORDS_BY_ID[e.id] && COORDS_BY_ID[e.id].lat);
-    const lng = e.lng || (window.COORDS_BY_ID && COORDS_BY_ID[e.id] && COORDS_BY_ID[e.id].lng);
-    if (!lat || !lng) return;
-    const marker = L.marker([lat, lng]).addTo(mMobileMap);
-    const nameEsc = (e.name||'').replace(/'/g,"'");
-    marker.bindPopup('<strong>' + nameEsc + '</strong><br><span style="font-size:12px;color:#666">' + (e.addr||'') + '</span>');
+    const ti = (typeof e.tonteriaIndex === 'number' && e.tonteriaIndex >= 0) ? e.tonteriaIndex : 0;
+    const col = colors[Math.min(ti, 5)];
+    const icon = L.divIcon({
+      className: '',
+      html: '<div style="width:32px;height:32px;background:' + col + ';border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;font-family:\'DM Mono\',monospace;line-height:1">' + ti + '</div>',
+      iconSize: [32,32], iconAnchor: [16,16], popupAnchor: [0,-20]
+    });
+    const marker = L.marker([e.lat, e.lng], {icon}).addTo(mMobileMap);
+    const stars = '★'.repeat(ti) + '☆'.repeat(5-ti);
+    marker.bindPopup(
+      '<div style="font-family:\'DM Mono\',monospace;font-size:13px;font-weight:700">' + escHtml(e.name||'') + '</div>'
+      + '<div style="font-size:11px;color:#666;margin-top:2px">' + escHtml(e.addr||'') + '</div>'
+      + '<div style="color:' + col + ';font-size:13px;margin-top:4px">' + stars + ' <span style="font-size:10px">' + ti + '/5</span></div>'
+      + (e.tag ? '<div style="font-size:11px;font-family:\'DM Mono\',monospace;margin-top:3px">' + escHtml(e.tag) + '</div>' : '')
+    );
   });
+  if (entries.length > 0) {
+    const bounds = L.latLngBounds(entries.map(e => [e.lat, e.lng]));
+    mMobileMap.fitBounds(bounds, {padding:[30,30]});
+  }
   setTimeout(() => mMobileMap.invalidateSize(), 300);
 }
 
