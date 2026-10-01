@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v58 build:20261001-1700 -->
+<!-- v59 build:20261001-1710 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -176,15 +176,6 @@ hr.rule{border:none;border-top:3px double var(--rule);margin:50px 0 36px}
 .dict-pag-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .dict-pag-btn:not(.active):hover{border-color:var(--ink);color:var(--ink)}
 .dict-pag-info{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:0 8px}
-/* Coord picker modal */
-#coordPickerBg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9800;display:none;align-items:center;justify-content:center}
-#coordPickerBg.open{display:flex}
-#coordPickerModal{background:var(--paper);border:var(--border);width:min(600px,94vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.4)}
-#coordPickerHeader{background:var(--ink);color:var(--paper);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
-#coordPickerHeader button{background:none;border:1px solid rgba(255,255,255,.3);color:var(--paper);padding:3px 10px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px}
-#coordPickerMap{flex:1;min-height:380px;width:100%}
-#coordPickerInfo{padding:10px 16px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);border-top:1px solid var(--rule);display:flex;align-items:center;gap:10px}
-#coordPickerInfo button{background:var(--rust);color:#fff;border:none;padding:6px 14px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em}
 .enunciat-map-btn{display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:rgba(41,84,44,.08);border:1px solid var(--green);color:var(--green);padding:3px 8px;cursor:pointer;margin-left:6px;transition:background .15s}
 .enunciat-map-btn:hover{background:var(--green);color:#fff}
 .dict-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center}
@@ -704,20 +695,6 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
     </div>
   </div>
 
-  <!-- Coord picker modal (admin) -->
-  <div id="coordPickerBg" onclick="if(event.target===this)closeCoordPicker()">
-    <div id="coordPickerModal" onclick="event.stopPropagation()">
-      <div id="coordPickerHeader">
-        <span>🗺 Tria la ubicació al mapa</span>
-        <button onclick="closeCoordPicker()">✕ Tancar</button>
-      </div>
-      <div id="coordPickerMap"></div>
-      <div id="coordPickerInfo">
-        <span id="coordPickerCoords" style="flex:1">Fes clic al mapa per triar la ubicació…</span>
-        <button onclick="confirmCoordPicker()">✓ Confirmar coordenades</button>
-      </div>
-    </div>
-  </div>
 
   <hr class="rule">
   <div class="manifesto">
@@ -1376,60 +1353,6 @@ function verifyOnGoogleMaps(entryId) {
   window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q), '_blank');
 }
 
-// ── COORD PICKER MODAL ─────────────────────────────────────────────────────
-let _coordPickerMap = null, _coordPickerMarker = null, _coordPickerEntryId = null, _coordPickerLat = null, _coordPickerLng = null;
-
-function openCoordPicker(entryId) {
-  _coordPickerEntryId = entryId;
-  _coordPickerLat = null; _coordPickerLng = null;
-  const bg = document.getElementById('coordPickerBg');
-  if (!bg) return;
-  bg.classList.add('open');
-  document.getElementById('coordPickerCoords').textContent = 'Fes clic al mapa per triar la ubicació…';
-  // Detect current coords from the text field
-  const latEl = document.getElementById('enunciat-lat-' + entryId);
-  let initLat = 41.392, initLng = 2.168, initZoom = 13;
-  if (latEl && latEl.value.trim()) {
-    const parts = latEl.value.trim().split(/[\s,]+/).filter(Boolean);
-    if (parts.length >= 2) { const a = parseFloat(parts[0]), b = parseFloat(parts[1]); if (!isNaN(a) && !isNaN(b)) { initLat = a; initLng = b; initZoom = 17; } }
-  }
-  // Init or reset the map
-  setTimeout(function() {
-    if (!_coordPickerMap) {
-      _coordPickerMap = L.map('coordPickerMap').setView([initLat, initLng], initZoom);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap', maxZoom:19 }).addTo(_coordPickerMap);
-      _coordPickerMap.on('click', function(ev) {
-        const lt = ev.latlng.lat, ln = ev.latlng.lng;
-        _coordPickerLat = lt; _coordPickerLng = ln;
-        document.getElementById('coordPickerCoords').textContent = lt.toFixed(6) + ', ' + ln.toFixed(6);
-        if (_coordPickerMarker) { _coordPickerMarker.setLatLng([lt, ln]); }
-        else { _coordPickerMarker = L.marker([lt, ln]).addTo(_coordPickerMap); }
-      });
-    } else {
-      _coordPickerMap.setView([initLat, initLng], initZoom);
-      if (_coordPickerMarker) { _coordPickerMap.removeLayer(_coordPickerMarker); _coordPickerMarker = null; }
-      document.getElementById('coordPickerCoords').textContent = 'Fes clic al mapa per triar la ubicació…';
-    }
-    _coordPickerMap.invalidateSize();
-    // If there are current coords, place a marker
-    if (initZoom === 17) {
-      _coordPickerLat = initLat; _coordPickerLng = initLng;
-      _coordPickerMarker = L.marker([initLat, initLng]).addTo(_coordPickerMap);
-      document.getElementById('coordPickerCoords').textContent = initLat.toFixed(6) + ', ' + initLng.toFixed(6);
-    }
-  }, 100);
-}
-function closeCoordPicker() {
-  const bg = document.getElementById('coordPickerBg');
-  if (bg) bg.classList.remove('open');
-}
-function confirmCoordPicker() {
-  if (_coordPickerLat === null || _coordPickerLng === null) { alert('Fes clic al mapa per seleccionar la ubicació primer.'); return; }
-  const latEl = document.getElementById('enunciat-lat-' + _coordPickerEntryId);
-  if (latEl) latEl.value = _coordPickerLat.toFixed(6) + ', ' + _coordPickerLng.toFixed(6);
-  closeCoordPicker();
-  showToast('Coordenades seleccionades. Recorda desar-les amb 📍 Desar coords.');
-}
 
 // ── COMMENT EDITOR ─────────────────────────────────────────────────────────
 let commentEditLang = {}; // entryId → current tab lang
@@ -1608,7 +1531,7 @@ function renderEnunciatBlock(e, isAdmin) {
   html += '<div style="display:flex;gap:8px;margin-top:4px">';
   html += '<div style="flex:2"><label>Lat, Lng <span style="font-family:\'DM Mono\',monospace;font-size:10px;opacity:.6">(pega directament des de Google Maps)</span></label><input type="text" id="enunciat-lat-' + id + '" placeholder="41.3851, 2.1734" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()" onpaste="parseGmapsCoords(event,\'' + id + '\')" style="width:100%"></div>';
   html += '<div style="display:none"><input type="text" id="enunciat-lng-' + id + '"></div>';
-  html += '<div style="display:flex;align-items:flex-end;gap:6px"><button class="enunciat-save-btn" style="white-space:nowrap" onclick="saveAdminCoords(\'' + id + '\');event.stopPropagation()">📍 Desar coords</button><button class="enunciat-map-btn" onclick="openCoordPicker(\'' + id + '\');event.stopPropagation()">🗺 Triar al mapa</button></div>';
+  html += '<div style="display:flex;align-items:flex-end;gap:6px"><button class="enunciat-save-btn" style="white-space:nowrap" onclick="saveAdminCoords(\'' + id + '\');event.stopPropagation()">📍 Desar coords</button></div>';
   html += '</div>';
   html += '<div class="enunciat-lang-tabs">';
   html += '<button class="enunciat-lang-tab active" id="etab-ca-' + id + '" onclick="switchEnunciatTab(\'' + id + '\',\'ca\');event.stopPropagation()">CA</button>';
