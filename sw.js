@@ -1,8 +1,6 @@
 // Service Worker — La Tonteria de l'Anglès
-const CACHE = 'tonteria-v9';
+const CACHE = 'tonteria-v10';
 const PRECACHE = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
@@ -26,13 +24,28 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Network-first per a Supabase (dades en temps real), cache-first per a la resta
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
   // Supabase: sempre xarxa, sense cache
   if (url.hostname.includes('supabase.co')) {
     e.respondWith(fetch(e.request).catch(() => new Response('', {status: 503})));
+    return;
+  }
+
+  // index.html: SEMPRE xarxa primer — mai servir versió antiga de la cache
+  if (url.pathname === '/' || url.pathname === '/index.html') {
+    e.respondWith(
+      fetch(e.request)
+        .then(r => {
+          if (r && r.status === 200) {
+            const c = r.clone();
+            caches.open(CACHE).then(cache => cache.put(e.request, c));
+          }
+          return r;
+        })
+        .catch(() => caches.match(e.request))
+    );
     return;
   }
 
@@ -46,7 +59,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Resta: cache-first
+  // Resta (fonts, icones, libs): cache-first
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;

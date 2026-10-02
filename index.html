@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v60 build:20261002-0710 -->
+<!-- v61 build:20261002-1500 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1138,9 +1138,16 @@ function copyLink(name, mapUrl) {
 }
 
 // ── SUPABASE HELPERS ───────────────────────────────────────────────────────
-async function loadPublished() {
+async function loadPublished(retries = 2) {
   const { data, error } = await sb.from('entries').select('*').eq('status', 'published');
-  if (error) { console.warn('loadPublished error:', error); return; }
+  if (error) {
+    console.warn('loadPublished error:', error);
+    if (retries > 0) {
+      await new Promise(r => setTimeout(r, 1500));
+      return loadPublished(retries - 1);
+    }
+    return;
+  }
   publishedEntries = (data || []).map(e => ({
     ...e,
     tonteriaIndex: e.tonteriaIndex !== null && e.tonteriaIndex !== undefined ? Number(e.tonteriaIndex) : null,
