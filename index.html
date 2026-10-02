@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v63 build:20261002-1525 -->
+<!-- v64 build:20261002-1615 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1140,7 +1140,7 @@ function copyLink(name, mapUrl) {
 
 // ── SUPABASE HELPERS ───────────────────────────────────────────────────────
 async function loadPublished(retries = 3) {
-  const { data, error } = await sb.from('entries').select('*').eq('status', 'published');
+  const { data, error } = await sb.from('entries').select('id,status,name,addr,municipi,provincia,category,tonteriaIndex,lat,lng,mapUrl,tag,num,createdAt,ca,es,en,descOriginal').eq('status', 'published');
   if (error) {
     console.warn('loadPublished error:', error);
     if (retries > 0) {
@@ -1174,7 +1174,7 @@ async function loadPublished(retries = 3) {
 }
 
 async function loadPending() {
-  const { data, error } = await sb.from('entries').select('*').eq('status', 'pending').order('createdAt', { ascending: false });
+  const { data, error } = await sb.from('entries').select('id,status,name,addr,municipi,provincia,category,tonteriaIndex,lat,lng,mapUrl,tag,num,createdAt,ca,es,en,descOriginal').eq('status', 'pending').order('createdAt', { ascending: false });
   if (error) { console.warn(error); return; }
   pendingEntries = data || [];
   document.getElementById('pendingCount').textContent = pendingEntries.length + (pendingEntries.length === 1 ? ' pendent' : ' pendents');
