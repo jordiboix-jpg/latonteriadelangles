@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v59 build:20261001-1710 -->
+<!-- v60 build:20261002-0710 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -771,6 +771,17 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
     </div>
     <button class="submit-btn" id="submitBtn" onclick="submitCase()">Enviar cas →</button>
     <div class="form-msg hidden" id="formMsg"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div id="confirmBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;align-items:center;justify-content:center">
+  <div style="background:var(--paper);border:var(--border);width:min(320px,90vw);padding:24px 20px;box-shadow:0 8px 40px rgba(0,0,0,.4)">
+    <p id="confirmMsg" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--ink);margin-bottom:20px;line-height:1.5"></p>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="confirmCancel" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:var(--border);color:var(--muted);padding:8px 16px;cursor:pointer">Cancel·lar</button>
+      <button id="confirmOk" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--red);border:none;color:#fff;padding:8px 16px;cursor:pointer">Eliminar</button>
+    </div>
   </div>
 </div>
 
@@ -1977,7 +1988,7 @@ async function dictModalSave() {
   renderDict();
 }
 async function dictDelete(idx) {
-  if (!confirm('Eliminar aquesta entrada del diccionari?')) return;
+  if (!await showConfirm('Eliminar aquesta entrada del diccionari?')) return;
   const row = DICT[idx];
   const { error } = await sb.from('dict_entries').delete().eq('id', row.id);
   if (error) { showToast('Error: ' + error.message); return; }
@@ -2036,7 +2047,7 @@ async function approveProposal(id) {
   showToast('✓ Proposta aprovada i afegida al diccionari');
 }
 async function rejectProposal(id) {
-  if (!confirm('Rebutjar aquesta proposta?')) return;
+  if (!await showConfirm('Rebutjar aquesta proposta?', 'Rebutjar')) return;
   await sb.from('dict_proposals').update({status:'rejected'}).eq('id', id);
   dictProposals = dictProposals.filter(p => p.id !== id);
   const badge = document.getElementById('dictPropCount');
@@ -2332,8 +2343,25 @@ async function rejectEntry(id) {
   await sb.from('entries').update({status:'rejected'}).eq('id',id);
   await loadPending();
 }
+function showConfirm(msg, okLabel) {
+  return new Promise(resolve => {
+    const bg = document.getElementById('confirmBg');
+    document.getElementById('confirmMsg').textContent = msg;
+    const okBtn = document.getElementById('confirmOk');
+    okBtn.textContent = okLabel || 'Eliminar';
+    bg.style.display = 'flex';
+    function cleanup(result) {
+      bg.style.display = 'none';
+      okBtn.onclick = null;
+      document.getElementById('confirmCancel').onclick = null;
+      resolve(result);
+    }
+    okBtn.onclick = () => cleanup(true);
+    document.getElementById('confirmCancel').onclick = () => cleanup(false);
+  });
+}
 async function deleteEntry(id) {
-  if (!confirm('Eliminar aquest cas?')) return;
+  if (!await showConfirm('Eliminar aquest cas?')) return;
   await sb.from('entries').delete().eq('id',id);
   await loadPublished(); await loadPending();
 }
@@ -2368,7 +2396,7 @@ async function adminPhotoSave(id) {
   await loadPublished();
 }
 async function adminPhotoRemove(id) {
-  if (!confirm('Eliminar la foto?')) return;
+  if (!await showConfirm('Eliminar la foto?')) return;
   await sb.from('entries').update({photoB64: null}).eq('id',id);
   showToast('Foto eliminada');
   await loadPublished();
@@ -2774,11 +2802,11 @@ function mToggleDict(id) {
 function mStepNext(step) {
   if (step === 1) {
     const mfName = document.getElementById('mfName');
-    if (!mfName || !mfName.value.trim()) { alert('Cal indicar el nom del negoci'); return; }
+    if (!mfName || !mfName.value.trim()) { showToast('⚠ Cal indicar el nom del negoci'); return; }
   }
   if (step === 2) {
     const mfProv = document.getElementById('mfProv');
-    if (!mfProv || !mfProv.value) { alert('Cal seleccionar la província'); return; }
+    if (!mfProv || !mfProv.value) { showToast('⚠ Cal seleccionar la província'); return; }
   }
   if (step === 4) return;
   mGoToStep(step + 1);
