@@ -1,5 +1,5 @@
 // Service Worker — La Tonteria de l'Anglès
-const CACHE = 'tonteria-v10';
+const CACHE = 'tonteria-v11';
 const PRECACHE = [
   '/manifest.json',
   '/icon-192.png',
@@ -27,6 +27,9 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
+  // Ignorar esquemes no-http (chrome-extension, etc.)
+  if (!url.protocol.startsWith('http')) return;
+
   // Supabase: sempre xarxa, sense cache
   if (url.hostname.includes('supabase.co')) {
     e.respondWith(fetch(e.request).catch(() => new Response('', {status: 503})));
@@ -46,6 +49,12 @@ self.addEventListener('fetch', e => {
         })
         .catch(() => caches.match(e.request))
     );
+    return;
+  }
+
+  // sw.js: sempre xarxa (per permetre actualitzacions del SW)
+  if (url.pathname === '/sw.js') {
+    e.respondWith(fetch(e.request));
     return;
   }
 

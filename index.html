@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v61 build:20261002-1500 -->
+<!-- v63 build:20261002-1525 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -15,6 +15,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tonteria">
 <link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇬🇧</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css">
@@ -1138,14 +1139,23 @@ function copyLink(name, mapUrl) {
 }
 
 // ── SUPABASE HELPERS ───────────────────────────────────────────────────────
-async function loadPublished(retries = 2) {
+async function loadPublished(retries = 3) {
   const { data, error } = await sb.from('entries').select('*').eq('status', 'published');
   if (error) {
     console.warn('loadPublished error:', error);
     if (retries > 0) {
-      await new Promise(r => setTimeout(r, 1500));
+      await new Promise(r => setTimeout(r, 2000));
       return loadPublished(retries - 1);
     }
+    // Tots els reintents han fallat — mostrar botó de reintent
+    const feed = document.getElementById('feed');
+    if (feed) feed.innerHTML = '<div style="text-align:center;padding:60px 20px;font-family:\'DM Mono\',monospace"><p style="color:var(--muted);font-size:13px;margin-bottom:16px">Error connectant amb el servidor.<br>Comprova la connexió i torna-ho a intentar.</p><button onclick="location.reload()" style="background:var(--rust);color:#fff;border:none;padding:10px 24px;font-family:\'DM Mono\',monospace;font-size:12px;letter-spacing:.1em;cursor:pointer">↺ Recarregar</button></div>';
+    const mList = document.getElementById('mCasosList');
+    if (mList) mList.innerHTML = '<div style="text-align:center;padding:40px 20px;font-family:\'DM Mono\',monospace"><p style="color:var(--muted);font-size:12px;margin-bottom:16px">Error de connexió.</p><button onclick="location.reload()" style="background:var(--rust);color:#fff;border:none;padding:10px 24px;font-family:\'DM Mono\',monospace;font-size:12px;letter-spacing:.1em;cursor:pointer">↺ Recarregar</button></div>';
+    const splashStatus = document.getElementById('mSplashStatus');
+    if (splashStatus) { splashStatus.textContent = 'Error de connexió. Torna-ho a intentar.'; splashStatus.style.color = 'var(--rust)'; }
+    const splashBtn = document.getElementById('mSplashBtn');
+    if (splashBtn) { splashBtn.textContent = '↺ Recarregar'; splashBtn.style.display = 'inline-block'; splashBtn.onclick = () => location.reload(); }
     return;
   }
   publishedEntries = (data || []).map(e => ({
@@ -2994,8 +3004,18 @@ function mCaptureGPS() {
 
 // ── PWA SERVICE WORKER ──────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  window.addEventListener('load', async () => {
+    try {
+      // Desregistrar SW antics per forçar actualització neta
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) {
+        const sw = reg.active || reg.waiting || reg.installing;
+        const isOld = sw && sw.scriptURL && !sw.scriptURL.includes('sw.js');
+        // Forçar update sempre — el navegador comprovarà si sw.js ha canviat
+        reg.update();
+      }
+      await navigator.serviceWorker.register('/sw.js');
+    } catch(e) {}
   });
 }
 
