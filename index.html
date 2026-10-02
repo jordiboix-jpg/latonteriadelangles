@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v67 build:20261002-1715 -->
+<!-- v68 build:20261002-1800 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -2565,7 +2565,6 @@ function scrollToEntry(id) {
 async function init() {
   initDark();
   initPhotoUpload();
-  await seedIfEmpty();
   await Promise.all([loadPublished(), loadVisitCounts(), loadDict()]);
   dictSetSort('en'); // estableix columna activa per defecte
   applyLang(lang);
