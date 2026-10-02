@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v64 build:20261002-1615 -->
+<!-- v65 build:20261002-1700 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1171,6 +1171,21 @@ async function loadPublished(retries = 3) {
   updateStats();
   mUpdateStats();
   if (isMobile()) mRenderCasos();
+  // Carregar fotos en segon pla (no bloqueja la càrrega inicial)
+  loadPhotos();
+}
+
+async function loadPhotos() {
+  const { data } = await sb.from('entries').select('id,photoB64').eq('status','published').not('photoB64','is',null);
+  if (!data) return;
+  data.forEach(row => {
+    // Actualitzar en memòria
+    const entry = publishedEntries.find(e => e.id === row.id);
+    if (entry) entry.photoB64 = row.photoB64;
+    // Injectar foto a les targetes ja renderitzades
+    const img = document.querySelector(`[data-photo-id="${row.id}"]`);
+    if (img) { img.src = row.photoB64; img.style.display = 'block'; }
+  });
 }
 
 async function loadPending() {
@@ -1468,7 +1483,9 @@ function renderCard(e, showAdminActions) {
   const comment = ld.comment || '';
   const nameEsc = escHtml(e.name);
   const mapUrlEsc = escHtml(e.mapUrl||'');
-  const photoHtml = e.photoB64 ? `<img class="entry-photo" src="${e.photoB64}" alt="Foto de ${nameEsc}">` : '';
+  const photoHtml = e.photoB64
+    ? `<img class="entry-photo" data-photo-id="${e.id}" src="${e.photoB64}" alt="Foto de ${nameEsc}">`
+    : `<img class="entry-photo" data-photo-id="${e.id}" style="display:none" alt="Foto de ${nameEsc}">`;
   const visits = visitCounts[e.id] || 0;
   const visitHtml = `<div class="visit-badge" id="vb-${e.id}">${visitCountText(visits)}</div>`;
   const shareHtml = `<div class="share-row">
@@ -2379,7 +2396,9 @@ function showConfirm(msg, okLabel) {
 }
 async function deleteEntry(id) {
   if (!await showConfirm('Eliminar aquest cas?')) return;
-  await sb.from('entries').delete().eq('id',id);
+  const { error } = await sb.from('entries').delete().eq('id',id);
+  if (error) { showToast('❌ Error en eliminar: ' + error.message); console.error('deleteEntry error:', error); return; }
+  showToast('✓ Cas eliminat');
   await loadPublished(); await loadPending();
 }
 async function saveTonteriaIndex(id) {
