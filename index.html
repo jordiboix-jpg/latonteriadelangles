@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v65 build:20261002-1700 -->
+<!-- v66 build:20261002-1715 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1171,21 +1171,21 @@ async function loadPublished(retries = 3) {
   updateStats();
   mUpdateStats();
   if (isMobile()) mRenderCasos();
-  // Carregar fotos en segon pla (no bloqueja la càrrega inicial)
-  loadPhotos();
+  // Carregar fotos en segon pla, una a una per evitar timeout
+  loadPhotosOneByOne();
 }
 
-async function loadPhotos() {
-  const { data } = await sb.from('entries').select('id,photoB64').eq('status','published').not('photoB64','is',null);
-  if (!data) return;
-  data.forEach(row => {
-    // Actualitzar en memòria
-    const entry = publishedEntries.find(e => e.id === row.id);
-    if (entry) entry.photoB64 = row.photoB64;
-    // Injectar foto a les targetes ja renderitzades
-    const img = document.querySelector(`[data-photo-id="${row.id}"]`);
-    if (img) { img.src = row.photoB64; img.style.display = 'block'; }
-  });
+async function loadPhotosOneByOne() {
+  // Carregar foto de cada entrada individualment per evitar timeout de query gran
+  for (const entry of publishedEntries) {
+    try {
+      const { data } = await sb.from('entries').select('id,photoB64').eq('id', entry.id).single();
+      if (!data || !data.photoB64) continue;
+      entry.photoB64 = data.photoB64;
+      const img = document.querySelector(`[data-photo-id="${entry.id}"]`);
+      if (img) { img.src = data.photoB64; img.style.display = 'block'; }
+    } catch(e) { /* continuar amb la següent */ }
+  }
 }
 
 async function loadPending() {
