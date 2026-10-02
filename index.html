@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v66 build:20261002-1715 -->
+<!-- v67 build:20261002-1715 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -2396,8 +2396,9 @@ function showConfirm(msg, okLabel) {
 }
 async function deleteEntry(id) {
   if (!await showConfirm('Eliminar aquest cas?')) return;
-  const { error } = await sb.from('entries').delete().eq('id',id);
+  const { data, error } = await sb.from('entries').delete().eq('id',id).select('id');
   if (error) { showToast('❌ Error en eliminar: ' + error.message); console.error('deleteEntry error:', error); return; }
+  if (!data || data.length === 0) { showToast('⚠️ No s\'ha pogut eliminar el cas'); console.warn('deleteEntry: no rows deleted for id', id); return; }
   showToast('✓ Cas eliminat');
   await loadPublished(); await loadPending();
 }
