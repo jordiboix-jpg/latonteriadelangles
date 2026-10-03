@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v68 build:20261002-1800 -->
+<!-- v69 build:20261003-0720 · ordenació del diccionari corregida -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -637,7 +637,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
     <div style="border:1px solid var(--rule);overflow:hidden;margin-bottom:8px">
       <div class="dict-header-row">
         <div class="dict-hcol" style="border-right:1px solid #3a2e1e" id="dictCol1" onclick="dictSetSort('en')"><span id="dictCol1Lbl">Anglès misteriós</span> <span class="sort-arrows" id="dictCol1Arrow">↑↓</span></div>
-        <div class="dict-hcol dict-hcol-comment" id="dictCol2" onclick="dictSetSort(lang==='en'?'eng':lang)"><span id="dictCol2Lbl">Traducció / Comentari</span> <span class="sort-arrows" id="dictCol2Arrow">↑↓</span></div>
+        <div class="dict-hcol dict-hcol-comment" id="dictCol2" onclick="dictSetSort('tr')"><span id="dictCol2Lbl">Traducció / Comentari</span> <span class="sort-arrows" id="dictCol2Arrow">↑↓</span></div>
         <div class="dict-hcol dict-hcol-comment-desktop" style="border-left:1px solid #3a2e1e" id="dictCol3">Comentari editorial</div>
       </div>
       <div id="dictRows"></div>
@@ -1744,7 +1744,8 @@ function renderLegend() {
 }
 
 // ── DICT STATE ─────────────────────────────────────────────────────────────
-let dictSort = 'en';
+let dictSort = 'en';   // 'en' = columna anglès · 'tr' = columna traducció (segons l'idioma actiu) · 'orig'
+let dictSortDir = 1;   // 1 = A→Z · -1 = Z→A
 let dictPageSize = 10;
 let dictPageNum = 0;
 let dictEditIdx = -1; // -1 = nova entrada
@@ -1767,10 +1768,14 @@ function dictGetFiltered() {
       }
     });
   }
-  if (dictSort === 'en') arr.sort((a,b) => a.en.localeCompare(b.en));
-  else if (dictSort === 'ca') arr.sort((a,b) => a.ca.localeCompare(b.ca, 'ca'));
-  else if (dictSort === 'es') arr.sort((a,b) => (a.es||'').localeCompare(b.es||'', 'es'));
-  else arr.sort((a,b) => a._orig - b._orig);
+  // Ordenació: la columna de traducció sempre ordena pel text que es veu en l'idioma actiu
+  const trKey = lang === 'en' ? 'eng' : lang;
+  const sortText = r => String((dictSort === 'en' ? r.en : (r[trKey] || r.ca)) || '')
+    .trim().replace(/^[¿¡«»"'(\[]+/, '');
+  const loc = dictSort === 'en' ? 'en' : lang;
+  if (dictSort === 'en' || dictSort === 'tr') {
+    arr.sort((a,b) => dictSortDir * sortText(a).localeCompare(sortText(b), loc, {sensitivity:'base', numeric:true}));
+  } else arr.sort((a,b) => a._orig - b._orig);
   return arr;
 }
 function dictUpdate() {
@@ -1778,6 +1783,10 @@ function dictUpdate() {
   renderDict();
 }
 function dictSetSort(s) {
+  // compatibilitat amb valors antics
+  if (s === 'ca' || s === 'es' || s === 'eng') s = 'tr';
+  // tornar a clicar la mateixa columna inverteix l'ordre
+  if (s === dictSort) dictSortDir = -dictSortDir; else dictSortDir = 1;
   dictSort = s;
   // Actualitza classes sort-col-active a les capçaleres
   ['dictCol1','dictCol2'].forEach(c => {
@@ -1844,6 +1853,8 @@ function renderDict() {
   // Restaura colors de les fletxes de manera explícita
   ['dictCol1','dictCol2'].forEach(c=>{const arrow=document.getElementById(c+'Arrow');if(arrow)arrow.style.color='rgba(255,255,255,.3)';});
   const _activeArrow=document.getElementById(_activeCol+'Arrow');if(_activeArrow)_activeArrow.style.color='#fff';
+  // Fletxes: la columna activa mostra el sentit (↑ A→Z, ↓ Z→A); la inactiva, ↑↓
+  ['dictCol1','dictCol2'].forEach(c=>{const a=document.getElementById(c+'Arrow');if(a)a.textContent=(c===_activeCol && dictSort!=='orig')?(dictSortDir===1?'↑':'↓'):'↑↓';});
 
   rows.innerHTML = page.map((row, i) => {
     const bg = i%2===0?'var(--paper)':'var(--cream)';
