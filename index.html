@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v75 build:20261005-1920 · banderola d'instal·lació: espera 35 s perquè Chrome ofereixi el botó «Instal·la» -->
+<!-- v76 build:20261005-1945 · banderola: el text no es pot seleccionar (evita «Toca per cercar» de Google) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -58,6 +58,7 @@ hr.rule{border:none;border-top:3px double var(--rule);margin:50px 0 36px}
 /* ── PWA INSTALL BANNER ─────────────────────────────────────────────────── */
 #pwaBanner{position:fixed;bottom:0;left:0;right:0;padding-bottom:calc(14px + env(safe-area-inset-bottom))!important;z-index:9999;background:var(--ink);color:var(--paper);padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 -3px 16px rgba(0,0,0,.35);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.05em;border-top:3px solid var(--rust)}
 #pwaBanner.hidden{display:none}
+#pwaBanner,#pwaBanner *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body:has(#detailModal.open) #pwaBanner{display:none}
 #pwaBanner .pwa-icon{font-size:22px;flex-shrink:0}
 #pwaBanner .pwa-text{flex:1;line-height:1.4}
