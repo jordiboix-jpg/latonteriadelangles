@@ -1,5 +1,5 @@
 // Service Worker — La Tonteria de l'Anglès
-const CACHE = 'tonteria-v11';
+const CACHE = 'tonteria-v73';
 const PRECACHE = [
   '/manifest.json',
   '/icon-192.png',

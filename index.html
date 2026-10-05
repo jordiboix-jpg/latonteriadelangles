@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v71 build:20261003-0745 · etiquetes i filtres de tipus de negoci traduïts, any 2026 -->
+<!-- v73 build:20261005-1730 · trucades i visites es desen de debò a Supabase; banderola d'instal·lació només al mòbil i sense molestar -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -56,8 +56,9 @@ body{background:var(--paper);color:var(--ink);font-family:'Source Serif 4',Georg
 hr.rule{border:none;border-top:3px double var(--rule);margin:50px 0 36px}
 
 /* ── PWA INSTALL BANNER ─────────────────────────────────────────────────── */
-#pwaBanner{position:fixed;bottom:60px;left:0;right:0;z-index:9999;background:var(--ink);color:var(--paper);padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 -3px 16px rgba(0,0,0,.35);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.05em;border-top:3px solid var(--rust)}
+#pwaBanner{position:fixed;bottom:0;left:0;right:0;padding-bottom:calc(14px + env(safe-area-inset-bottom))!important;z-index:9999;background:var(--ink);color:var(--paper);padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 -3px 16px rgba(0,0,0,.35);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.05em;border-top:3px solid var(--rust)}
 #pwaBanner.hidden{display:none}
+body:has(#detailModal.open) #pwaBanner{display:none}
 #pwaBanner .pwa-icon{font-size:22px;flex-shrink:0}
 #pwaBanner .pwa-text{flex:1;line-height:1.4}
 #pwaBanner .pwa-text strong{display:block;font-size:13px;color:var(--paper);margin-bottom:2px}
@@ -215,6 +216,60 @@ hr.rule{border:none;border-top:3px double var(--rule);margin:50px 0 36px}
 
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;padding:10px 20px;border-radius:3px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:200}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── DETAIL MODAL ──────────────────────────────────────────────────────────── */
+#detailModal{display:none;position:fixed;inset:0;z-index:1000;background:var(--paper)}
+#detailModal.open{display:flex;flex-direction:column}
+.dm-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:var(--border);background:var(--paper);flex-shrink:0;position:sticky;top:0;z-index:10}
+.dm-back-btn{background:none;border:none;cursor:pointer;font-size:20px;padding:4px 8px 4px 0;color:var(--ink);line-height:1;flex-shrink:0}
+.dm-header-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dm-header-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);flex-shrink:0}
+.dm-body{flex:1;overflow-y:auto;padding-bottom:90px}
+.dm-hero{width:100%;height:200px;background:linear-gradient(135deg,var(--cream) 0%,var(--rule) 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0}
+.dm-hero-placeholder{font-size:64px;opacity:.3}
+.dm-hero-badge{position:absolute;top:12px;right:12px;background:var(--rust);color:#fff;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;padding:4px 8px;border-radius:2px}
+.dm-info-block{padding:14px 16px 10px;border-bottom:var(--border)}
+.dm-name-big{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:4px}
+.dm-addr{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px}
+.dm-tags-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.dm-tag-pill{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;background:var(--cream);border:var(--border);padding:3px 8px;border-radius:20px;color:var(--muted)}
+.dm-ti-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+.dm-ti-dots{font-size:14px;letter-spacing:2px}
+.dm-ti-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+.dm-tonteria-box{margin:14px 16px;padding:14px 16px;background:var(--cream);border:2px solid var(--rust);border-radius:4px}
+.dm-tonteria-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--rust);margin-bottom:8px;font-weight:700}
+.dm-tonteria-text{font-family:'Source Serif 4',serif;font-size:15px;line-height:1.6;color:var(--ink);font-style:italic}
+.dm-tonteria-empty{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);font-style:italic}
+.dm-desc-block{padding:14px 16px;border-bottom:var(--border)}
+.dm-desc-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.dm-desc-text{font-family:'Source Serif 4',serif;font-size:14px;line-height:1.6;color:var(--ink)}
+.dm-transl-block{padding:12px 16px;border-bottom:var(--border);background:rgba(0,0,0,.02)}
+.dm-transl-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--green);letter-spacing:.05em}
+.dm-maps-link{display:block;margin:14px 16px 6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:8px 12px;border:var(--border);border-radius:3px;text-align:center}
+.dm-maps-link:hover{color:var(--rust);border-color:var(--rust)}
+.dm-cta-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px;background:var(--paper);border-top:2px solid var(--rust);z-index:20}
+.dm-call-btn{display:block;width:100%;padding:16px;background:var(--rust);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;border-radius:3px;text-align:center;font-weight:700;text-decoration:none}
+.dm-call-btn:hover{background:#9b2e08}
+.dm-call-btn:active{transform:scale(.98)}
+.dm-call-disclaimer{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;margin-top:6px;letter-spacing:.1em}
+
+/* Desktop: modal overlay centrat */
+@media(min-width:768px){
+  #detailModal{background:rgba(0,0,0,.7);align-items:center;justify-content:center}
+  .dm-inner{background:var(--paper);width:min(580px,92vw);max-height:85vh;border-radius:4px;overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  .dm-header{border-radius:4px 4px 0 0}
+  .dm-body{overflow-y:auto;padding-bottom:0}
+  .dm-hero{height:240px}
+  .dm-name-big{font-size:24px}
+  .dm-tonteria-box{margin:16px 20px}
+  .dm-info-block{padding:16px 20px 12px}
+  .dm-desc-block{padding:14px 20px}
+  .dm-transl-block{padding:12px 20px}
+  .dm-cta-bar{position:sticky;bottom:0;border-radius:0 0 4px 4px}
+}
+@media(max-width:767px){
+  .dm-inner{display:contents}
+}
 
 .tonteria-index{margin:12px 0 14px;padding:10px 13px;background:rgba(0,0,0,.04);border:1px solid var(--rule)}
 .ti-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
@@ -1229,7 +1284,8 @@ async function incrementVisit(id, url) {
   visitCounts[id] = cur + 1;
   const badge = document.getElementById('vb-' + id);
   if (badge) badge.textContent = visitCountText(cur + 1);
-  sb.from('visits').upsert({ id, count: cur + 1 }); // fire-and-forget
+  sb.from('visits').upsert({ id, count: cur + 1 })
+    .then(({ error }) => { if (error) console.warn('No s\'ha desat la visita', error); });
   // Obrir la web del negoci
   if (url) window.open(url, '_blank', 'noopener');
 }
@@ -1237,6 +1293,174 @@ async function incrementVisit(id, url) {
 function visitCountText(n) {
   if (!n) return '';
   return `👁 ${n} ${n === 1 ? t('visits') : t('visitsPlural')}`;
+}
+
+// ── DETAIL MODAL ─────────────────────────────────────────────────────────────
+let _dmEntry = null;
+
+const CAT_ICONS = {
+  cafeteria:'☕', restaurant:'🍳', barberia:'✂️', botiga:'🛍',
+  beaute:'💅', negoci:'🏢', vehicle:'🚗', altre:'🏪'
+};
+const TI_COLORS = ['#4caf50','#a8c61b','#f0a500','#e07000','#d03020','#8b0000'];
+const TI_CALL_TEXTS = {
+  ca: ['Millor no trucar (per si de cas)', 'Pots provar, però porta sort', 'Normal, si no t\'avorreix', 'Pensa-t\'ho bé, de debò', 'Al·lèrgia a l\'anglès confirmada', 'Cas clínic. Truca si t\'atreveixes 🚨'],
+  es: ['Mejor no llamar (por si acaso)', 'Puedes intentarlo, lleva suerte', 'Normal, si no te aburre', 'Piénsatelo bien, en serio', 'Alergia al inglés confirmada', 'Caso clínico. Llama si te atreves 🚨'],
+  en: ['Better not call (just in case)', 'You can try, bring luck', 'Normal, if you\'re not bored', 'Think twice, really', 'Confirmed English allergy', 'Clinical case. Call if you dare 🚨']
+};
+
+function openDetailModal(entryId) {
+  const e = publishedEntries.find(x => x.id === entryId) || SEED.find(x => x.id === entryId);
+  if (!e) return;
+  _dmEntry = e;
+
+  // Incrementar visita (igual que abans)
+  const cur = visitCounts[e.id] || 0;
+  visitCounts[e.id] = cur + 1;
+  const badge = document.getElementById('vb-' + e.id);
+  if (badge) badge.textContent = visitCountText(cur + 1);
+  sb.from('visits').upsert({ id: e.id, count: cur + 1 })
+    .then(({ error }) => { if (error) console.warn('No s\'ha desat la visita', error); });
+
+  const eData = e[lang] || e.ca || {};
+  const ti = (typeof e.tonteriaIndex === 'number') ? e.tonteriaIndex : 3;
+  const tiData = TINDEX[ti] || TINDEX[3];
+  const catIcon = CAT_ICONS[e.category] || '🏪';
+  const col = TI_COLORS[Math.min(ti, 5)];
+  const dots = Array(5).fill(0).map((_,d) => d < ti
+    ? `<span style="color:${col}">■</span>`
+    : '<span style="opacity:.25">■</span>'
+  ).join('');
+  const tiLbl = tiData ? tiData.label[lang] || tiData.label.ca : '';
+  const callTexts = TI_CALL_TEXTS[lang] || TI_CALL_TEXTS.ca;
+
+  // Omplir el modal
+  document.getElementById('dmHeaderName').textContent = e.name || '';
+  document.getElementById('dmHeaderNum').textContent = e.num ? '#' + e.num : '';
+  document.getElementById('dmHeroIcon').textContent = catIcon;
+  document.getElementById('dmHeroBadge').textContent = (tiData ? tiData.emoji : '') + ' ' + ti + '/5';
+  document.getElementById('dmHeroBadge').style.background = col;
+  document.getElementById('dmName').textContent = e.name || '';
+  document.getElementById('dmAddr').textContent = e.addr || '';
+
+  // Tags
+  const tagsRow = document.getElementById('dmTagsRow');
+  tagsRow.innerHTML = '';
+  if (e.tag) { const p = document.createElement('span'); p.className='dm-tag-pill'; p.textContent='🏷 '+e.tag; tagsRow.appendChild(p); }
+  if (e.category) { const p = document.createElement('span'); p.className='dm-tag-pill'; p.textContent=catIcon+' '+(e.category); tagsRow.appendChild(p); }
+
+  // Tonteria Index
+  document.getElementById('dmTiDots').innerHTML = dots;
+  document.getElementById('dmTiLabel').textContent = tiLbl;
+
+  // Comentari editorial (el "LA TONTERIA DIU:")
+  const commentEl = document.getElementById('dmComment');
+  const comment = eData.comment || '';
+  if (comment && comment !== '—') {
+    commentEl.className = 'dm-tonteria-text';
+    commentEl.textContent = comment;
+  } else {
+    commentEl.className = 'dm-tonteria-empty';
+    commentEl.textContent = '[ Comentari editorial pendent... ]';
+  }
+
+  // Traducció
+  const translEl = document.getElementById('dmTransl');
+  const transl = eData.transl || '';
+  const translBlock = document.getElementById('dmTranslBlock');
+  if (transl) { translEl.textContent = '→ ' + transl; translBlock.style.display = ''; }
+  else { translBlock.style.display = 'none'; }
+
+  // Descripció
+  const descEl = document.getElementById('dmDesc');
+  const descBlock = document.getElementById('dmDescBlock');
+  const desc = eData.desc || '';
+  if (desc) { descEl.textContent = desc; descBlock.style.display = ''; }
+  else { descBlock.style.display = 'none'; }
+
+  // Google Maps link (de referència)
+  const mapsLink = document.getElementById('dmMapsLink');
+  const mapUrl = e.mapUrl || ('https://maps.google.com/?q=' + encodeURIComponent((e.name||'')+(e.addr?', '+e.addr:'')));
+  mapsLink.href = mapUrl;
+
+  // CTA: botó trucada
+  const callBtn = document.getElementById('dmCallBtn');
+  // Per ara fem servir un número fictici; v73 tindrà el camp phone real
+  const phone = e.phone || null;
+  if (phone) {
+    callBtn.href = 'tel:' + phone.replace(/\s/g,'');
+    callBtn.dataset.entryId = e.id;
+    callBtn.dataset.phone = phone;
+  } else {
+    // Sense telèfon: obrim Google Maps com a fallback
+    callBtn.href = mapUrl;
+    callBtn.target = '_blank';
+    callBtn.dataset.entryId = e.id;
+    callBtn.dataset.phone = '';
+  }
+  // Disclaimer humorístic segons nivell de tonteria
+  const disclaimer = callTexts[Math.min(ti, 5)];
+  document.getElementById('dmCallDisclaimer').textContent = disclaimer;
+
+  // Mostrar modal
+  const modal = document.getElementById('detailModal');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Tancar amb Escape
+  document.addEventListener('keydown', _dmEscListener);
+
+  // Desktop: tancar clicant el fons
+  modal.addEventListener('click', _dmBackdropListener);
+}
+
+function _dmEscListener(e) {
+  if (e.key === 'Escape') closeDetailModal();
+}
+function _dmBackdropListener(e) {
+  // Tancar si es clica el backdrop (no el contingut inner)
+  if (e.target === document.getElementById('detailModal')) closeDetailModal();
+}
+
+function closeDetailModal() {
+  const modal = document.getElementById('detailModal');
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+  document.removeEventListener('keydown', _dmEscListener);
+  modal.removeEventListener('click', _dmBackdropListener);
+  _dmEntry = null;
+}
+
+function trackCall(event) {
+  const btn = document.getElementById('dmCallBtn');
+  const entryId = btn.dataset.entryId;
+  const phone = btn.dataset.phone;
+  const e = _dmEntry;
+
+  // GA4 event (si disponible)
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'call_click', {
+      entry_id: entryId,
+      entry_name: e ? e.name : '',
+      has_phone: !!phone,
+      tonteria_index: e ? e.tonteriaIndex : null
+    });
+  }
+
+  // Desar a Supabase per seguiment intern
+  if (entryId) {
+    sb.from('call_clicks').insert({ entry_id: entryId, ts: new Date().toISOString(), has_phone: !!phone })
+      .then(({ error }) => { if (error) console.warn('No s\'ha desat la trucada', error); });
+  }
+
+  // Si no té telèfon, obrir Maps en nova pestanya
+  if (!phone) {
+    event.preventDefault();
+    const href = btn.href;
+    window.open(href, '_blank', 'noopener');
+    showToast('📞 Sense telèfon directe — obrim Maps!');
+  }
+  // Si té tel:, el navegador ho obre sol (no prevenim per defecte)
 }
 
 // ── RENDER ──────────────────────────────────────────────────────────────────
@@ -1518,8 +1742,7 @@ function renderCard(e, showAdminActions) {
     </div>`;
   }
   const googleMapsUrl = e.name ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.name+(e.addr?', '+e.addr:''))}` : (e.mapUrl||'');
-  const clickUrl = googleMapsUrl.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  return `<article class="entry" data-entry-id="${e.id}" ${isAdmin?'':`onclick="incrementVisit('${e.id}','${clickUrl}')" title="Obrir ${nameEsc} →"`}>
+  return `<article class="entry" data-entry-id="${e.id}" ${isAdmin?'':`onclick="openDetailModal('${e.id}')" title="Veure fitxa de ${nameEsc}"`}>
     ${photoHtml}
     <div class="entry-num">${e.num||'??'}</div>
     <span class="${tagClass}">${displayTag}</span>
@@ -1532,7 +1755,7 @@ function renderCard(e, showAdminActions) {
     <p class="entry-desc">${escHtml(desc)}</p>
     ${renderCommentBlock(e, comment, isAdmin)}
     ${e.email&&isAdmin?`<p style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px">${t('submittedBy')}: ${escHtml(e.email)}</p>`:''}
-    ${e.name&&!isAdmin?`<a class="map-btn" href="${escHtml(googleMapsUrl)}" target="_blank" onclick="event.stopPropagation()">${t('mapBtn')}</a>`:''}
+    ${e.name&&!isAdmin?`<button class="map-btn" onclick="openDetailModal('${e.id}');event.stopPropagation()">📋 Veure fitxa + trucada</button>`:''}
     ${shareHtml}
     ${adminHtml}
   </article>`;
@@ -2774,8 +2997,8 @@ function mRenderCasos() {
     const tIdx = TINDEX[e.tonteriaIndex] || TINDEX[3];
     const dots = Array(5).fill(0).map(function(_,d){ return d < e.tonteriaIndex ? tIdx.emoji : '⬜'; }).join('');
     const eData = e[lang] || e.ca || {};
-    const googleUrl = e.mapUrl || 'https://maps.google.com/?q=' + encodeURIComponent(e.name);
-    return '<div class="mCaseCard" onclick="mToggleCase(\'mcase_' + i + '\')">'
+    // googleUrl ara és gestionat pel modal openDetailModal
+    return '<div class="mCaseCard" onclick="openDetailModal(\'' + e.id + '\')">'
       + '<div class="mCaseCardHeader">'
       + '<div class="mCaseNum">' + escHtml(e.num || String(i+1).padStart(2,'0')) + '</div>'
       + '<div style="flex:1">'
@@ -2786,12 +3009,7 @@ function mRenderCasos() {
       + '<span class="mCaseTag">' + escHtml(e.tag||'') + '</span>'
       + '</div>'
       + '</div>'
-      + '</div>'
-      + '<div class="mCaseBody" id="mcase_' + i + '">'
-      + '<div class="mCaseTransl">→ ' + escHtml(eData.transl||'') + '</div>'
-      + '<div class="mCaseDesc">' + escHtml(eData.desc||'') + '</div>'
-      + '<div class="mCaseComment">' + escHtml(eData.comment||'') + '</div>'
-      + '<a class="mCaseMapLink" href="' + escHtml(googleUrl) + '" target="_blank" onclick="event.stopPropagation()">📍 Veure al mapa ↗</a>'
+      + '<div style="font-size:16px;color:var(--muted);padding-left:8px">›</div>'
       + '</div>'
       + '</div>';
   }).join('');
@@ -3051,91 +3269,139 @@ if ('serviceWorker' in navigator) {
 }
 
 // ── PWA INSTALL BANNER ──────────────────────────────────────────────────────
+// Regles: només mòbil, mai si ja està instal·lada, a partir de la 2a visita,
+// al cap de 20 s, mai amb una fitxa oberta, i si la tanquen no torna en 30 dies.
 (function() {
-  // No mostrar si ja estava instal·lat o descartat
-  if (localStorage.getItem('pwaDismissed')) return;
-  if (window.matchMedia('(display-mode: standalone)').matches) return;
-  if (window.navigator.standalone === true) return; // iOS standalone
+  const DIES_SILENCI = 30;
+  const RETARD_MS = 20000;
+  const VISITES_MINIMES = 2;
 
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-  const isAndroid = /android/i.test(navigator.userAgent);
-  if (!isIOS && !isAndroid) return; // Només mòbil
+  const ls = {
+    get(k) { try { return localStorage.getItem(k); } catch(e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+  };
+
+  // Ja instal·lada (oberta des de la icona)
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  if (window.navigator.standalone === true) return; // iOS
+
+  // Només mòbils de veritat: pantalla tàctil i estreta
+  const ua = navigator.userAgent;
+  const isIOS = /iphone|ipad|ipod/i.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPad modern
+  const isAndroid = /android/i.test(ua);
+  const tactil = window.matchMedia('(pointer: coarse)').matches;
+  const estreta = Math.min(screen.width, screen.height) < 820;
+  if (!(isIOS || isAndroid) || !tactil || !estreta) return;
+
+  // Comptador de visites (una per sessió del navegador)
+  let visites = parseInt(ls.get('pwaVisits') || '0', 10);
+  try {
+    if (!sessionStorage.getItem('pwaVisitCounted')) {
+      visites++;
+      ls.set('pwaVisits', String(visites));
+      sessionStorage.setItem('pwaVisitCounted', '1');
+    }
+  } catch(e) {}
+
+  // Descartada fa menys de 30 dies?
+  const descartada = parseInt(ls.get('pwaDismissedAt') || '0', 10);
+  const enSilenci = descartada && (Date.now() - descartada) < DIES_SILENCI * 864e5;
 
   let deferredPrompt = null;
+  let platform = null;
+  let tempsCumplert = false;
+  let mostrada = false;
 
-  // Funció global per al botó de la barra
+  const navBtn = () => document.getElementById('pwaNavBtn');
+  const modalObert = () => {
+    const m = document.getElementById('detailModal');
+    return m && m.classList.contains('open');
+  };
+
+  // Botó «📲 App» de la barra: sempre disponible al mòbil, encara que la banderola estigui en silenci
   window.pwaTriggerInstall = async function() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       deferredPrompt = null;
-      const btn = document.getElementById('pwaNavBtn');
-      if (btn) btn.style.display = 'none';
-      dismissBanner();
+      if (outcome === 'accepted' && navBtn()) navBtn().style.display = 'none';
+      amagaBanner();
     } else if (isIOS) {
-      showBanner('ios');
+      pintaBanner('ios');
     }
   };
 
-  // Android: captura l'event d'instal·lació
+  // Android/Chrome: guardem l'event per mostrar la nostra banderola quan toqui
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
-    // Mostra el botó a la barra
-    const btn = document.getElementById('pwaNavBtn');
-    if (btn) btn.style.display = 'block';
-    showBanner('android');
+    platform = 'android';
+    if (navBtn()) navBtn().style.display = 'block';
+    potserMostra();
   });
 
-  function showBanner(platform) {
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    if (navBtn()) navBtn().style.display = 'none';
+    amagaBanner();
+  });
+
+  if (isIOS) {
+    platform = 'ios';
+    if (navBtn()) navBtn().style.display = 'block';
+  }
+
+  setTimeout(() => { tempsCumplert = true; potserMostra(); }, RETARD_MS);
+
+  function potserMostra() {
+    if (mostrada || enSilenci || !tempsCumplert || !platform) return;
+    if (visites < VISITES_MINIMES) return;
+    if (platform === 'android' && !deferredPrompt) return;
+    if (modalObert()) { setTimeout(potserMostra, 3000); return; } // ho tornem a provar quan tanquin la fitxa
+    pintaBanner(platform);
+  }
+
+  function pintaBanner(plat) {
     const banner = document.getElementById('pwaBanner');
     if (!banner) return;
-    if (platform === 'android') {
+    mostrada = true;
+    if (plat === 'android') {
       banner.innerHTML = `
         <div class="pwa-icon">📲</div>
         <div class="pwa-text">
           <strong>Instal·la La Tonteria</strong>
-          <span>Accés ràpid des de la pantalla d'inici, sense obrir el navegador</span>
+          <span>A pantalla completa, sense les barres del navegador</span>
         </div>
         <button class="pwa-install-btn" id="pwaInstallBtn">Instal·la</button>
         <button class="pwa-close-btn" id="pwaCloseBtn" title="Tanca">✕</button>
       `;
-      document.getElementById('pwaInstallBtn').addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        dismissBanner();
-      });
-    } else if (platform === 'ios') {
+      document.getElementById('pwaInstallBtn').addEventListener('click', () => window.pwaTriggerInstall());
+    } else {
       banner.innerHTML = `
         <div class="pwa-icon">📲</div>
         <div class="pwa-text">
-          <strong>Instal·la La Tonteria a l'inici</strong>
+          <strong>Posa La Tonteria a la pantalla d'inici</strong>
           <div class="pwa-ios-steps">
-            Prem <b>⎙ Compartir</b> → <b>«Afegir a la pantalla d'inici»</b>
+            Prem <b>Compartir</b> (el quadrat amb la fletxa) → <b>«Afegir a la pantalla d'inici»</b>
           </div>
         </div>
         <button class="pwa-close-btn" id="pwaCloseBtn" title="Tanca">✕</button>
       `;
     }
     banner.classList.remove('hidden');
-    document.getElementById('pwaCloseBtn').addEventListener('click', dismissBanner);
+    document.getElementById('pwaCloseBtn').addEventListener('click', descarta);
   }
 
-  function dismissBanner() {
+  function amagaBanner() {
     const banner = document.getElementById('pwaBanner');
     if (banner) banner.classList.add('hidden');
-    localStorage.setItem('pwaDismissed', '1');
   }
 
-  // iOS: mostra el botó a la barra i el banner als 3s
-  if (isIOS) {
-    const btn = document.getElementById('pwaNavBtn');
-    if (btn) btn.style.display = 'block';
-    setTimeout(() => showBanner('ios'), 3000);
+  function descarta() {
+    amagaBanner();
+    ls.set('pwaDismissedAt', String(Date.now()));
   }
-  // Android: el banner apareix quan es dispara beforeinstallprompt (automàtic)
 })();
 </script>
 
@@ -3151,6 +3417,48 @@ if ('serviceWorker' in navigator) {
   <div id="mapFloatBody">
     <div id="mapaFloat"></div>
     <div id="mapFloatResize"></div>
+  </div>
+</div>
+
+<!-- ── DETAIL MODAL ────────────────────────────────────────────────────── -->
+<div id="detailModal" role="dialog" aria-modal="true">
+  <div class="dm-inner">
+    <div class="dm-header">
+      <button class="dm-back-btn" onclick="closeDetailModal()" aria-label="Tornar">←</button>
+      <span class="dm-header-name" id="dmHeaderName"></span>
+      <span class="dm-header-num" id="dmHeaderNum"></span>
+    </div>
+    <div class="dm-body" id="dmBody">
+      <div class="dm-hero" id="dmHero">
+        <span class="dm-hero-placeholder" id="dmHeroIcon">🏪</span>
+        <span class="dm-hero-badge" id="dmHeroBadge"></span>
+      </div>
+      <div class="dm-info-block">
+        <div class="dm-name-big" id="dmName"></div>
+        <div class="dm-addr" id="dmAddr"></div>
+        <div class="dm-tags-row" id="dmTagsRow"></div>
+        <div class="dm-ti-row">
+          <span class="dm-ti-dots" id="dmTiDots"></span>
+          <span class="dm-ti-label" id="dmTiLabel"></span>
+        </div>
+      </div>
+      <div class="dm-tonteria-box">
+        <div class="dm-tonteria-label">🗞 La Tonteria Diu:</div>
+        <div id="dmComment"></div>
+      </div>
+      <div class="dm-transl-block" id="dmTranslBlock">
+        <div class="dm-transl-text" id="dmTransl"></div>
+      </div>
+      <div class="dm-desc-block" id="dmDescBlock">
+        <div class="dm-desc-label">De què va això?</div>
+        <div class="dm-desc-text" id="dmDesc"></div>
+      </div>
+      <a class="dm-maps-link" id="dmMapsLink" href="#" target="_blank" onclick="event.stopPropagation()">🗺 Verificar a Google Maps ↗</a>
+    </div>
+    <div class="dm-cta-bar">
+      <a class="dm-call-btn" id="dmCallBtn" href="#" onclick="trackCall(event)">📞 TRUCA'LS (si t'atreveixes)</a>
+      <div class="dm-call-disclaimer" id="dmCallDisclaimer">Ets responsable de la teva pròpia valentia</div>
+    </div>
   </div>
 </div>
 
