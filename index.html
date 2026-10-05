@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v73 build:20261005-1730 · trucades i visites es desen de debò a Supabase; banderola d'instal·lació només al mòbil i sense molestar -->
+<!-- v74 build:20261005-1830 · banderola d'instal·lació: compta visites per temps, instruccions manuals a Android i mode de prova ?pwa=prova -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -404,7 +404,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
 
 @media(max-width:767px){
   /* Hide all desktop sections */
-  .masthead,.lang-bar,.admin-bar,.stats-bar,.section,.dict-section,.submit-section,.manifesto,footer,hr.rule,.carousel-wrap,#mapFloatAnchor,#mapFloat,#pwaBanner{display:none!important}
+  .masthead,.lang-bar,.admin-bar,.stats-bar,.section,.dict-section,.submit-section,.manifesto,footer,hr.rule,.carousel-wrap,#mapFloatAnchor,#mapFloat{display:none!important}
   body{overflow:hidden}
 
   /* Splash screen */
@@ -3271,10 +3271,15 @@ if ('serviceWorker' in navigator) {
 // ── PWA INSTALL BANNER ──────────────────────────────────────────────────────
 // Regles: només mòbil, mai si ja està instal·lada, a partir de la 2a visita,
 // al cap de 20 s, mai amb una fitxa oberta, i si la tanquen no torna en 30 dies.
+// Mode de prova: afegiu ?pwa=prova a l'adreça per veure-la al cap d'1 segon.
 (function() {
   const DIES_SILENCI = 30;
   const RETARD_MS = 20000;
   const VISITES_MINIMES = 2;
+  const PAUSA_NOVA_VISITA = 30 * 60 * 1000; // 30 min sense entrar = visita nova
+
+  const prova = /[?&]pwa=prova\b/.test(location.search);
+  const log = (...a) => console.info('[banderola]', ...a);
 
   const ls = {
     get(k) { try { return localStorage.getItem(k); } catch(e) { return null; } },
@@ -3282,8 +3287,9 @@ if ('serviceWorker' in navigator) {
   };
 
   // Ja instal·lada (oberta des de la icona)
-  if (window.matchMedia('(display-mode: standalone)').matches) return;
-  if (window.navigator.standalone === true) return; // iOS
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    log('no surt: l\'app ja s\'ha obert des de la pantalla d\'inici'); return;
+  }
 
   // Només mòbils de veritat: pantalla tàctil i estreta
   const ua = navigator.userAgent;
@@ -3292,24 +3298,29 @@ if ('serviceWorker' in navigator) {
   const isAndroid = /android/i.test(ua);
   const tactil = window.matchMedia('(pointer: coarse)').matches;
   const estreta = Math.min(screen.width, screen.height) < 820;
-  if (!(isIOS || isAndroid) || !tactil || !estreta) return;
+  if (!prova && (!(isIOS || isAndroid) || !tactil || !estreta)) {
+    log('no surt: no és un mòbil'); return;
+  }
 
-  // Comptador de visites (una per sessió del navegador)
+  // Comptador de visites: una visita nova si fa més de 30 min que no s'hi entrava
+  const ara = Date.now();
+  const darrera = parseInt(ls.get('pwaLastSeen') || '0', 10);
   let visites = parseInt(ls.get('pwaVisits') || '0', 10);
-  try {
-    if (!sessionStorage.getItem('pwaVisitCounted')) {
-      visites++;
-      ls.set('pwaVisits', String(visites));
-      sessionStorage.setItem('pwaVisitCounted', '1');
-    }
-  } catch(e) {}
+  if (!darrera || ara - darrera > PAUSA_NOVA_VISITA) {
+    visites++;
+    ls.set('pwaVisits', String(visites));
+  }
+  const marcaActivitat = () => ls.set('pwaLastSeen', String(Date.now()));
+  marcaActivitat();
+  document.addEventListener('visibilitychange', () => { if (document.hidden) marcaActivitat(); });
 
   // Descartada fa menys de 30 dies?
   const descartada = parseInt(ls.get('pwaDismissedAt') || '0', 10);
-  const enSilenci = descartada && (Date.now() - descartada) < DIES_SILENCI * 864e5;
+  const enSilenci = !prova && descartada && (ara - descartada) < DIES_SILENCI * 864e5;
+
+  log('visites:', visites, '· en silenci:', !!enSilenci, '· iOS:', isIOS, '· Android:', isAndroid);
 
   let deferredPrompt = null;
-  let platform = null;
   let tempsCumplert = false;
   let mostrada = false;
 
@@ -3319,7 +3330,7 @@ if ('serviceWorker' in navigator) {
     return m && m.classList.contains('open');
   };
 
-  // Botó «📲 App» de la barra: sempre disponible al mòbil, encara que la banderola estigui en silenci
+  // Botó «📲 App» de la barra: sempre disponible al mòbil
   window.pwaTriggerInstall = async function() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -3327,18 +3338,19 @@ if ('serviceWorker' in navigator) {
       deferredPrompt = null;
       if (outcome === 'accepted' && navBtn()) navBtn().style.display = 'none';
       amagaBanner();
-    } else if (isIOS) {
-      pintaBanner('ios');
+    } else {
+      pintaBanner(isIOS ? 'ios' : 'manual');
     }
   };
+  if (navBtn()) navBtn().style.display = 'block';
 
-  // Android/Chrome: guardem l'event per mostrar la nostra banderola quan toqui
+  // Chrome a Android: guardem l'event per fer servir el botó «Instal·la»
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
-    platform = 'android';
-    if (navBtn()) navBtn().style.display = 'block';
-    potserMostra();
+    log('el navegador permet instal·lar amb un botó');
+    if (mostrada) pintaBanner('android'); // si ja hi havia les instruccions, posem el botó
+    else potserMostra();
   });
 
   window.addEventListener('appinstalled', () => {
@@ -3347,50 +3359,51 @@ if ('serviceWorker' in navigator) {
     amagaBanner();
   });
 
-  if (isIOS) {
-    platform = 'ios';
-    if (navBtn()) navBtn().style.display = 'block';
-  }
-
-  setTimeout(() => { tempsCumplert = true; potserMostra(); }, RETARD_MS);
+  setTimeout(() => { tempsCumplert = true; potserMostra(); }, prova ? 1000 : RETARD_MS);
 
   function potserMostra() {
-    if (mostrada || enSilenci || !tempsCumplert || !platform) return;
-    if (visites < VISITES_MINIMES) return;
-    if (platform === 'android' && !deferredPrompt) return;
-    if (modalObert()) { setTimeout(potserMostra, 3000); return; } // ho tornem a provar quan tanquin la fitxa
-    pintaBanner(platform);
+    if (mostrada || !tempsCumplert) return;
+    if (enSilenci) { log('no surt: la van tancar fa menys de ' + DIES_SILENCI + ' dies'); return; }
+    if (!prova && visites < VISITES_MINIMES) { log('no surt: encara és la primera visita'); return; }
+    if (modalObert()) { setTimeout(potserMostra, 3000); return; } // esperem que tanquin la fitxa
+    const splash = document.getElementById('mSplash');
+    if (splash && getComputedStyle(splash).display !== 'none') { setTimeout(potserMostra, 2000); return; } // esperem que entrin
+    pintaBanner(deferredPrompt ? 'android' : (isIOS ? 'ios' : 'manual'));
   }
 
   function pintaBanner(plat) {
     const banner = document.getElementById('pwaBanner');
     if (!banner) return;
     mostrada = true;
+    let text, boto = '';
     if (plat === 'android') {
-      banner.innerHTML = `
-        <div class="pwa-icon">📲</div>
-        <div class="pwa-text">
-          <strong>Instal·la La Tonteria</strong>
-          <span>A pantalla completa, sense les barres del navegador</span>
-        </div>
-        <button class="pwa-install-btn" id="pwaInstallBtn">Instal·la</button>
-        <button class="pwa-close-btn" id="pwaCloseBtn" title="Tanca">✕</button>
-      `;
-      document.getElementById('pwaInstallBtn').addEventListener('click', () => window.pwaTriggerInstall());
+      text = `<strong>Instal·la La Tonteria</strong>
+              <span>A pantalla completa, sense les barres del navegador</span>`;
+      boto = `<button class="pwa-install-btn" id="pwaInstallBtn">Instal·la</button>`;
+    } else if (plat === 'ios') {
+      text = `<strong>Posa La Tonteria a la pantalla d'inici</strong>
+              <div class="pwa-ios-steps">Prem <b>Compartir</b> (el quadrat amb la fletxa) → <b>«Afegir a la pantalla d'inici»</b></div>`;
     } else {
-      banner.innerHTML = `
-        <div class="pwa-icon">📲</div>
-        <div class="pwa-text">
-          <strong>Posa La Tonteria a la pantalla d'inici</strong>
-          <div class="pwa-ios-steps">
-            Prem <b>Compartir</b> (el quadrat amb la fletxa) → <b>«Afegir a la pantalla d'inici»</b>
-          </div>
-        </div>
-        <button class="pwa-close-btn" id="pwaCloseBtn" title="Tanca">✕</button>
-      `;
+      text = `<strong>Posa La Tonteria a la pantalla d'inici</strong>
+              <div class="pwa-ios-steps">Obre el menú <b>⋮</b> del navegador → <b>«Instal·la l'aplicació»</b> o <b>«Afegeix a la pantalla d'inici»</b></div>`;
     }
+    banner.innerHTML = `
+      <div class="pwa-icon">📲</div>
+      <div class="pwa-text">${text}</div>
+      ${boto}
+      <button class="pwa-close-btn" id="pwaCloseBtn" title="Tanca">✕</button>
+    `;
+    const ib = document.getElementById('pwaInstallBtn');
+    if (ib) ib.addEventListener('click', () => window.pwaTriggerInstall());
     banner.classList.remove('hidden');
     document.getElementById('pwaCloseBtn').addEventListener('click', descarta);
+    // Al mòbil, just a sobre de la barra de navegació de baix
+    const nav = document.getElementById('mBottomNav');
+    if (nav && nav.offsetHeight) {
+      banner.style.bottom = nav.offsetHeight + 'px';
+      banner.style.setProperty('padding-bottom', '14px', 'important');
+    }
+    log('es mostra (' + plat + ')');
   }
 
   function amagaBanner() {
@@ -3400,7 +3413,7 @@ if ('serviceWorker' in navigator) {
 
   function descarta() {
     amagaBanner();
-    ls.set('pwaDismissedAt', String(Date.now()));
+    if (!prova) ls.set('pwaDismissedAt', String(Date.now()));
   }
 })();
 </script>
