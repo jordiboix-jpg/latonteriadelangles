@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v76 build:20261005-1945 · banderola: el text no es pot seleccionar (evita «Toca per cercar» de Google) -->
+<!-- v78 build:20261005-2030 · fitxa nova només a localhost (o amb ?fitxa=1); a la web publicada els casos obren Google Maps com abans -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1310,9 +1310,23 @@ const TI_CALL_TEXTS = {
   en: ['Better not call (just in case)', 'You can try, bring luck', 'Normal, if you\'re not bored', 'Think twice, really', 'Confirmed English allergy', 'Clinical case. Call if you dare 🚨']
 };
 
+// ── INTERRUPTOR DE LA FITXA NOVA ─────────────────────────────────────────────
+// Mentre no estigui connectada l'API de Google, la fitxa nova (amb el botó de trucada)
+// només es veu treballant en local (localhost) o afegint ?fitxa=1 a l'adreça.
+// A la web publicada, els casos s'obren a Google Maps com sempre.
+// Quan estigui a punt per a tothom, canvieu la línia de sota per: const FITXA_ACTIVA = true;
+const FITXA_ACTIVA = ['localhost', '127.0.0.1'].includes(location.hostname) || /[?&]fitxa=1\b/.test(location.search);
+
+function googleMapsUrlDe(e) {
+  return e.name
+    ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(e.name + (e.addr ? ', ' + e.addr : ''))
+    : (e.mapUrl || '');
+}
+
 function openDetailModal(entryId) {
   const e = publishedEntries.find(x => x.id === entryId) || SEED.find(x => x.id === entryId);
   if (!e) return;
+  if (!FITXA_ACTIVA) { incrementVisit(e.id, googleMapsUrlDe(e)); return; } // comportament d'abans
   _dmEntry = e;
 
   // Incrementar visita (igual que abans)
@@ -1756,7 +1770,7 @@ function renderCard(e, showAdminActions) {
     <p class="entry-desc">${escHtml(desc)}</p>
     ${renderCommentBlock(e, comment, isAdmin)}
     ${e.email&&isAdmin?`<p style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px">${t('submittedBy')}: ${escHtml(e.email)}</p>`:''}
-    ${e.name&&!isAdmin?`<button class="map-btn" onclick="openDetailModal('${e.id}');event.stopPropagation()">📋 Veure fitxa + trucada</button>`:''}
+    ${e.name&&!isAdmin?`<button class="map-btn" onclick="openDetailModal('${e.id}');event.stopPropagation()">${FITXA_ACTIVA ? '📋 Veure fitxa + trucada' : '🗺 Veure a Google Maps'}</button>`:''}
     ${shareHtml}
     ${adminHtml}
   </article>`;
@@ -3289,8 +3303,11 @@ if ('serviceWorker' in navigator) {
 
   // Ja instal·lada (oberta des de la icona)
   if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    ls.set('pwaInstalled', '1');
     log('no surt: l\'app ja s\'ha obert des de la pantalla d\'inici'); return;
   }
+  // Ja s'ha instal·lat alguna vegada des d'aquest mòbil (l'app i Chrome comparteixen aquesta memòria)
+  if (!prova && ls.get('pwaInstalled')) { log('no surt: ja està instal·lada'); return; }
 
   // Només mòbils de veritat: pantalla tàctil i estreta
   const ua = navigator.userAgent;
@@ -3337,7 +3354,10 @@ if ('serviceWorker' in navigator) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       deferredPrompt = null;
-      if (outcome === 'accepted' && navBtn()) navBtn().style.display = 'none';
+      if (outcome === 'accepted') {
+        ls.set('pwaInstalled', '1');
+        if (navBtn()) navBtn().style.display = 'none';
+      }
       amagaBanner();
     } else {
       pintaBanner(isIOS ? 'ios' : 'manual');
@@ -3355,6 +3375,7 @@ if ('serviceWorker' in navigator) {
   });
 
   window.addEventListener('appinstalled', () => {
+    ls.set('pwaInstalled', '1');
     deferredPrompt = null;
     if (navBtn()) navBtn().style.display = 'none';
     amagaBanner();
