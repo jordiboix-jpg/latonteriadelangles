@@ -1,5 +1,5 @@
 // Service Worker — La Tonteria de l'Anglès
-const CACHE = 'tonteria-v74';
+const CACHE = 'tonteria-v75';
 const PRECACHE = [
   '/manifest.json',
   '/icon-192.png',
@@ -37,9 +37,10 @@ self.addEventListener('fetch', e => {
   }
 
   // index.html: SEMPRE xarxa primer — mai servir versió antiga de la cache
+  // (cache:'no-cache' evita la còpia de 10 minuts que guarda el navegador amb GitHub Pages)
   if (url.pathname === '/' || url.pathname === '/index.html') {
     e.respondWith(
-      fetch(e.request)
+      fetch(e.request, { cache: 'no-cache' })
         .then(r => {
           if (r && r.status === 200) {
             const c = r.clone();
