@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v74 build:20261005-1830 · banderola d'instal·lació: compta visites per temps, instruccions manuals a Android i mode de prova ?pwa=prova -->
+<!-- v75 build:20261005-1920 · banderola d'instal·lació: espera 35 s perquè Chrome ofereixi el botó «Instal·la» -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -3270,11 +3270,11 @@ if ('serviceWorker' in navigator) {
 
 // ── PWA INSTALL BANNER ──────────────────────────────────────────────────────
 // Regles: només mòbil, mai si ja està instal·lada, a partir de la 2a visita,
-// al cap de 20 s, mai amb una fitxa oberta, i si la tanquen no torna en 30 dies.
+// al cap de 35 s, mai amb una fitxa oberta, i si la tanquen no torna en 30 dies.
 // Mode de prova: afegiu ?pwa=prova a l'adreça per veure-la al cap d'1 segon.
 (function() {
   const DIES_SILENCI = 30;
-  const RETARD_MS = 20000;
+  const RETARD_MS = 35000; // Chrome no ofereix «Instal·la» fins als ~30 s d'ús
   const VISITES_MINIMES = 2;
   const PAUSA_NOVA_VISITA = 30 * 60 * 1000; // 30 min sense entrar = visita nova
 
