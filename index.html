@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v78 build:20261005-2030 · fitxa nova només a localhost (o amb ?fitxa=1); a la web publicada els casos obren Google Maps com abans -->
+<!-- v79 build:20261006-0630 · al mòbil publicat els casos tornen a expandir-se en tocar-los (com a la v71); fitxa nova només a localhost o amb ?fitxa=1 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1770,7 +1770,7 @@ function renderCard(e, showAdminActions) {
     <p class="entry-desc">${escHtml(desc)}</p>
     ${renderCommentBlock(e, comment, isAdmin)}
     ${e.email&&isAdmin?`<p style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px">${t('submittedBy')}: ${escHtml(e.email)}</p>`:''}
-    ${e.name&&!isAdmin?`<button class="map-btn" onclick="openDetailModal('${e.id}');event.stopPropagation()">${FITXA_ACTIVA ? '📋 Veure fitxa + trucada' : '🗺 Veure a Google Maps'}</button>`:''}
+    ${e.name&&!isAdmin?`<button class="map-btn" onclick="openDetailModal('${e.id}');event.stopPropagation()">${FITXA_ACTIVA ? '📋 Veure fitxa + trucada' : t('mapBtn')}</button>`:''}
     ${shareHtml}
     ${adminHtml}
   </article>`;
@@ -3012,7 +3012,30 @@ function mRenderCasos() {
     const tIdx = TINDEX[e.tonteriaIndex] || TINDEX[3];
     const dots = Array(5).fill(0).map(function(_,d){ return d < e.tonteriaIndex ? tIdx.emoji : '⬜'; }).join('');
     const eData = e[lang] || e.ca || {};
-    // googleUrl ara és gestionat pel modal openDetailModal
+    if (!FITXA_ACTIVA) {
+      // Versió publicada: la fitxa s'expandeix en tocar-la (com a la v71)
+      const googleUrl = googleMapsUrlDe(e) || ('https://maps.google.com/?q=' + encodeURIComponent(e.name||''));
+      return '<div class="mCaseCard" onclick="mToggleCase(\'mcase_' + i + '\')">'
+        + '<div class="mCaseCardHeader">'
+        + '<div class="mCaseNum">' + escHtml(e.num || String(i+1).padStart(2,'0')) + '</div>'
+        + '<div style="flex:1">'
+        + '<div class="mCaseTitle">' + escHtml(e.name||'') + '</div>'
+        + '<div class="mCaseAddr">' + escHtml(e.addr||'') + '</div>'
+        + '<div class="mCaseTindex">'
+        + '<span class="mCaseTindexDots">' + dots + '</span>'
+        + '<span class="mCaseTag">' + escHtml(e.tag||'') + '</span>'
+        + '</div>'
+        + '</div>'
+        + '</div>'
+        + '<div class="mCaseBody" id="mcase_' + i + '">'
+        + (eData.transl ? '<div class="mCaseTransl">→ ' + escHtml(eData.transl) + '</div>' : '')
+        + '<div class="mCaseDesc">' + escHtml(eData.desc||'') + '</div>'
+        + '<div class="mCaseComment">' + escHtml(eData.comment||'') + '</div>'
+        + '<a class="mCaseMapLink" href="' + escHtml(googleUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation();incrementVisit(\'' + e.id + '\')">📍 Veure al mapa ↗</a>'
+        + '</div>'
+        + '</div>';
+    }
+    // Versió local (localhost o ?fitxa=1): obre la fitxa nova
     return '<div class="mCaseCard" onclick="openDetailModal(\'' + e.id + '\')">'
       + '<div class="mCaseCardHeader">'
       + '<div class="mCaseNum">' + escHtml(e.num || String(i+1).padStart(2,'0')) + '</div>'
