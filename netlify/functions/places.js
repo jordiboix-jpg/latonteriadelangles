@@ -2,7 +2,9 @@
 // Busca un establiment a Google Places API (New) i retorna telèfon, web, horari, valoració i enllaç a Maps.
 // La GOOGLE_PLACES_KEY va a Netlify > Project configuration > Environment variables (marcada com a secreta).
 //
-// Ús:  GET /.netlify/functions/places?q=Nom del negoci, adreça
+// Ús:
+//   GET /.netlify/functions/places?q=Nom del negoci, adreça      → dades bàsiques (telèfon, web, horari, valoració)
+//   GET /.netlify/functions/places?extra=1&id=<placeId>           → fotos (màx. 3) i opinions (màx. 3), només quan l'usuari ho demana
 //
 // Protecció de costos:
 //  - Només demana a Google els camps imprescindibles (FieldMask).
@@ -48,6 +50,61 @@ function httpsPost(options, postData) {
   });
 }
 
+function httpsGet(options) {
+  return new Promise((resolve, reject) => {
+    const req = https.request({ method: 'GET', ...options }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve({ status: res.statusCode, body: data }));
+    });
+    req.on('error', reject);
+    req.setTimeout(8000, () => req.destroy(new Error('Temps d\'espera esgotat')));
+    req.end();
+  });
+}
+
+// Fotos i opinions d'un establiment (segona consulta, «lazy»)
+async function fotosIOpinions(apiKey, placeId, lang, json) {
+  const det = await httpsGet({
+    hostname: 'places.googleapis.com',
+    path: '/v1/places/' + encodeURIComponent(placeId) + '?languageCode=' + lang,
+    headers: { 'X-Goog-Api-Key': apiKey, 'X-Goog-FieldMask': 'photos,reviews,googleMapsUri' }
+  });
+  if (det.status !== 200) return json(502, { error: 'Google Places ha retornat ' + det.status, detail: det.body.slice(0, 400) });
+  const d = JSON.parse(det.body);
+
+  // Màxim 3 fotos: cada foto és una consulta a part a Google
+  const fotos = [];
+  for (const f of (d.photos || []).slice(0, 3)) {
+    try {
+      const r = await httpsGet({
+        hostname: 'places.googleapis.com',
+        path: '/v1/' + f.name + '/media?maxWidthPx=800&skipHttpRedirect=true',
+        headers: { 'X-Goog-Api-Key': apiKey }
+      });
+      if (r.status !== 200) continue;
+      const m = JSON.parse(r.body);
+      if (!m.photoUri) continue;
+      const a = (f.authorAttributions || [])[0] || {};
+      fotos.push({ url: m.photoUri, autor: a.displayName || '', autorUrl: a.uri || '' });
+    } catch (e) { /* passem a la següent */ }
+  }
+
+  const opinions = (d.reviews || []).slice(0, 3).map(r => ({
+    autor: (r.authorAttribution && r.authorAttribution.displayName) || '',
+    autorUrl: (r.authorAttribution && r.authorAttribution.uri) || '',
+    nota: r.rating || null,
+    quan: r.relativePublishTimeDescription || '',
+    text: (r.text && r.text.text) || (r.originalText && r.originalText.text) || ''
+  }));
+
+  // Els enllaços de les fotos caduquen: guardem la resposta només 6 hores
+  return json(200, { fotos, opinions, mapsUrl: d.googleMapsUri || '' }, {
+    'Cache-Control': 'public, max-age=3600',
+    'Netlify-CDN-Cache-Control': 'public, s-maxage=21600, durable'
+  });
+}
+
 function capcaleresCors(origin) {
   const permes = ORIGENS_PERMESOS.includes(origin) ? origin : ORIGENS_PERMESOS[0];
   return {
@@ -73,10 +130,18 @@ exports.handler = async (event) => {
   const apiKey = process.env.GOOGLE_PLACES_KEY;
   if (!apiKey) return json(500, { error: 'GOOGLE_PLACES_KEY no configurada a Netlify' });
 
-  const q = ((event.queryStringParameters && event.queryStringParameters.q) || '').trim();
-  if (q.length < 3 || q.length > 200) return json(400, { error: 'Cal el paràmetre q (entre 3 i 200 caràcters)' });
+  const params = event.queryStringParameters || {};
+  const lang = ['ca', 'es', 'en'].includes(params.lang) ? params.lang : 'ca';
 
-  const lang = ['ca', 'es', 'en'].includes(event.queryStringParameters.lang) ? event.queryStringParameters.lang : 'ca';
+  if (params.extra) {
+    const id = String(params.id || '');
+    if (!/^[A-Za-z0-9_-]{10,300}$/.test(id)) return json(400, { error: 'Cal un id de lloc vàlid' });
+    try { return await fotosIOpinions(apiKey, id, lang, json); }
+    catch (err) { return json(500, { error: err.message }); }
+  }
+
+  const q = (params.q || '').trim();
+  if (q.length < 3 || q.length > 200) return json(400, { error: 'Cal el paràmetre q (entre 3 i 200 caràcters)' });
 
   const postData = JSON.stringify({
     textQuery: q,
