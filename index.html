@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v79 build:20261006-0630 · al mòbil publicat els casos tornen a expandir-se en tocar-los (com a la v71); fitxa nova només a localhost o amb ?fitxa=1 -->
+<!-- v82 build:20261006-1700 · nota de la redacció a l'Índex; filtres desplegables (tipus, província, municipi); tipus de negoci editables per l'admin; el cas ja no obre Google Maps en clicar-lo (botons «Veure al mapa» i «Obrir Google Maps») -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -85,6 +85,25 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .stat-l{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:3px}
 
 .filter-bar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 28px;align-items:center}
+.filter-sel{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--ink);background:var(--paper);border:1px solid var(--rule);padding:6px 8px;cursor:pointer;max-width:240px;border-radius:2px}
+.filter-sel.actiu{border-color:var(--rust);color:var(--rust)}
+.entry-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.entry-actions .map-btn{margin-top:0}
+.ti-promo{padding:16px 20px;border-bottom:1px solid var(--rule);background:var(--ink);color:var(--paper);display:flex;flex-direction:column;justify-content:center}
+.ti-promo-k{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#d4a373;margin-bottom:6px}
+.ti-promo-t{font-family:'Source Serif 4',Georgia,serif;font-style:italic;font-size:14px;line-height:1.55}
+#tipusModal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99998;display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:40px 12px}
+#tipusModal.open{display:flex}
+#tipusModal .tm-box{background:var(--paper);color:var(--ink);max-width:900px;width:100%;border:1px solid var(--rule);padding:20px}
+#tipusModal h3{font-family:'Playfair Display',serif;margin:0 0 6px}
+#tipusModal table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:12px;margin-top:12px}
+#tipusModal th{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:4px}
+#tipusModal td{padding:3px 4px;border-top:1px solid var(--rule)}
+#tipusModal input{width:100%;box-sizing:border-box;font-family:inherit;font-size:12px;padding:5px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+#tipusModal .tm-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+#tipusModal button{font-family:'DM Mono',monospace;font-size:11px;padding:7px 12px;border:1px solid var(--rule);background:var(--cream);color:var(--ink);cursor:pointer}
+#tipusModal button.tm-primari{background:var(--rust);color:#fff;border-color:var(--rust)}
+#tipusModal .tm-msg{font-family:'DM Mono',monospace;font-size:11px;margin-top:10px;color:var(--muted)}
 .filter-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-right:4px}
 .cas-search{font-family:'DM Mono',monospace;font-size:11px;padding:5px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);width:220px;transition:border-color .15s}
 .cas-search:focus{border-color:var(--rust);outline:none}
@@ -242,6 +261,16 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .dm-tonteria-text{font-family:'Source Serif 4',serif;font-size:15px;line-height:1.6;color:var(--ink);font-style:italic}
 .dm-tonteria-empty{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);font-style:italic}
 .dm-desc-block{padding:14px 16px;border-bottom:var(--border)}
+.dm-google-block{padding:12px 16px;border-bottom:var(--border);font-family:'DM Mono',monospace;font-size:12px;color:var(--ink)}
+.dm-google-block .dm-g-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.dm-google-block .dm-g-row{display:flex;gap:8px;align-items:baseline;padding:4px 0;line-height:1.5}
+.dm-google-block .dm-g-row a{color:var(--rust);text-decoration:none;word-break:break-all}
+.dm-google-block .dm-g-open{color:#2e7d32;font-weight:500}
+.dm-google-block .dm-g-closed{color:var(--rust);font-weight:500}
+.dm-google-block details{margin-top:4px}
+.dm-google-block summary{cursor:pointer;color:var(--muted)}
+.dm-google-block ul{list-style:none;margin:6px 0 0;padding:0;font-size:11px;line-height:1.7}
+.dm-google-block .dm-g-muted{color:var(--muted)}
 .dm-desc-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .dm-desc-text{font-family:'Source Serif 4',serif;font-size:14px;line-height:1.6;color:var(--ink)}
 .dm-transl-block{padding:12px 16px;border-bottom:var(--border);background:rgba(0,0,0,.02)}
@@ -585,6 +614,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   <button class="admin-tab" id="tabPending" onclick="switchAdminTab('pending')">Submissions pendents</button>
   <button class="admin-tab" id="tabAll" onclick="switchAdminTab('all')">Tots els casos</button>
   <button class="admin-tab" id="tabDictProposals" onclick="switchAdminTab('dictProposals')">💡 Propostes diccionari <span id="dictPropCount" style="display:none;background:var(--rust);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;margin-left:4px">0</span></button>
+  <button class="admin-tab" onclick="obreTipusAdmin()">🏷 Tipus de negoci</button>
   <button class="admin-tab" onclick="geocodeAll()" title="Geocodifica automàticament tots els casos publicats sense coordenades via Nominatim (OpenStreetMap). Pot trigar uns minuts.">🌍 Geocodificar tots</button>
   <button class="admin-tab" onclick="adminLogout()" style="margin-left:auto">Tancar sessió</button>
 </div>
@@ -625,18 +655,9 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
       <button class="filter-btn" id="f2" onclick="setFilter('2')">🟠 2★</button>
       <button class="filter-btn" id="f1" onclick="setFilter('1')">🟡 1★</button>
       <div class="filter-sep"></div>
-      <button class="filter-btn" id="fcafeteria" onclick="setFilter('cat:cafeteria')">☕ <span id="fcat_cafeteria">Cafeteria</span></button>
-      <button class="filter-btn" id="frestaurant" onclick="setFilter('cat:restaurant')">🍳 <span id="fcat_restaurant">Restaurant</span></button>
-      <button class="filter-btn" id="fbarberia" onclick="setFilter('cat:barberia')">✂️ <span id="fcat_barberia">Barberia</span></button>
-      <button class="filter-btn" id="fbotiga" onclick="setFilter('cat:botiga')">🛍 <span id="fcat_botiga">Botiga</span></button>
-      <button class="filter-btn" id="fbeaute" onclick="setFilter('cat:beaute')">💅 <span id="fcat_beaute">Bellesa</span></button>
-      <button class="filter-btn" id="fnegoci" onclick="setFilter('cat:negoci')">🏢 <span id="fcat_negoci">Negoci</span></button>
-      <button class="filter-btn" id="fvehicle" onclick="setFilter('cat:vehicle')">🚗 <span id="fcat_vehicle">Vehicle</span></button>
-      <div class="filter-sep"></div>
-      <button class="filter-btn" id="fprov-barcelona" onclick="setFilter('prov:barcelona')">📍 Barcelona</button>
-      <button class="filter-btn" id="fprov-girona" onclick="setFilter('prov:girona')">📍 Girona</button>
-      <button class="filter-btn" id="fprov-lleida" onclick="setFilter('prov:lleida')">📍 Lleida</button>
-      <button class="filter-btn" id="fprov-tarragona" onclick="setFilter('prov:tarragona')">📍 Tarragona</button>
+      <select class="filter-sel" id="fCat" onchange="setFiltreSel()" aria-label="Tipus de negoci"></select>
+      <select class="filter-sel" id="fProv" onchange="setFiltreSel('prov')" aria-label="Província"></select>
+      <select class="filter-sel" id="fMuni" onchange="setFiltreSel()" aria-label="Municipi"></select>
       <div class="filter-sep"></div>
       <input class="cas-search" id="casSearch" type="text" placeholder="🔍 Cercar cas o municipi…" oninput="casSearchUpdate()">
     </div>
@@ -788,17 +809,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
       </div>
       <div class="field">
         <label id="fldCatL">Tipus de negoci</label>
-        <select id="fldCat">
-          <option value="" id="catOptSelect">-- Selecciona --</option>
-          <option value="cafeteria" id="catOptCafeteria">Cafeteria / Cafè</option>
-          <option value="restaurant" id="catOptRestaurant">Restaurant / Brunch</option>
-          <option value="barberia" id="catOptBarberia">Barberia / Perruqueria</option>
-          <option value="botiga" id="catOptBotiga">Botiga / Comerç</option>
-          <option value="beaute" id="catOptBeaute">Estètica / Bellesa</option>
-          <option value="negoci" id="catOptNegoci">Oficina / Serveis</option>
-          <option value="vehicle" id="catOptVehicle">Vehicle / Mobilitat</option>
-          <option value="altre" id="catOptAltre">Altre</option>
-        </select>
+        <select id="fldCat"></select>
       </div>
       <div class="field form-full">
         <label id="fldDescL">Descripció breu (per què és una tonteria?)</label>
@@ -883,14 +894,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
     <div id="mTabCasos" class="mTab active">
       <div id="mCasosSearch">
         <input type="text" id="mCasosQ" placeholder="🔍 Cercar..." oninput="mRenderCasos()">
-        <div id="mCatFilter">
-          <button class="mCatBtn active" data-cat="all" onclick="mSetCat(this,'all')">Tots</button>
-          <button class="mCatBtn" data-cat="cafeteria" onclick="mSetCat(this,'cafeteria')">☕ Cafè</button>
-          <button class="mCatBtn" data-cat="restaurant" onclick="mSetCat(this,'restaurant')">🍽 Rest.</button>
-          <button class="mCatBtn" data-cat="barberia" onclick="mSetCat(this,'barberia')">✂️ Barb.</button>
-          <button class="mCatBtn" data-cat="botiga" onclick="mSetCat(this,'botiga')">🛍 Botiga</button>
-          <button class="mCatBtn" data-cat="beaute" onclick="mSetCat(this,'beaute')">💅 Bellesa</button>
-        </div>
+        <div id="mCatFilter"></div>
       </div>
       <div id="mCasosList"></div>
     </div>
@@ -931,17 +935,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
           </div>
           <div class="mField">
             <label>Tipus de negoci</label>
-            <select id="mfCat">
-              <option value="">-- Selecciona --</option>
-              <option value="cafeteria">☕ Cafeteria / Cafè</option>
-              <option value="restaurant">🍽 Restaurant / Brunch</option>
-              <option value="barberia">✂️ Barberia / Perruqueria</option>
-              <option value="botiga">🛍 Botiga / Comerç</option>
-              <option value="beaute">💅 Estètica / Bellesa</option>
-              <option value="negoci">🏢 Oficina / Serveis</option>
-              <option value="vehicle">🚗 Vehicle / Mobilitat</option>
-              <option value="altre">📦 Altre</option>
-            </select>
+            <select id="mfCat"></select>
           </div>
           <div class="mField">
             <label>Descripció breu (per què és una tonteria?)</label>
@@ -1137,6 +1131,195 @@ function initDark() {
 }
 
 // ── TOAST ──────────────────────────────────────────────────────────────────
+// ── TEXTOS NOUS v82 ─────────────────────────────────────────────────────────
+Object.assign(T.ca, {
+  fSelCat: 'Tipus de negoci', fSelProv: 'Província', fSelMuni: 'Municipi',
+  mapBtnSite: '🗺 Veure al mapa', gmapsBtn: 'Obrir Google Maps ↗', noMapLoc: 'Aquest cas encara no té ubicació al mapa',
+  tiPromoK: 'Nota de la redacció',
+  tiPromo: 'Darrere de tot aquest esforç per destacar l\'anglès en lloc del català, hi trobareu negocis que fan de la qualitat, la modernitat i l\'excel·lència en el servei al client un senyal d\'identitat. I un personal molt «guai»… Truqueu a qualsevol d\'ells i ho descobrireu!'
+});
+Object.assign(T.es, {
+  fSelCat: 'Tipo de negocio', fSelProv: 'Provincia', fSelMuni: 'Municipio',
+  mapBtnSite: '🗺 Ver en el mapa', gmapsBtn: 'Abrir Google Maps ↗', noMapLoc: 'Este caso todavía no tiene ubicación en el mapa',
+  tiPromoK: 'Nota de la redacción',
+  tiPromo: 'Detrás de todo este esfuerzo por destacar el inglés en lugar del catalán, encontraréis negocios que hacen de la calidad, la modernidad y la excelencia en el servicio al cliente su seña de identidad. Y un personal muy «cool»… ¡Llamad a cualquiera de ellos y lo descubriréis!'
+});
+Object.assign(T.en, {
+  fSelCat: 'Type of business', fSelProv: 'Province', fSelMuni: 'Town',
+  mapBtnSite: '🗺 Show on map', gmapsBtn: 'Open Google Maps ↗', noMapLoc: 'This case has no location on the map yet',
+  tiPromoK: 'Editor\'s note',
+  tiPromo: 'Behind all this effort to put English ahead of Catalan, you\'ll find businesses that have made quality, modernity and excellent customer service their trademark. And very «cool» staff… Call any of them and see for yourself!'
+});
+
+// ── TIPUS DE NEGOCI (editables per l'admin, taula Supabase «business_types») ──
+const TIPUS_DEFECTE = [
+  { key:'cafeteria',  icon:'☕', ca:'Cafeteria / Cafè',       es:'Cafetería / Café',       en:'Café / Coffee shop',       ord:10 },
+  { key:'restaurant', icon:'🍳', ca:'Restaurant / Brunch',    es:'Restaurante / Brunch',   en:'Restaurant / Brunch',      ord:20 },
+  { key:'barberia',   icon:'✂️', ca:'Barberia / Perruqueria', es:'Barbería / Peluquería',  en:'Barbershop / Hairdresser', ord:30 },
+  { key:'botiga',     icon:'🛍', ca:'Botiga / Comerç',        es:'Tienda / Comercio',      en:'Shop / Store',             ord:40 },
+  { key:'beaute',     icon:'💅', ca:'Estètica / Bellesa',     es:'Estética / Belleza',     en:'Beauty / Aesthetics',      ord:50 },
+  { key:'negoci',     icon:'🏢', ca:'Oficina / Serveis',      es:'Oficina / Servicios',    en:'Office / Services',        ord:60 },
+  { key:'vehicle',    icon:'🚗', ca:'Vehicle / Mobilitat',    es:'Vehículo / Movilidad',   en:'Vehicle / Mobility',       ord:70 },
+  { key:'altre',      icon:'🏪', ca:'Altre',                  es:'Otro',                   en:'Other',                    ord:999 }
+];
+let TIPUS = TIPUS_DEFECTE.slice();
+let _tipusTaulaOk = null; // null = no comprovat, true = existeix, false = no existeix
+
+function tipusNom(key, l) {
+  const x = TIPUS.find(y => y.key === key);
+  if (!x) return key || '';
+  return x[l || lang] || x.ca || key;
+}
+function tipusIcona(key) {
+  const x = TIPUS.find(y => y.key === key);
+  return (x && x.icon) || '🏪';
+}
+async function loadTipus() {
+  try {
+    const { data, error } = await sb.from('business_types').select('key,icon,ca,es,en,ord').order('ord', { ascending: true });
+    if (error) { _tipusTaulaOk = false; console.info('[tipus] es fa servir la llista per defecte:', error.message); }
+    else { _tipusTaulaOk = true; if (data && data.length) TIPUS = data; }
+  } catch (e) { _tipusTaulaOk = false; }
+  omplirTipusUI();
+}
+function omplirTipusUI() {
+  // Formulari d'escriptori
+  const f = document.getElementById('fldCat');
+  if (f) {
+    const v = f.value;
+    f.innerHTML = '<option value="">' + escHtml(t('catOptSelect') || '-- Selecciona --') + '</option>' +
+      TIPUS.map(x => '<option value="' + escHtml(x.key) + '">' + escHtml(tipusNom(x.key)) + '</option>').join('');
+    f.value = v;
+  }
+  // Formulari mòbil
+  const mf = document.getElementById('mfCat');
+  if (mf) {
+    const v = mf.value;
+    mf.innerHTML = '<option value="">-- Selecciona --</option>' +
+      TIPUS.map(x => '<option value="' + escHtml(x.key) + '">' + escHtml((x.icon || '') + ' ' + tipusNom(x.key)) + '</option>').join('');
+    mf.value = v;
+  }
+  // Xips del mòbil
+  const chips = document.getElementById('mCatFilter');
+  if (chips) {
+    const actiu = (typeof mActiveCat !== 'undefined' && mActiveCat) || 'all';
+    chips.innerHTML = '<button class="mCatBtn' + (actiu === 'all' ? ' active' : '') + '" data-cat="all" onclick="mSetCat(this,\'all\')">' + escHtml(t('filterAll') || 'Tots') + '</button>' +
+      TIPUS.filter(x => x.key !== 'altre').map(x => '<button class="mCatBtn' + (actiu === x.key ? ' active' : '') + '" data-cat="' + escHtml(x.key) + '" onclick="mSetCat(this,\'' + escHtml(x.key) + '\')">' + escHtml((x.icon || '') + ' ' + tipusNom(x.key).split(' / ')[0]) + '</button>').join('');
+  }
+  omplirFiltreSelects();
+}
+
+// ── EDITOR DE TIPUS (ADMIN) ───────────────────────────────────────────────
+function _slug(txt) {
+  return String(txt || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/·/g, '').replace(/[^a-z0-9]+/g, '').slice(0, 24);
+}
+function obreTipusAdmin() {
+  let m = document.getElementById('tipusModal');
+  if (!m) {
+    m = document.createElement('div');
+    m.id = 'tipusModal';
+    m.addEventListener('click', ev => { if (ev.target === m) m.classList.remove('open'); });
+    document.body.appendChild(m);
+  }
+  pintaTipusAdmin();
+  m.classList.add('open');
+}
+function pintaTipusAdmin(msg) {
+  const m = document.getElementById('tipusModal');
+  const entries = publishedEntries || [];
+  const usos = k => entries.filter(e => e.category === k).length;
+  const avis = _tipusTaulaOk === false
+    ? '<div class="tm-msg" style="color:var(--rust)">⚠️ La taula <b>business_types</b> encara no existeix a Supabase. Mentre no la creeu, es fa servir la llista per defecte i els canvis no es poden desar.</div>' : '';
+  m.innerHTML = '<div class="tm-box">' +
+    '<h3>🏷 Tipus de negoci</h3>' +
+    '<div class="tm-msg">Els noms surten als filtres, als formularis i a les fitxes. La «clau» és interna i no es pot canviar un cop creada.</div>' + avis +
+    '<table><thead><tr><th style="width:52px">Icona</th><th style="width:110px">Clau</th><th>Català</th><th>Castellà</th><th>Anglès</th><th style="width:56px">Ordre</th><th style="width:70px">Casos</th><th style="width:34px"></th></tr></thead><tbody>' +
+    TIPUS.map((x, i) => '<tr data-i="' + i + '">' +
+      '<td><input data-f="icon" value="' + escHtml(x.icon || '') + '"></td>' +
+      '<td><input data-f="key" value="' + escHtml(x.key) + '" ' + (x._nou ? '' : 'readonly style="opacity:.6"') + '></td>' +
+      '<td><input data-f="ca" value="' + escHtml(x.ca || '') + '"></td>' +
+      '<td><input data-f="es" value="' + escHtml(x.es || '') + '"></td>' +
+      '<td><input data-f="en" value="' + escHtml(x.en || '') + '"></td>' +
+      '<td><input data-f="ord" type="number" value="' + escHtml(x.ord != null ? x.ord : '') + '"></td>' +
+      '<td style="text-align:center">' + usos(x.key) + '</td>' +
+      '<td><button title="Eliminar" onclick="eliminaTipus(' + i + ')">🗑</button></td>' +
+    '</tr>').join('') +
+    '</tbody></table>' +
+    '<div class="tm-btns"><button onclick="afegeixTipus()">➕ Afegir tipus</button><button onclick="document.getElementById(\'tipusModal\').classList.remove(\'open\')">Tancar</button><button class="tm-primari" onclick="desaTipus()">💾 Desar canvis</button></div>' +
+    (msg ? '<div class="tm-msg">' + msg + '</div>' : '') +
+    '</div>';
+}
+function _llegeixTaulaTipus() {
+  document.querySelectorAll('#tipusModal tbody tr').forEach(tr => {
+    const x = TIPUS[+tr.dataset.i]; if (!x) return;
+    tr.querySelectorAll('input').forEach(inp => {
+      const f = inp.dataset.f;
+      x[f] = f === 'ord' ? (inp.value === '' ? 100 : parseInt(inp.value, 10)) : inp.value.trim();
+    });
+  });
+}
+function afegeixTipus() {
+  _llegeixTaulaTipus();
+  TIPUS.push({ key: '', icon: '🏪', ca: '', es: '', en: '', ord: 100, _nou: true });
+  pintaTipusAdmin();
+  const inputs = document.querySelectorAll('#tipusModal tbody tr:last-child input[data-f="ca"]');
+  if (inputs[0]) inputs[0].focus();
+}
+async function eliminaTipus(i) {
+  _llegeixTaulaTipus();
+  const x = TIPUS[i]; if (!x) return;
+  const n = (publishedEntries || []).filter(e => e.category === x.key).length;
+  if (n) { pintaTipusAdmin('⚠️ No es pot eliminar «' + escHtml(x.ca) + '»: hi ha ' + n + ' casos publicats amb aquest tipus. Canvieu-los primer de tipus.'); return; }
+  if (!x._nou) {
+    if (_tipusTaulaOk === false) { pintaTipusAdmin('⚠️ Cal crear primer la taula business_types a Supabase.'); return; }
+    const { error } = await sb.from('business_types').delete().eq('key', x.key);
+    if (error) { pintaTipusAdmin('❌ Error en eliminar: ' + escHtml(error.message)); return; }
+  }
+  TIPUS.splice(i, 1);
+  omplirTipusUI();
+  pintaTipusAdmin('✓ Tipus eliminat.');
+}
+async function desaTipus() {
+  _llegeixTaulaTipus();
+  if (_tipusTaulaOk === false) { pintaTipusAdmin('⚠️ Cal crear primer la taula business_types a Supabase. Els canvis no s\'han desat.'); return; }
+  const vistes = new Set();
+  for (const x of TIPUS) {
+    if (!x.ca) { pintaTipusAdmin('⚠️ Tots els tipus han de tenir el nom en català.'); return; }
+    if (!x.key) x.key = _slug(x.ca);
+    if (!x.key) { pintaTipusAdmin('⚠️ No s\'ha pogut generar la clau per a «' + escHtml(x.ca) + '».'); return; }
+    if (vistes.has(x.key)) { pintaTipusAdmin('⚠️ Hi ha dos tipus amb la mateixa clau: «' + escHtml(x.key) + '».'); return; }
+    vistes.add(x.key);
+  }
+  const files = TIPUS.map(x => ({ key: x.key, icon: x.icon || '', ca: x.ca, es: x.es || x.ca, en: x.en || x.ca, ord: x.ord != null ? x.ord : 100 }));
+  const { error } = await sb.from('business_types').upsert(files, { onConflict: 'key' });
+  if (error) { pintaTipusAdmin('❌ Error en desar: ' + escHtml(error.message)); return; }
+  TIPUS = files.sort((a, b) => a.ord - b.ord);
+  omplirTipusUI();
+  renderPublic();
+  pintaTipusAdmin('✓ Canvis desats.');
+}
+
+// ── VEURE UN CAS AL MAPA DE LA WEB ──────────────────────────────────────────
+function veureAlMapa(id) {
+  const m = (typeof leafletMarkers !== 'undefined' ? leafletMarkers : []).find(x => x._entryId === id);
+  if (!m || !leafletMap) { showToast(t('noMapLoc')); return; }
+  const wrap = document.querySelector('.map-wrap');
+  if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(() => { leafletMap.setView(m.getLatLng(), 17); m.openPopup(); }, 450);
+}
+
+// ── NOTA DE LA REDACCIÓ: omple l'espai buit de la quadrícula de l'Índex ─────
+function ajustaPromo() {
+  const grid = document.getElementById('legendGrid');
+  const promo = document.getElementById('tiPromo');
+  if (!grid || !promo) return;
+  const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+  const n = grid.children.length - 1;
+  const resta = n % cols;
+  promo.style.gridColumn = 'span ' + (resta ? cols - resta : cols);
+}
+window.addEventListener('resize', ajustaPromo);
+
 function showToast(msg) {
   const el = document.getElementById('toast');
   if (!el) return;
@@ -1152,8 +1335,52 @@ function casSearchUpdate() {
   carPage = 0;
   renderPublic();
 }
+let filtCat = '', filtProv = '', filtMuni = '';
+function setFiltreSel(quin) {
+  const c = document.getElementById('fCat'), pv = document.getElementById('fProv'), m = document.getElementById('fMuni');
+  filtCat = c ? c.value : ''; filtProv = pv ? pv.value : '';
+  if (quin === 'prov') { filtMuni = ''; omplirMunicipis(); } else { filtMuni = m ? m.value : ''; }
+  [c, pv, m].forEach(el => el && el.classList.toggle('actiu', !!el.value));
+  carPage = 0;
+  renderPublic();
+}
+function omplirMunicipis() {
+  const sel = document.getElementById('fMuni');
+  if (!sel) return;
+  const entries = publishedEntries.length ? publishedEntries : (typeof SEED !== 'undefined' ? SEED : []);
+  const set = new Set();
+  entries.forEach(e => {
+    if (filtProv && (e.provincia || 'barcelona') !== filtProv) return;
+    set.add((e.municipi || 'Barcelona').trim());
+  });
+  const llista = [...set].filter(Boolean).sort((x, y) => x.localeCompare(y, 'ca'));
+  if (filtMuni && !llista.includes(filtMuni)) filtMuni = '';
+  sel.innerHTML = '<option value="">🏘 ' + escHtml(t('fSelMuni')) + '</option>' +
+    llista.map(mu => '<option value="' + escHtml(mu) + '"' + (mu === filtMuni ? ' selected' : '') + '>' + escHtml(mu) + '</option>').join('');
+  sel.classList.toggle('actiu', !!filtMuni);
+}
+function omplirFiltreSelects() {
+  const c = document.getElementById('fCat'), pv = document.getElementById('fProv');
+  if (c) {
+    c.innerHTML = '<option value="">🏷 ' + escHtml(t('fSelCat')) + '</option>' +
+      TIPUS.filter(x => x.key !== 'altre').map(x => '<option value="' + escHtml(x.key) + '"' + (x.key === filtCat ? ' selected' : '') + '>' + escHtml((x.icon || '') + ' ' + tipusNom(x.key)) + '</option>').join('');
+    c.classList.toggle('actiu', !!filtCat);
+  }
+  if (pv) {
+    const provs = [['barcelona','Barcelona'],['girona','Girona'],['lleida','Lleida'],['tarragona','Tarragona']];
+    pv.innerHTML = '<option value="">📍 ' + escHtml(t('fSelProv')) + '</option>' +
+      provs.map(([k, n]) => '<option value="' + k + '"' + (k === filtProv ? ' selected' : '') + '>' + n + '</option>').join('');
+    pv.classList.toggle('actiu', !!filtProv);
+  }
+  omplirMunicipis();
+}
 function setFilter(f) {
   activeFilter = f;
+  if (f === 'all') {
+    filtCat = filtProv = filtMuni = '';
+    ['fCat','fProv','fMuni'].forEach(id => { const el = document.getElementById(id); if (el) { el.value = ''; el.classList.remove('actiu'); } });
+    omplirMunicipis();
+  }
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   const idMap = {'all':'fAll','5':'f5','4':'f4','3':'f3','2':'f2','1':'f1','cat:cafeteria':'fcafeteria','cat:restaurant':'frestaurant','cat:barberia':'fbarberia','cat:botiga':'fbotiga','cat:beaute':'fbeaute','cat:negoci':'fnegoci','cat:vehicle':'fvehicle','prov:barcelona':'fprov-barcelona','prov:girona':'fprov-girona','prov:lleida':'fprov-lleida','prov:tarragona':'fprov-tarragona'};
   const btn = document.getElementById(idMap[f]);
@@ -1168,6 +1395,9 @@ function applyFilter(entries) {
     else if (activeFilter.startsWith('prov:')) result = result.filter(e => (e.provincia||'barcelona') === activeFilter.slice(5));
     else result = result.filter(e => e.tonteriaIndex === parseInt(activeFilter, 10));
   }
+  if (filtCat) result = result.filter(e => e.category === filtCat);
+  if (filtProv) result = result.filter(e => (e.provincia || 'barcelona') === filtProv);
+  if (filtMuni) result = result.filter(e => (e.municipi || 'Barcelona').trim() === filtMuni);
   if (casSearchQ) {
     result = result.filter(e => {
       const name = (e.name||'').toLowerCase();
@@ -1340,7 +1570,7 @@ function openDetailModal(entryId) {
   const eData = e[lang] || e.ca || {};
   const ti = (typeof e.tonteriaIndex === 'number') ? e.tonteriaIndex : 3;
   const tiData = TINDEX[ti] || TINDEX[3];
-  const catIcon = CAT_ICONS[e.category] || '🏪';
+  const catIcon = tipusIcona(e.category);
   const col = TI_COLORS[Math.min(ti, 5)];
   const dots = Array(5).fill(0).map((_,d) => d < ti
     ? `<span style="color:${col}">■</span>`
@@ -1417,6 +1647,9 @@ function openDetailModal(entryId) {
   const disclaimer = callTexts[Math.min(ti, 5)];
   document.getElementById('dmCallDisclaimer').textContent = disclaimer;
 
+  // Dades de Google Places (telèfon, horari, valoració, web)
+  carregaGooglePlaces(e, mapUrl);
+
   // Mostrar modal
   const modal = document.getElementById('detailModal');
   modal.classList.add('open');
@@ -1427,6 +1660,70 @@ function openDetailModal(entryId) {
 
   // Desktop: tancar clicant el fons
   modal.addEventListener('click', _dmBackdropListener);
+}
+
+// ── GOOGLE PLACES ─────────────────────────────────────────────────────────────
+// En local (localhost) es crida la funció ja publicada a Netlify, perquè el servidor local no executa funcions.
+const PLACES_URL = (['localhost', '127.0.0.1'].includes(location.hostname)
+  ? 'https://latonteriadelangles.com' : '') + '/.netlify/functions/places';
+const _placesCache = {};
+let _placesPeticio = 0;
+
+async function carregaGooglePlaces(e, mapUrlInicial) {
+  const bloc = document.getElementById('dmGoogleBlock');
+  const callBtn = document.getElementById('dmCallBtn');
+  const mapsLink = document.getElementById('dmMapsLink');
+  if (!bloc) return;
+  const peticio = ++_placesPeticio;
+  const q = [e.name, e.addr, (e.municipi && !String(e.addr||'').includes(e.municipi)) ? e.municipi : ''].filter(Boolean).join(', ');
+  if (!q) { bloc.style.display = 'none'; return; }
+
+  bloc.style.display = '';
+  bloc.innerHTML = '<div class="dm-g-label">Dades de Google</div><div class="dm-g-muted">Consultant Google…</div>';
+
+  let d = _placesCache[q];
+  if (!d) {
+    try {
+      const r = await fetch(PLACES_URL + '?lang=' + encodeURIComponent(lang) + '&q=' + encodeURIComponent(q));
+      d = await r.json();
+      if (!r.ok) throw new Error(d && d.error ? d.error : ('HTTP ' + r.status));
+      _placesCache[q] = d;
+    } catch (err) {
+      console.warn('[places]', err);
+      if (peticio !== _placesPeticio) return;
+      bloc.innerHTML = '<div class="dm-g-label">Dades de Google</div><div class="dm-g-muted">No s\'han pogut carregar les dades ara mateix.</div>';
+      return;
+    }
+  }
+  if (peticio !== _placesPeticio) return; // l'usuari ja ha obert una altra fitxa
+
+  if (!d.found) {
+    bloc.innerHTML = '<div class="dm-g-label">Dades de Google</div><div class="dm-g-muted">Google no troba aquest establiment.</div>';
+    return;
+  }
+
+  const files = [];
+  if (d.status === 'CLOSED_PERMANENTLY') files.push('<div class="dm-g-row"><span>⚠️</span><span class="dm-g-closed">Tancat definitivament</span></div>');
+  else if (d.status === 'CLOSED_TEMPORARILY') files.push('<div class="dm-g-row"><span>⚠️</span><span class="dm-g-closed">Tancat temporalment</span></div>');
+  else if (d.openNow === true) files.push('<div class="dm-g-row"><span>🕒</span><span class="dm-g-open">Obert ara</span></div>');
+  else if (d.openNow === false) files.push('<div class="dm-g-row"><span>🕒</span><span class="dm-g-closed">Tancat ara</span></div>');
+  if (d.phone) files.push('<div class="dm-g-row"><span>📞</span><a href="tel:' + escHtml((d.phoneIntl || d.phone).replace(/\s/g,'')) + '">' + escHtml(d.phone) + '</a></div>');
+  if (d.rating) files.push('<div class="dm-g-row"><span>⭐</span><span>' + d.rating.toFixed(1).replace('.', ',') + ' <span class="dm-g-muted">(' + d.ratingCount + ' ressenyes)</span></span></div>');
+  if (d.website) files.push('<div class="dm-g-row"><span>🌐</span><a href="' + escHtml(d.website) + '" target="_blank" rel="noopener">' + escHtml(d.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')) + '</a></div>');
+  if (d.hours && d.hours.length) files.push('<details><summary>Horari</summary><ul>' + d.hours.map(h => '<li>' + escHtml(h) + '</li>').join('') + '</ul></details>');
+  bloc.innerHTML = '<div class="dm-g-label">Dades de Google</div>' + (files.join('') || '<div class="dm-g-muted">Google no té dades de contacte d\'aquest establiment.</div>');
+
+  // Enllaç exacte a la fitxa de Google Maps
+  if (d.mapsUrl && mapsLink) mapsLink.href = d.mapsUrl;
+
+  // Botó de trucada amb el telèfon real
+  if (d.phone && callBtn) {
+    callBtn.href = 'tel:' + (d.phoneIntl || d.phone).replace(/\s/g, '');
+    callBtn.removeAttribute('target');
+    callBtn.dataset.phone = d.phone;
+  } else if (callBtn && d.mapsUrl) {
+    callBtn.href = d.mapsUrl;
+  }
 }
 
 function _dmEscListener(e) {
@@ -1715,9 +2012,9 @@ function renderCard(e, showAdminActions) {
   const ld = entryLangData(e);
   const isPending = e.status === 'pending';
   const tagClass = isPending ? 'entry-tag pending' : 'entry-tag';
-  const catName = t('catNames')[e.category] || e.tag || '';
+  const catName = (e.category ? tipusNom(e.category) : '') || e.tag || '';
   // En català es manté l'etiqueta original del cas; en castellà i anglès es mostra el tipus de negoci traduït
-  const displayTag = isPending ? catName + ' · ' + t('pendingOf') : (lang === 'ca' ? (e.tag || catName) : (t('catNames')[e.category] || e.tag || ''));
+  const displayTag = isPending ? catName + ' · ' + t('pendingOf') : (lang === 'ca' ? (e.tag || catName) : (catName || e.tag || ''));
   const transl = ld.transl || '';
   const desc = ld.desc || e.descOriginal || '';
   const comment = ld.comment || '';
@@ -1757,7 +2054,8 @@ function renderCard(e, showAdminActions) {
     </div>`;
   }
   const googleMapsUrl = e.name ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.name+(e.addr?', '+e.addr:''))}` : (e.mapUrl||'');
-  return `<article class="entry" data-entry-id="${e.id}" ${isAdmin?'':`onclick="openDetailModal('${e.id}')" title="Veure fitxa de ${nameEsc}"`}>
+  const gmClick = googleMapsUrl.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  return `<article class="entry" data-entry-id="${e.id}" ${(isAdmin||!FITXA_ACTIVA)?'style="cursor:default"':`onclick="openDetailModal('${e.id}')" title="Veure fitxa de ${nameEsc}"`}>
     ${photoHtml}
     <div class="entry-num">${e.num||'??'}</div>
     <span class="${tagClass}">${displayTag}</span>
@@ -1770,7 +2068,11 @@ function renderCard(e, showAdminActions) {
     <p class="entry-desc">${escHtml(desc)}</p>
     ${renderCommentBlock(e, comment, isAdmin)}
     ${e.email&&isAdmin?`<p style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px">${t('submittedBy')}: ${escHtml(e.email)}</p>`:''}
-    ${e.name&&!isAdmin?`<button class="map-btn" onclick="openDetailModal('${e.id}');event.stopPropagation()">${FITXA_ACTIVA ? '📋 Veure fitxa + trucada' : t('mapBtn')}</button>`:''}
+    ${e.name&&!isAdmin?`<div class="entry-actions">
+      <button class="map-btn" onclick="veureAlMapa('${e.id}');event.stopPropagation()">${t('mapBtnSite')}</button>
+      <button class="map-btn" onclick="incrementVisit('${e.id}','${gmClick}');event.stopPropagation()">${t('gmapsBtn')}</button>
+      ${FITXA_ACTIVA ? `<button class="map-btn" onclick="openDetailModal('${e.id}');event.stopPropagation()">📋 Veure fitxa + trucada</button>` : ''}
+    </div>`:''}
     ${shareHtml}
     ${adminHtml}
   </article>`;
@@ -1939,6 +2241,7 @@ function buildMap(entries) {
       iconSize: [32,32], iconAnchor: [16,16], popupAnchor: [0,-20]
     });
     const m = L.marker([e.lat, e.lng], {icon}).addTo(leafletMap);
+    m._entryId = e.id;
     m.bindPopup(`<div class="map-popup-name">${e.name}</div>
       <span class="map-popup-tag">${e.tag||''}</span>
       <div class="map-popup-addr">📍 ${e.addr||''}</div>
@@ -1979,7 +2282,8 @@ function renderLegend() {
       <div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--ink)">${ti.emoji} ${ti.label[lang]||ti.label.ca}</div>
       <div style="font-family:'Source Serif 4',serif;font-style:italic;font-size:13px;color:var(--muted);margin-top:3px">${ti.desc[lang]||ti.desc.ca}</div>
     </div>`;
-  }).join('');
+  }).join('') + `<div class="ti-promo" id="tiPromo"><div class="ti-promo-k">📞 ${t('tiPromoK')}</div><div class="ti-promo-t">${t('tiPromo')}</div></div>`;
+  ajustaPromo();
 }
 
 // ── DICT STATE ─────────────────────────────────────────────────────────────
@@ -2489,25 +2793,14 @@ function applyLang(l) {
   const catMap={catOptSelect:'catOptSelect',cafeteria:'catOptCafeteria',restaurant:'catOptRestaurant',barberia:'catOptBarberia',botiga:'catOptBotiga',beaute:'catOptBeaute',negoci:'catOptNegoci',vehicle:'catOptVehicle',altre:'catOptAltre'};
   const optSelect=document.getElementById('catOptSelect');if(optSelect)optSelect.textContent=T[l].catOptSelect||'-- Selecciona --';
   const optAltre=document.getElementById('catOptAltre');if(optAltre)optAltre.textContent=T[l].catOptAltre||'Altre';
-  if(T[l].catNames){
-    ['cafeteria','restaurant','barberia','botiga','beaute','negoci','vehicle'].forEach(cat=>{
-      const opt=document.getElementById('catOpt'+cat.charAt(0).toUpperCase()+cat.slice(1));
-      if(opt&&T[l].catNames[cat])opt.textContent=T[l].catNames[cat];
-    });
-  }
+  omplirTipusUI();
   // Fix botó "Tots" — actualització directa
   const fAllBtn=document.getElementById('fAll');if(fAllBtn){const sp=fAllBtn.querySelector('span');if(sp)sp.textContent=T[l].filterAll||'Tots';}
   // Botó fullscreen/float mapa
   const mapFsBtn=document.getElementById('mapFsBtn');
   if(mapFsBtn){const isFs=document.querySelector('.map-wrap.map-fullscreen');mapFsBtn.textContent=isFs?'✕ '+(l==='en'?'Exit fullscreen':l==='es'?'Salir':'Sortir'):'⛶ '+(l==='en'?'Full screen':l==='es'?'Pantalla completa':'Pantalla completa');}
   // Category buttons text
-  if (T[l].catNames) {
-    ['cafeteria','restaurant','barberia','botiga','beaute','negoci','vehicle'].forEach(cat=>{
-      const icons={cafeteria:'☕',restaurant:'🍳',barberia:'✂️',botiga:'🛍',beaute:'💅',negoci:'🏢',vehicle:'🚗'};
-      const btn=document.getElementById('f'+cat);
-      if(btn&&T[l].catNames[cat])btn.textContent=(icons[cat]||'')+' '+T[l].catNames[cat];
-    });
-  }
+
   renderLegend(); renderDict(); renderPublic(); renderMap();
   if (isAdmin) { if(adminView==='pending')renderPending(); if(adminView==='all')renderAll(); }
   if (isMobile()) { mUpdateLangBtn(); mRenderCasos(); mRenderDict(); if(mMobileMap) mInitMobileMap(); }
@@ -2762,7 +3055,7 @@ async function submitCase() {
     ca:{desc,transl:'',comment:''},
     es:{desc:'',transl:'',comment:''},
     en:{desc:'',transl:'',comment:''},
-    tag: T.ca.catNames[category]||category,
+    tag: tipusNom(category, 'ca') || category,
     mapUrl:`https://maps.google.com/?q=${encodeURIComponent(name+' '+addr)}`,
     lat: pendingLat,
     lng: pendingLng,
@@ -2815,9 +3108,11 @@ function scrollToEntry(id) {
 async function init() {
   initDark();
   initPhotoUpload();
-  await Promise.all([loadPublished(), loadVisitCounts(), loadDict()]);
+  await Promise.all([loadPublished(), loadVisitCounts(), loadDict(), loadTipus()]);
+  omplirFiltreSelects();
   dictSetSort('en'); // estableix columna activa per defecte
   applyLang(lang);
+  _dadesLlestes = true;
   if (isMobile()) mSplashReady(); // mostra botó Entrar quan les dades estan llestes
   else mInit && mInit(); // desktop: mInit no aplica però no fa res
   // Realtime subscriptions
@@ -2866,6 +3161,11 @@ function mHideNetlifyBadge() {
 }
 
 let _mSplashReady = false;
+let _dadesLlestes = false;
+// Si la finestra passa a mida de mòbil després de carregar (p. ex. mode mòbil de DevTools), activem el botó Entrar
+window.addEventListener('resize', () => {
+  if (_dadesLlestes && !_mSplashReady && isMobile()) mSplashReady();
+});
 function mSplashReady() {
   _mSplashReady = true;
   const statusEl = document.getElementById('mSplashStatus');
@@ -3144,8 +3444,7 @@ function mBuildSummary() {
   const name = mfName ? mfName.value : '—';
   const mfCat = document.getElementById('mfCat');
   const catVal = mfCat ? mfCat.value : '';
-  const catNames = {cafeteria:'Cafeteria',restaurant:'Restaurant',barberia:'Barberia',botiga:'Botiga',beaute:'Estètica',negoci:'Oficina',vehicle:'Vehicle',altre:'Altre'};
-  const cat = catNames[catVal] || catVal || '—';
+  const cat = catVal ? tipusNom(catVal) : '—';
   const mfProv = document.getElementById('mfProv');
   const prov = mfProv && mfProv.selectedOptions[0] ? mfProv.selectedOptions[0].text : '—';
   const mfMuni = document.getElementById('mfMuni');
@@ -3511,6 +3810,7 @@ if ('serviceWorker' in navigator) {
         <div class="dm-desc-label">De què va això?</div>
         <div class="dm-desc-text" id="dmDesc"></div>
       </div>
+      <div class="dm-google-block" id="dmGoogleBlock" style="display:none"></div>
       <a class="dm-maps-link" id="dmMapsLink" href="#" target="_blank" onclick="event.stopPropagation()">🗺 Verificar a Google Maps ↗</a>
     </div>
     <div class="dm-cta-bar">
