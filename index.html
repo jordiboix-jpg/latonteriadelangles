@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v82 build:20261006-1700 · nota de la redacció a l'Índex; filtres desplegables (tipus, província, municipi); tipus de negoci editables per l'admin; el cas ja no obre Google Maps en clicar-lo (botons «Veure al mapa» i «Obrir Google Maps») -->
+<!-- v83 build:20261006-1830 · fotos retallades per dalt (es veu el rètol); fitxa (només local): foto del cas, «Dades de Google Maps», botó «Veure fotos i opinions» sota demanda -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -223,7 +223,7 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .enunciat-cancel-btn:hover{color:var(--ink);border-color:var(--ink)}
 .map-btn{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);text-decoration:none;border:1px solid var(--rust);padding:5px 11px;transition:all .15s;margin-top:2px}
 .map-btn:hover{background:var(--rust);color:var(--paper)}
-.entry-photo{width:100%;height:180px;object-fit:cover;border-radius:2px;margin-bottom:12px;display:block}
+.entry-photo{width:100%;height:180px;object-fit:cover;object-position:center top;border-radius:2px;margin-bottom:12px;display:block}
 .visit-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:4px 0 10px}
 
 .share-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
@@ -247,6 +247,19 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .dm-body{flex:1;overflow-y:auto;padding-bottom:90px}
 .dm-hero{width:100%;height:200px;background:linear-gradient(135deg,var(--cream) 0%,var(--rule) 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0}
 .dm-hero-placeholder{font-size:64px;opacity:.3}
+.dm-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:none}
+.dm-google-block .dm-g-label a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.dm-g-mes{display:block;width:100%;margin-top:12px;padding:10px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--rust);border:1px solid var(--rust);border-radius:3px;cursor:pointer}
+.dm-g-mes:hover{background:var(--rust);color:#fff}
+.dm-g-fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.dm-g-fotos figure{margin:0}
+.dm-g-fotos img{width:100%;height:110px;object-fit:cover;border-radius:2px;display:block}
+.dm-g-fotos figcaption{font-size:9px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dm-g-fotos figcaption a{color:var(--muted)}
+.dm-g-op{border-top:1px solid var(--rule);padding:10px 0 4px;margin-top:10px}
+.dm-g-op-cap{display:flex;justify-content:space-between;gap:8px;font-size:11px}
+.dm-g-op-cap a{color:var(--ink);text-decoration:none;font-weight:500}
+.dm-g-op-text{font-family:'Source Serif 4',Georgia,serif;font-size:14px;line-height:1.55;margin-top:4px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 .dm-hero-badge{position:absolute;top:12px;right:12px;background:var(--rust);color:#fff;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;padding:4px 8px;border-radius:2px}
 .dm-info-block{padding:14px 16px 10px;border-bottom:var(--border)}
 .dm-name-big{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:4px}
@@ -330,7 +343,7 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .admin-photo-row label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#a09070;cursor:pointer;display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--rule);padding:5px 10px;width:fit-content}
 .admin-photo-row label:hover{border-color:var(--gold);color:var(--gold)}
 .admin-photo-row input[type=file]{display:none}
-.admin-photo-preview{width:100%;max-height:120px;object-fit:cover;border-radius:2px;display:none;margin-top:4px}
+.admin-photo-preview{width:100%;max-height:120px;object-fit:cover;object-position:center top;border-radius:2px;display:none;margin-top:4px}
 .act-photo-save{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--green);color:#fff;border:none;padding:5px 10px;cursor:pointer;display:none}
 .act-photo-remove{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:#888;color:#fff;border:none;padding:5px 10px;cursor:pointer}
 .act-photo-remove:hover{background:var(--red)}
@@ -374,7 +387,7 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .form-msg.ok{background:rgba(45,106,63,.3);color:#7ecf95;border-left:3px solid var(--green)}
 .form-msg.err{background:rgba(204,34,0,.2);color:#f09090;border-left:3px solid var(--red)}
 .form-msg.hidden{display:none}
-.photo-preview{width:100%;max-height:200px;object-fit:cover;margin-top:8px;border-radius:2px;display:none}
+.photo-preview{width:100%;max-height:200px;object-fit:cover;object-position:center top;margin-top:8px;border-radius:2px;display:none}
 .photo-pick-row{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
 .photo-pick-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px dashed #4a3a28;color:#a09070;padding:8px 14px;cursor:pointer;border-radius:2px;transition:all .15s;flex:1 1 auto}
 .photo-pick-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,133,10,.07)}
@@ -1583,6 +1596,7 @@ function openDetailModal(entryId) {
   document.getElementById('dmHeaderName').textContent = e.name || '';
   document.getElementById('dmHeaderNum').textContent = e.num ? '#' + e.num : '';
   document.getElementById('dmHeroIcon').textContent = catIcon;
+  mostraFotoCas(e);
   document.getElementById('dmHeroBadge').textContent = (tiData ? tiData.emoji : '') + ' ' + ti + '/5';
   document.getElementById('dmHeroBadge').style.background = col;
   document.getElementById('dmName').textContent = e.name || '';
@@ -1679,7 +1693,8 @@ async function carregaGooglePlaces(e, mapUrlInicial) {
   if (!q) { bloc.style.display = 'none'; return; }
 
   bloc.style.display = '';
-  bloc.innerHTML = '<div class="dm-g-label">Dades de Google</div><div class="dm-g-muted">Consultant Google…</div>';
+  if (mapsLink) mapsLink.style.display = '';
+  bloc.innerHTML = '<div class="dm-g-label">Dades de Google Maps</div><div class="dm-g-muted">Consultant Google…</div>';
 
   let d = _placesCache[q];
   if (!d) {
@@ -1691,14 +1706,14 @@ async function carregaGooglePlaces(e, mapUrlInicial) {
     } catch (err) {
       console.warn('[places]', err);
       if (peticio !== _placesPeticio) return;
-      bloc.innerHTML = '<div class="dm-g-label">Dades de Google</div><div class="dm-g-muted">No s\'han pogut carregar les dades ara mateix.</div>';
+      bloc.innerHTML = '<div class="dm-g-label">Dades de Google Maps</div><div class="dm-g-muted">No s\'han pogut carregar les dades ara mateix.</div>';
       return;
     }
   }
   if (peticio !== _placesPeticio) return; // l'usuari ja ha obert una altra fitxa
 
   if (!d.found) {
-    bloc.innerHTML = '<div class="dm-g-label">Dades de Google</div><div class="dm-g-muted">Google no troba aquest establiment.</div>';
+    bloc.innerHTML = '<div class="dm-g-label">Dades de Google Maps</div><div class="dm-g-muted">Google no troba aquest establiment.</div>';
     return;
   }
 
@@ -1711,10 +1726,14 @@ async function carregaGooglePlaces(e, mapUrlInicial) {
   if (d.rating) files.push('<div class="dm-g-row"><span>⭐</span><span>' + d.rating.toFixed(1).replace('.', ',') + ' <span class="dm-g-muted">(' + d.ratingCount + ' ressenyes)</span></span></div>');
   if (d.website) files.push('<div class="dm-g-row"><span>🌐</span><a href="' + escHtml(d.website) + '" target="_blank" rel="noopener">' + escHtml(d.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')) + '</a></div>');
   if (d.hours && d.hours.length) files.push('<details><summary>Horari</summary><ul>' + d.hours.map(h => '<li>' + escHtml(h) + '</li>').join('') + '</ul></details>');
-  bloc.innerHTML = '<div class="dm-g-label">Dades de Google</div>' + (files.join('') || '<div class="dm-g-muted">Google no té dades de contacte d\'aquest establiment.</div>');
+  const titol = d.mapsUrl
+    ? '<div class="dm-g-label"><a href="' + escHtml(d.mapsUrl) + '" target="_blank" rel="noopener">Dades de Google Maps ↗</a></div>'
+    : '<div class="dm-g-label">Dades de Google Maps</div>';
+  const botoMes = d.placeId ? '<button class="dm-g-mes" id="dmGMes" onclick="carregaFotosOpinions(\'' + escHtml(d.placeId) + '\')">📷 Veure fotos i opinions</button><div id="dmGExtra"></div>' : '';
+  bloc.innerHTML = titol + (files.join('') || '<div class="dm-g-muted">Google no té dades de contacte d\'aquest establiment.</div>') + botoMes;
 
-  // Enllaç exacte a la fitxa de Google Maps
-  if (d.mapsUrl && mapsLink) mapsLink.href = d.mapsUrl;
+  // Les dades ja vénen de Google Maps: amaguem el botó «Verificar a Google Maps»
+  if (mapsLink) { if (d.mapsUrl) mapsLink.href = d.mapsUrl; mapsLink.style.display = 'none'; }
 
   // Botó de trucada amb el telèfon real
   if (d.phone && callBtn) {
@@ -1724,6 +1743,65 @@ async function carregaGooglePlaces(e, mapUrlInicial) {
   } else if (callBtn && d.mapsUrl) {
     callBtn.href = d.mapsUrl;
   }
+}
+
+// Foto del cas (la nostra, de Supabase) a la capçalera de la fitxa
+async function mostraFotoCas(e) {
+  const img = document.getElementById('dmHeroImg');
+  const icona = document.getElementById('dmHeroIcon');
+  if (!img) return;
+  img.style.display = 'none'; img.removeAttribute('src');
+  if (icona) icona.style.display = '';
+  let foto = e.photoB64;
+  if (!foto) {
+    try {
+      const { data } = await sb.from('entries').select('id,photoB64').eq('id', e.id).single();
+      if (data && data.photoB64) { foto = data.photoB64; e.photoB64 = foto; }
+    } catch (err) {}
+  }
+  if (!foto || _dmEntry !== e) return; // sense foto, o ja s'ha obert una altra fitxa
+  img.src = foto; img.alt = 'Foto de ' + (e.name || '');
+  img.style.display = 'block';
+  if (icona) icona.style.display = 'none';
+}
+
+// Fotos i opinions de Google: només quan l'usuari ho demana (estalvia consultes)
+const _extraCache = {};
+async function carregaFotosOpinions(placeId) {
+  const boto = document.getElementById('dmGMes');
+  const zona = document.getElementById('dmGExtra');
+  if (!zona) return;
+  if (boto) { boto.disabled = true; boto.textContent = 'Carregant…'; }
+  let d = _extraCache[placeId];
+  if (!d) {
+    try {
+      const r = await fetch(PLACES_URL + '?extra=1&lang=' + encodeURIComponent(lang) + '&id=' + encodeURIComponent(placeId));
+      d = await r.json();
+      if (!r.ok) throw new Error(d && d.error ? d.error : ('HTTP ' + r.status));
+      _extraCache[placeId] = d;
+    } catch (err) {
+      console.warn('[places extra]', err);
+      if (boto) { boto.disabled = false; boto.textContent = '📷 Veure fotos i opinions'; }
+      zona.innerHTML = '<div class="dm-g-muted" style="margin-top:8px">No s\'han pogut carregar ara mateix.</div>';
+      return;
+    }
+  }
+  if (boto) boto.style.display = 'none';
+  let html = '';
+  if (d.fotos && d.fotos.length) {
+    html += '<div class="dm-g-fotos">' + d.fotos.map(f =>
+      '<figure><img src="' + escHtml(f.url) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' +
+      (f.autor ? '<figcaption>📷 ' + (f.autorUrl ? '<a href="' + escHtml(f.autorUrl) + '" target="_blank" rel="noopener">' + escHtml(f.autor) + '</a>' : escHtml(f.autor)) + '</figcaption>' : '') +
+      '</figure>').join('') + '</div>';
+  }
+  if (d.opinions && d.opinions.length) {
+    html += d.opinions.map(o =>
+      '<div class="dm-g-op"><div class="dm-g-op-cap">' +
+      (o.autorUrl ? '<a href="' + escHtml(o.autorUrl) + '" target="_blank" rel="noopener">' + escHtml(o.autor) + '</a>' : '<span>' + escHtml(o.autor) + '</span>') +
+      '<span class="dm-g-muted">' + (o.nota ? '⭐'.repeat(Math.round(o.nota)) + ' · ' : '') + escHtml(o.quan) + '</span></div>' +
+      (o.text ? '<div class="dm-g-op-text">' + escHtml(o.text) + '</div>' : '') + '</div>').join('');
+  }
+  zona.innerHTML = html || '<div class="dm-g-muted" style="margin-top:8px">Google no té fotos ni opinions d\'aquest establiment.</div>';
 }
 
 function _dmEscListener(e) {
@@ -3787,6 +3865,7 @@ if ('serviceWorker' in navigator) {
     </div>
     <div class="dm-body" id="dmBody">
       <div class="dm-hero" id="dmHero">
+        <img class="dm-hero-img" id="dmHeroImg" alt="">
         <span class="dm-hero-placeholder" id="dmHeroIcon">🏪</span>
         <span class="dm-hero-badge" id="dmHeroBadge"></span>
       </div>
