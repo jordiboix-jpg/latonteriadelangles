@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v88 build:20261007-1630 · mòbil: «Veure a Google» ja no canvia la pàgina de la Tonteria per Google Maps -->
+<!-- v89 build:20261007-1730 · accés d'administrador amb compte de Supabase (correu + contrasenya); la contrasenya ja no és al codi -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -590,9 +590,12 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
 <div class="admin-login hidden" id="loginModal">
   <div class="login-box">
     <h2 id="loginTitle">Panell d'administrador</h2>
-    <p id="loginDesc" style="font-size:14px;color:var(--muted);margin-bottom:16px">Introdueix la contrasenya d'administrador.</p>
+    <p id="loginDesc" style="font-size:14px;color:var(--muted);margin-bottom:16px">Introdueix el correu i la contrasenya d'administrador.</p>
+    <form id="loginForm" onsubmit="event.preventDefault();doLogin();" style="margin:0">
+    <input type="email" id="loginEmail" placeholder="Correu..." autocomplete="username">
     <input type="password" id="loginPwd" placeholder="Contrasenya..." autocomplete="current-password">
-    <div class="login-err" id="loginErr">Contrasenya incorrecta.</div>
+    </form>
+    <div class="login-err" id="loginErr">Correu o contrasenya incorrectes.</div>
     <div style="display:flex;gap:10px">
       <button class="submit-btn" id="loginOk" style="flex:1">Entrar</button>
       <button class="submit-btn" id="loginCancel" style="background:#555">Cancel·lar</button>
@@ -1065,7 +1068,6 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── CONSTANTS ──────────────────────────────────────────────────────────────
-const ADMIN_PWD = "tonteria2025";
 
 const TINDEX = [
   {score:0,emoji:"🟢",label:{ca:"0/5 — COMPLETAMENT NORMAL",es:"0/5 — COMPLETAMENTE NORMAL",en:"0/5 — PERFECTLY NORMAL"},desc:{ca:"L'anglès té sentit.",es:"El inglés tiene sentido.",en:"The English actually makes sense."}},
@@ -2895,33 +2897,55 @@ function applyLang(l) {
 }
 
 // ── ADMIN LOGIN ─────────────────────────────────────────────────────────────
-function showAdminLogin() {
+// L'administrador entra amb el seu compte de Supabase (Authentication → Users).
+// Supabase comprova el correu i la contrasenya; la base de dades només deixa
+// modificar dades a aquest compte (normes RLS).
+async function showAdminLogin() {
   if (isAdmin) return;
+  // Si ja hi ha una sessió oberta d'abans, entrem directament
+  try {
+    const { data } = await sb.auth.getSession();
+    if (data && data.session) { entraComAdmin(); return; }
+  } catch (e) {}
+  document.getElementById('loginErr').style.display = 'none';
   document.getElementById('loginModal').classList.remove('hidden');
-  document.getElementById('loginPwd').focus();
+  document.getElementById('loginEmail').focus();
 }
 document.getElementById('loginOk').addEventListener('click', doLogin);
 document.getElementById('loginCancel').addEventListener('click', ()=>document.getElementById('loginModal').classList.add('hidden'));
-document.getElementById('loginPwd').addEventListener('keydown', e=>{if(e.key==='Enter')doLogin();});
-function doLogin() {
+document.getElementById('loginPwd').addEventListener('keydown', e=>{if(e.key==='Enter'){e.preventDefault();doLogin();}});
+document.getElementById('loginEmail').addEventListener('keydown', e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('loginPwd').focus();}});
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
   const pwd = document.getElementById('loginPwd').value;
-  if (pwd === ADMIN_PWD) {
-    isAdmin = true;
-    document.getElementById('loginModal').classList.add('hidden');
-    document.getElementById('loginPwd').value = '';
-    document.getElementById('adminBar').classList.remove('hidden');
-    document.getElementById('adminLoginBtn').style.display = 'none';
-    loadPending();
-    loadDictProposals();
-    setTimeout(()=>applyLang(lang), 50); // força re-render en l'idioma actiu
-    renderPublic();
-  } else {
-    document.getElementById('loginErr').style.display = 'block';
-    document.getElementById('loginPwd').value = '';
+  const err = document.getElementById('loginErr');
+  const btn = document.getElementById('loginOk');
+  if (!email || !pwd) { err.style.display = 'block'; return; }
+  btn.disabled = true;
+  const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  btn.disabled = false;
+  document.getElementById('loginPwd').value = '';
+  if (error) {
+    console.warn('[admin] login:', error.message);
+    err.style.display = 'block';
     document.getElementById('loginPwd').focus();
+    return;
   }
+  err.style.display = 'none';
+  entraComAdmin();
 }
-function adminLogout() {
+function entraComAdmin() {
+  isAdmin = true;
+  document.getElementById('loginModal').classList.add('hidden');
+  document.getElementById('adminBar').classList.remove('hidden');
+  document.getElementById('adminLoginBtn').style.display = 'none';
+  loadPending();
+  loadDictProposals();
+  setTimeout(()=>applyLang(lang), 50); // força re-render en l'idioma actiu
+  renderPublic();
+}
+async function adminLogout() {
+  try { await sb.auth.signOut(); } catch (e) {}
   isAdmin = false;
   document.getElementById('adminBar').classList.add('hidden');
   document.getElementById('adminLoginBtn').style.display = '';
