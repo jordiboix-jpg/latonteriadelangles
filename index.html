@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v90 build:20261007-1745 · les visites es compten amb la funció segura suma_visita de Supabase -->
+<!-- v92 build:20261007-1930 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -223,7 +223,7 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .enunciat-cancel-btn:hover{color:var(--ink);border-color:var(--ink)}
 .map-btn{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);text-decoration:none;border:1px solid var(--rust);padding:5px 11px;transition:all .15s;margin-top:2px}
 .map-btn:hover{background:var(--rust);color:var(--paper)}
-.entry-photo{width:100%;height:180px;object-fit:cover;object-position:center top;border-radius:2px;margin-bottom:12px;display:block}
+.entry-photo{width:100%;height:auto;aspect-ratio:2/1;object-fit:cover;object-position:center top;border-radius:2px;margin-bottom:12px;display:block}
 .visit-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:4px 0 10px}
 
 .share-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
@@ -245,9 +245,25 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .dm-header-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dm-header-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);flex-shrink:0}
 .dm-body{flex:1;overflow-y:auto;padding-bottom:90px}
-.dm-hero{width:100%;height:200px;background:linear-gradient(135deg,var(--cream) 0%,var(--rule) 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0}
+.dm-hero{width:100%;height:auto;aspect-ratio:2/1;background:linear-gradient(135deg,var(--cream) 0%,var(--rule) 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0}
 .dm-hero-placeholder{font-size:64px;opacity:.3}
 .dm-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:none}
+/* Retallador de fotos */
+#retallador{position:fixed;inset:0;z-index:100000;background:rgba(10,8,5,.82);display:none;align-items:center;justify-content:center;padding:16px}
+#retallador.open{display:flex}
+#retallador .rt-caixa{background:var(--paper);color:var(--ink);width:min(680px,100%);border-radius:4px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#retallador h3{font-family:'Playfair Display',serif;font-size:20px;margin:0 0 4px}
+#retallador .rt-ajuda{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:10px}
+#retallador .rt-marc{position:relative;width:100%;aspect-ratio:2/1;overflow:hidden;background:#222;border-radius:2px;touch-action:none;cursor:grab;user-select:none}
+#retallador .rt-marc.arrossegant{cursor:grabbing}
+#retallador .rt-marc img{position:absolute;top:0;left:0;transform-origin:0 0;max-width:none;pointer-events:none;-webkit-user-drag:none}
+#retallador .rt-marc img.rt-fons{inset:-10%;width:120%;height:120%;object-fit:cover;filter:blur(18px) brightness(.85);transform:none}
+#retallador .rt-marc::after{content:'';position:absolute;inset:0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.7);pointer-events:none}
+#retallador .rt-zoom{display:flex;align-items:center;gap:10px;margin:12px 0 4px;font-family:'DM Mono',monospace;font-size:13px}
+#retallador .rt-zoom input{flex:1;accent-color:var(--rust)}
+#retallador .rt-botons{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+#retallador .rt-botons button{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:10px 16px;border-radius:3px;cursor:pointer;border:1px solid var(--rule);background:var(--cream);color:var(--ink)}
+#retallador .rt-botons .rt-desa{background:var(--rust);color:#fff;border-color:var(--rust)}
 .dm-google-block .dm-g-label a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
 .dm-g-mes{display:block;width:100%;margin-top:12px;padding:10px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--rust);border:1px solid var(--rust);border-radius:3px;cursor:pointer}
 .dm-g-mes:hover{background:var(--rust);color:#fff}
@@ -302,7 +318,6 @@ body:has(#detailModal.open) #pwaBanner{display:none}
   .dm-inner{background:var(--paper);width:min(580px,92vw);max-height:85vh;border-radius:4px;overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4)}
   .dm-header{border-radius:4px 4px 0 0}
   .dm-body{overflow-y:auto;padding-bottom:0}
-  .dm-hero{height:240px}
   .dm-name-big{font-size:24px}
   .dm-tonteria-box{margin:16px 20px}
   .dm-info-block{padding:16px 20px 12px}
@@ -343,7 +358,7 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .admin-photo-row label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#a09070;cursor:pointer;display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--rule);padding:5px 10px;width:fit-content}
 .admin-photo-row label:hover{border-color:var(--gold);color:var(--gold)}
 .admin-photo-row input[type=file]{display:none}
-.admin-photo-preview{width:100%;max-height:120px;object-fit:cover;object-position:center top;border-radius:2px;display:none;margin-top:4px}
+.admin-photo-preview{width:100%;height:auto;aspect-ratio:2/1;object-fit:cover;object-position:center top;border-radius:2px;display:none;margin-top:4px}
 .act-photo-save{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--green);color:#fff;border:none;padding:5px 10px;cursor:pointer;display:none}
 .act-photo-remove{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:#888;color:#fff;border:none;padding:5px 10px;cursor:pointer}
 .act-photo-remove:hover{background:var(--red)}
@@ -387,7 +402,7 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .form-msg.ok{background:rgba(45,106,63,.3);color:#7ecf95;border-left:3px solid var(--green)}
 .form-msg.err{background:rgba(204,34,0,.2);color:#f09090;border-left:3px solid var(--red)}
 .form-msg.hidden{display:none}
-.photo-preview{width:100%;max-height:200px;object-fit:cover;object-position:center top;margin-top:8px;border-radius:2px;display:none}
+.photo-preview{width:100%;height:auto;max-width:480px;aspect-ratio:2/1;object-fit:cover;object-position:center top;margin-top:8px;border-radius:2px;display:none}
 .photo-pick-row{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
 .photo-pick-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px dashed #4a3a28;color:#a09070;padding:8px 14px;cursor:pointer;border-radius:2px;transition:all .15s;flex:1 1 auto}
 .photo-pick-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,133,10,.07)}
@@ -508,7 +523,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .mCaseTindexDots{font-size:12px;letter-spacing:1px}
   .mCaseTag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--rule);padding:1px 6px;border-radius:10px}
   .mCaseBody{display:none;padding-top:10px;font-size:14px;line-height:1.6;color:var(--ink)}
-  .mCasePhoto{width:100%;height:150px;object-fit:cover;object-position:center top;border-radius:2px;margin-bottom:8px;display:none}
+  .mCasePhoto{width:100%;height:auto;aspect-ratio:2/1;object-fit:cover;object-position:center top;border-radius:2px;margin-bottom:8px;display:none}
   .mCaseBody.open{display:block}
   .mCaseDesc{color:var(--ink);margin-bottom:8px}
   .mCaseComment{font-style:italic;color:var(--muted);font-size:13px;padding-left:10px;border-left:3px solid var(--rule)}
@@ -1003,7 +1018,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
             </div>
             <input type="file" id="mfPhoto" accept="image/*" style="display:none" onchange="mPreviewPhoto(this)">
             <input type="file" id="mfPhotoCam" accept="image/*" capture="environment" style="display:none" onchange="mPreviewPhoto(this)">
-            <img id="mPhotoPreview" style="display:none;max-width:100%;margin-top:10px;border-radius:4px;border:var(--border)">
+            <img id="mPhotoPreview" style="display:none;width:100%;aspect-ratio:2/1;object-fit:cover;margin-top:10px;border-radius:4px;border:var(--border)">
           </div>
           <div class="mField">
             <label>Ubicació GPS</label>
@@ -1150,6 +1165,7 @@ function initDark() {
 // ── TOAST ──────────────────────────────────────────────────────────────────
 // ── TEXTOS NOUS v82 ─────────────────────────────────────────────────────────
 Object.assign(T.ca, {
+  rtTitol: 'Ajusta la foto', rtAjuda: 'Arrossega per moure-la · roda del ratolí, pessic o barra per ampliar-la. El marc és com es veurà al cas.', rtDesa: 'Desar', rtCancel: 'Cancel·lar',
   mVeureGoogle: '📍 Veure a Google ↗',
   mCercaPh: '🔍 Cerca en català, castellà o anglès',
   fSelCat: 'Tipus de negoci', fSelProv: 'Província', fSelMuni: 'Municipi',
@@ -1158,6 +1174,7 @@ Object.assign(T.ca, {
   tiPromo: 'Darrere de tot aquest esforç per destacar l\'anglès en lloc del català, hi trobareu negocis que fan de la qualitat, la modernitat i l\'excel·lència en el servei al client un senyal d\'identitat. I un personal molt «guai»… Truqueu a qualsevol d\'ells i ho descobrireu!'
 });
 Object.assign(T.es, {
+  rtTitol: 'Ajusta la foto', rtAjuda: 'Arrastra para moverla · rueda del ratón, pellizco o barra para ampliarla. El marco es cómo se verá en el caso.', rtDesa: 'Guardar', rtCancel: 'Cancelar',
   mVeureGoogle: '📍 Ver en Google ↗',
   mCercaPh: '🔍 Busca en catalán, castellano o inglés',
   fSelCat: 'Tipo de negocio', fSelProv: 'Provincia', fSelMuni: 'Municipio',
@@ -1166,6 +1183,7 @@ Object.assign(T.es, {
   tiPromo: 'Detrás de todo este esfuerzo por destacar el inglés en lugar del catalán, encontraréis negocios que hacen de la calidad, la modernidad y la excelencia en el servicio al cliente su seña de identidad. Y un personal muy «cool»… ¡Llamad a cualquiera de ellos y lo descubriréis!'
 });
 Object.assign(T.en, {
+  rtTitol: 'Adjust the photo', rtAjuda: 'Drag to move it · mouse wheel, pinch or slider to zoom. The frame shows how it will look on the case.', rtDesa: 'Save', rtCancel: 'Cancel',
   mVeureGoogle: '📍 View on Google ↗',
   mCercaPh: '🔍 Search in Catalan, Spanish or English',
   fSelCat: 'Type of business', fSelProv: 'Province', fSelMuni: 'Town',
@@ -3075,17 +3093,16 @@ async function saveTonteriaIndex(id) {
 }
 
 // ── ADMIN PHOTO EDIT ────────────────────────────────────────────────────────
-function adminPhotoChange(id, input) {
+async function adminPhotoChange(id, input) {
   const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    adminPendingPhotos[id] = ev.target.result;
-    const prev = document.getElementById('aphoto-prev-'+id);
-    if (prev) { prev.src = ev.target.result; prev.style.display = 'block'; }
-    const saveBtn = document.getElementById('aphoto-save-'+id);
-    if (saveBtn) saveBtn.style.display = 'inline-block';
-  };
-  reader.readAsDataURL(file);
+  input.value = '';
+  const foto = await obreRetallador(file);
+  if (!foto) return;
+  adminPendingPhotos[id] = foto;
+  const prev = document.getElementById('aphoto-prev-'+id);
+  if (prev) { prev.src = foto; prev.style.display = 'block'; }
+  const saveBtn = document.getElementById('aphoto-save-'+id);
+  if (saveBtn) saveBtn.style.display = 'inline-block';
 }
 async function adminPhotoSave(id) {
   if (!adminPendingPhotos[id]) return;
@@ -3104,15 +3121,128 @@ async function adminPhotoRemove(id) {
   await loadPublished();
 }
 
+// ── RETALLADOR DE FOTOS ─────────────────────────────────────────────────────
+// Obre una finestra per moure i ampliar la foto dins d'un marc 2:1 (el format del requadre del cas)
+// i retorna (Promise) la foto retallada i reduïda (JPEG 1000×500), o null si es cancel·la.
+const RT_AMPLE = 1000, RT_ALT = 500, RT_QUALITAT = 0.82;
+function obreRetallador(file) {
+  return new Promise(resolve => {
+    if (!file) { resolve(null); return; }
+    let m = document.getElementById('retallador');
+    if (!m) { m = document.createElement('div'); m.id = 'retallador'; document.body.appendChild(m); }
+    m.innerHTML = '<div class="rt-caixa">' +
+      '<h3>' + escHtml(t('rtTitol')) + '</h3>' +
+      '<div class="rt-ajuda">' + escHtml(t('rtAjuda')) + '</div>' +
+      '<div class="rt-marc" id="rtMarc"><img class="rt-fons" id="rtFons" alt=""><img id="rtImg" alt=""></div>' +
+      '<div class="rt-zoom"><span>－</span><input type="range" id="rtZoom" min="0.3" max="4" step="0.01" value="1"><span>＋</span></div>' +
+      '<div class="rt-botons"><button type="button" id="rtCancel">' + escHtml(t('rtCancel')) + '</button><button type="button" class="rt-desa" id="rtDesa">' + escHtml(t('rtDesa')) + '</button></div>' +
+      '</div>';
+    const marc = m.querySelector('#rtMarc'), img = m.querySelector('#rtImg'), fons = m.querySelector('#rtFons'), zoom = m.querySelector('#rtZoom');
+    const url = URL.createObjectURL(file);
+    let iw = 0, ih = 0, base = 1, z = 1, zMin = 1, x = 0, y = 0;
+    const punters = new Map(); let pessic = null;
+
+    const fw = () => marc.clientWidth, fh = () => marc.clientHeight;
+    function limita() {
+      const s = base * z, w = iw * s, h = ih * s;
+      x = w >= fw() ? Math.min(0, Math.max(fw() - w, x)) : Math.max(0, Math.min(fw() - w, x));
+      y = h >= fh() ? Math.min(0, Math.max(fh() - h, y)) : Math.max(0, Math.min(fh() - h, y));
+    }
+    function pinta() { limita(); img.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (base * z) + ')'; }
+    function ampliaA(nouZ, cx, cy) {
+      nouZ = Math.min(4, Math.max(zMin, nouZ));
+      const s0 = base * z, s1 = base * nouZ;
+      x = cx - (cx - x) * s1 / s0; y = cy - (cy - y) * s1 / s0;
+      z = nouZ; zoom.value = z; pinta();
+    }
+    function tanca(res) {
+      m.classList.remove('open');
+      URL.revokeObjectURL(url);
+      window.removeEventListener('resize', reajusta);
+      resolve(res);
+    }
+    function reajusta() {
+      if (!iw) return;
+      const s0 = base * z;
+      base = Math.max(fw() / iw, fh() / ih);
+      const s1 = base * z; x = x * s1 / s0; y = y * s1 / s0; pinta();
+    }
+
+    img.onload = () => {
+      iw = img.naturalWidth; ih = img.naturalHeight;
+      img.style.width = iw + 'px'; img.style.height = ih + 'px';
+      base = Math.max(fw() / iw, fh() / ih);          // z = 1: la foto omple el marc
+      zMin = Math.min(1, Math.min(fw() / iw, fh() / ih) / base); // z = zMin: la foto es veu sencera
+      zoom.min = zMin.toFixed(3);
+      z = 1; zoom.value = 1;
+      x = (fw() - iw * base) / 2; y = 0;   // centrada en horitzontal, enganxada a dalt (on sol haver el rètol)
+      pinta();
+    };
+    img.onerror = () => { showToast('No s\'ha pogut obrir la imatge'); tanca(null); };
+    img.src = url; fons.src = url;
+    m.classList.add('open');
+    window.addEventListener('resize', reajusta);
+
+    zoom.addEventListener('input', () => ampliaA(parseFloat(zoom.value), fw() / 2, fh() / 2));
+    marc.addEventListener('wheel', ev => {
+      ev.preventDefault();
+      const r = marc.getBoundingClientRect();
+      ampliaA(z * (ev.deltaY < 0 ? 1.08 : 1 / 1.08), ev.clientX - r.left, ev.clientY - r.top);
+    }, { passive: false });
+    marc.addEventListener('pointerdown', ev => {
+      marc.setPointerCapture(ev.pointerId);
+      punters.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+      marc.classList.add('arrossegant');
+      if (punters.size === 2) {
+        const [a, b] = [...punters.values()];
+        pessic = { d: Math.hypot(a.x - b.x, a.y - b.y), z };
+      }
+    });
+    marc.addEventListener('pointermove', ev => {
+      if (!punters.has(ev.pointerId)) return;
+      const ant = punters.get(ev.pointerId);
+      punters.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+      if (punters.size === 2 && pessic) {
+        const [a, b] = [...punters.values()];
+        const r = marc.getBoundingClientRect();
+        ampliaA(pessic.z * Math.hypot(a.x - b.x, a.y - b.y) / pessic.d, (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top);
+      } else if (punters.size === 1) {
+        x += ev.clientX - ant.x; y += ev.clientY - ant.y; pinta();
+      }
+    });
+    const deixa = ev => { punters.delete(ev.pointerId); if (punters.size < 2) pessic = null; if (!punters.size) marc.classList.remove('arrossegant'); };
+    marc.addEventListener('pointerup', deixa);
+    marc.addEventListener('pointercancel', deixa);
+
+    m.querySelector('#rtCancel').onclick = () => tanca(null);
+    m.querySelector('#rtDesa').onclick = () => {
+      const s = base * z;
+      const c = document.createElement('canvas');
+      c.width = RT_AMPLE; c.height = RT_ALT;
+      const ctx = c.getContext('2d');
+      const k = RT_AMPLE / fw();
+      ctx.imageSmoothingQuality = 'high';
+      // Fons: la mateixa foto, omplint el marc i desenfocada (només es veu si la foto és més petita que el marc)
+      ctx.fillStyle = '#2a2218'; ctx.fillRect(0, 0, RT_AMPLE, RT_ALT);
+      if (z < 1 && 'filter' in ctx) {
+        const cs = Math.max(RT_AMPLE / iw, RT_ALT / ih) * 1.2;
+        ctx.filter = 'blur(28px) brightness(0.85)';
+        ctx.drawImage(img, (RT_AMPLE - iw * cs) / 2, (RT_ALT - ih * cs) / 2, iw * cs, ih * cs);
+        ctx.filter = 'none';
+      }
+      ctx.drawImage(img, x * k, y * k, iw * s * k, ih * s * k);
+      tanca(c.toDataURL('image/jpeg', RT_QUALITAT));
+    };
+  });
+}
+
 // ── PHOTO UPLOAD FORM ───────────────────────────────────────────────────────
-function handlePhotoFile(file, preview) {
-  if (!file) { pendingPhotoB64 = null; if(preview)preview.style.display='none'; return; }
-  const reader = new FileReader();
-  reader.onload = ev => {
-    pendingPhotoB64 = ev.target.result;
-    if (preview) { preview.src = pendingPhotoB64; preview.style.display = 'block'; }
-  };
-  reader.readAsDataURL(file);
+async function handlePhotoFile(file, preview) {
+  if (!file) return;
+  const foto = await obreRetallador(file);
+  if (!foto) return; // cancel·lat: mantenim la foto que hi hagués
+  pendingPhotoB64 = foto;
+  if (preview) { preview.src = pendingPhotoB64; preview.style.display = 'block'; }
 }
 function initPhotoUpload() {
   const inp = document.getElementById('fldPhoto');
@@ -3122,6 +3252,7 @@ function initPhotoUpload() {
   function onFileChosen(e, otherInp) {
     const file = e.target.files[0];
     if (otherInp) otherInp.value = '';
+    e.target.value = ''; // permet tornar a triar la mateixa foto
     handlePhotoFile(file, preview);
   }
   inp.addEventListener('change', e => onFileChosen(e, inpCam));
@@ -3718,16 +3849,15 @@ async function mLoadMunicipis() {
   if (loading) loading.style.display = 'none';
 }
 
-function mPreviewPhoto(input) {
+async function mPreviewPhoto(input) {
   const file = input && input.files ? input.files[0] : null;
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    mPendingPhotoB64 = e.target.result;
-    const prev = document.getElementById('mPhotoPreview');
-    if (prev) { prev.src = e.target.result; prev.style.display='block'; }
-  };
-  reader.readAsDataURL(file);
+  input.value = '';
+  const foto = await obreRetallador(file);
+  if (!foto) return;
+  mPendingPhotoB64 = foto;
+  const prev = document.getElementById('mPhotoPreview');
+  if (prev) { prev.src = foto; prev.style.display = 'block'; }
 }
 
 function mCaptureGPS() {
