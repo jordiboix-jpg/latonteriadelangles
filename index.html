@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v87 build:20261007-0945 · mòbil: el botó del cas ara diu «Veure a Google» i obre Google Maps de manera més robusta -->
+<!-- v88 build:20261007-1630 · mòbil: «Veure a Google» ja no canvia la pàgina de la Tonteria per Google Maps -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -3460,8 +3460,10 @@ function mObreGoogle(ev, id, url) {
   ev.stopPropagation();
   ev.preventDefault();
   incrementVisit(id);
-  const w = window.open(url, '_blank', 'noopener');
-  if (!w) location.href = url; // si el navegador bloqueja la pestanya nova, l'obrim aquí mateix
+  // Sense 'noopener' a les opcions: amb aquesta opció window.open sempre retorna null
+  const w = window.open(url, '_blank');
+  if (w) { try { w.opener = null; } catch (e) {} }
+  else location.href = url; // només si el navegador ha bloquejat de debò la pestanya nova
 }
 async function mCarregaFotoCas(entryId) {
   if (!entryId) return;
