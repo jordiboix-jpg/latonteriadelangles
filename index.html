@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v83 build:20261006-1830 · fotos retallades per dalt (es veu el rètol); fitxa (només local): foto del cas, «Dades de Google Maps», botó «Veure fotos i opinions» sota demanda -->
+<!-- v87 build:20261007-0945 · mòbil: el botó del cas ara diu «Veure a Google» i obre Google Maps de manera més robusta -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -447,7 +447,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
 
 @media(max-width:767px){
   /* Hide all desktop sections */
-  .masthead,.lang-bar,.admin-bar,.stats-bar,.section,.dict-section,.submit-section,.manifesto,footer,hr.rule,.carousel-wrap,#mapFloatAnchor,#mapFloat{display:none!important}
+  .masthead,.lang-bar,.admin-bar,.stats-bar,.section,.dict-section,.submit-section,.manifesto,footer,hr.rule,.carousel-wrap,#mapFloatAnchor,#mapFloat,#tiLegend,.map-wrap{display:none!important}
   body{overflow:hidden}
 
   /* Splash screen */
@@ -508,6 +508,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .mCaseTindexDots{font-size:12px;letter-spacing:1px}
   .mCaseTag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--rule);padding:1px 6px;border-radius:10px}
   .mCaseBody{display:none;padding-top:10px;font-size:14px;line-height:1.6;color:var(--ink)}
+  .mCasePhoto{width:100%;height:150px;object-fit:cover;object-position:center top;border-radius:2px;margin-bottom:8px;display:none}
   .mCaseBody.open{display:block}
   .mCaseDesc{color:var(--ink);margin-bottom:8px}
   .mCaseComment{font-style:italic;color:var(--muted);font-size:13px;padding-left:10px;border-left:3px solid var(--rule)}
@@ -906,7 +907,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
     <!-- TAB: Casos -->
     <div id="mTabCasos" class="mTab active">
       <div id="mCasosSearch">
-        <input type="text" id="mCasosQ" placeholder="🔍 Cercar..." oninput="mRenderCasos()">
+        <input type="text" id="mCasosQ" placeholder="🔍 Cerca en català, castellà o anglès" oninput="mRenderCasos()">
         <div id="mCatFilter"></div>
       </div>
       <div id="mCasosList"></div>
@@ -915,7 +916,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
     <!-- TAB: Diccionari -->
     <div id="mTabDiccionari" class="mTab">
       <div id="mDictSearch">
-        <input type="text" id="mDictQ" placeholder="🔍 Cercar al diccionari..." oninput="mRenderDict()">
+        <input type="text" id="mDictQ" placeholder="🔍 Cerca en català, castellà o anglès" oninput="mRenderDict()">
       </div>
       <div id="mDictList"></div>
     </div>
@@ -964,7 +965,8 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
             <label>Adreça (carrer i número)</label>
             <input type="text" id="mfAddr" placeholder="Carrer, número, barri">
           </div>
-          <div class="mField">
+          <!-- Província i municipi amagats de moment (la llista de municipis no carregava) -->
+          <div class="mField" style="display:none">
             <label>Província</label>
             <select id="mfProv" onchange="mLoadMunicipis()">
               <option value="">-- Selecciona --</option>
@@ -974,7 +976,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
               <option value="43">Tarragona</option>
             </select>
           </div>
-          <div class="mField">
+          <div class="mField" style="display:none">
             <label>Municipi</label>
             <select id="mfMuni" disabled>
               <option value="">-- Primer selecciona la província --</option>
@@ -1146,18 +1148,24 @@ function initDark() {
 // ── TOAST ──────────────────────────────────────────────────────────────────
 // ── TEXTOS NOUS v82 ─────────────────────────────────────────────────────────
 Object.assign(T.ca, {
+  mVeureGoogle: '📍 Veure a Google ↗',
+  mCercaPh: '🔍 Cerca en català, castellà o anglès',
   fSelCat: 'Tipus de negoci', fSelProv: 'Província', fSelMuni: 'Municipi',
   mapBtnSite: '🗺 Veure al mapa', gmapsBtn: 'Obrir Google Maps ↗', noMapLoc: 'Aquest cas encara no té ubicació al mapa',
   tiPromoK: 'Nota de la redacció',
   tiPromo: 'Darrere de tot aquest esforç per destacar l\'anglès en lloc del català, hi trobareu negocis que fan de la qualitat, la modernitat i l\'excel·lència en el servei al client un senyal d\'identitat. I un personal molt «guai»… Truqueu a qualsevol d\'ells i ho descobrireu!'
 });
 Object.assign(T.es, {
+  mVeureGoogle: '📍 Ver en Google ↗',
+  mCercaPh: '🔍 Busca en catalán, castellano o inglés',
   fSelCat: 'Tipo de negocio', fSelProv: 'Provincia', fSelMuni: 'Municipio',
   mapBtnSite: '🗺 Ver en el mapa', gmapsBtn: 'Abrir Google Maps ↗', noMapLoc: 'Este caso todavía no tiene ubicación en el mapa',
   tiPromoK: 'Nota de la redacción',
   tiPromo: 'Detrás de todo este esfuerzo por destacar el inglés en lugar del catalán, encontraréis negocios que hacen de la calidad, la modernidad y la excelencia en el servicio al cliente su seña de identidad. Y un personal muy «cool»… ¡Llamad a cualquiera de ellos y lo descubriréis!'
 });
 Object.assign(T.en, {
+  mVeureGoogle: '📍 View on Google ↗',
+  mCercaPh: '🔍 Search in Catalan, Spanish or English',
   fSelCat: 'Type of business', fSelProv: 'Province', fSelMuni: 'Town',
   mapBtnSite: '🗺 Show on map', gmapsBtn: 'Open Google Maps ↗', noMapLoc: 'This case has no location on the map yet',
   tiPromoK: 'Editor\'s note',
@@ -1483,6 +1491,8 @@ async function loadPhotosOneByOne() {
       entry.photoB64 = data.photoB64;
       const img = document.querySelector(`[data-photo-id="${entry.id}"]`);
       if (img) { img.src = data.photoB64; img.style.display = 'block'; }
+      const mimg = document.querySelector(`[data-mphoto-id="${entry.id}"]`);
+      if (mimg && !mimg.getAttribute('src')) { mimg.src = data.photoB64; mimg.style.display = 'block'; }
     } catch(e) { /* continuar amb la següent */ }
   }
 }
@@ -1555,10 +1565,10 @@ const TI_CALL_TEXTS = {
 
 // ── INTERRUPTOR DE LA FITXA NOVA ─────────────────────────────────────────────
 // Mentre no estigui connectada l'API de Google, la fitxa nova (amb el botó de trucada)
-// només es veu treballant en local (localhost) o afegint ?fitxa=1 a l'adreça.
-// A la web publicada, els casos s'obren a Google Maps com sempre.
+// només es veu afegint ?fitxa=1 a l'adreça (també en local: http://localhost:8888/?fitxa=1).
+// Sense ?fitxa=1, la web es comporta igual que la publicada.
 // Quan estigui a punt per a tothom, canvieu la línia de sota per: const FITXA_ACTIVA = true;
-const FITXA_ACTIVA = ['localhost', '127.0.0.1'].includes(location.hostname) || /[?&]fitxa=1\b/.test(location.search);
+const FITXA_ACTIVA = /[?&]fitxa=1\b/.test(location.search);
 
 function googleMapsUrlDe(e) {
   return e.name
@@ -3299,6 +3309,11 @@ function mUpdateLangBtn() {
   document.querySelectorAll('.mLangBtn2').forEach(function(btn) {
     btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang);
   });
+  // Text del cercador de casos
+  const cq = document.getElementById('mCasosQ');
+  if (cq) cq.placeholder = t('mCercaPh');
+  const dq = document.getElementById('mDictQ');
+  if (dq) dq.placeholder = t('mCercaPh');
   // Re-renderitza si estem al diccionari
   mRenderDict();
   mRenderCasos();
@@ -3377,11 +3392,13 @@ function mRenderCasos() {
   let filtered = entries;
   if (mActiveCat !== 'all') filtered = filtered.filter(e => e.category === mActiveCat);
   if (q) filtered = filtered.filter(e => {
-    const name = (e.name||'').toLowerCase();
-    const addr = (e.addr||'').toLowerCase();
-    const desc = (e[lang] && e[lang].desc ? e[lang].desc : '').toLowerCase();
-    return name.includes(q) || addr.includes(q) || desc.includes(q);
+    // Cerca al nom, l'adreça i els textos en català, castellà i anglès
+    const textos = [e.name, e.addr, e.municipi, e.tag];
+    ['ca', 'es', 'en'].forEach(l => { const d = e[l] || {}; textos.push(d.desc, d.transl, d.comment); });
+    return textos.some(x => x && String(x).toLowerCase().includes(q));
   });
+  // Ordre alfabètic pel nom del negoci
+  filtered = filtered.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ca', { sensitivity: 'base' }));
   if (!filtered.length) {
     container.innerHTML = '<div style="padding:30px;text-align:center;font-family:\'DM Mono\',monospace;font-size:12px;color:var(--muted)">Cap resultat</div>';
     return;
@@ -3395,7 +3412,7 @@ function mRenderCasos() {
       const googleUrl = googleMapsUrlDe(e) || ('https://maps.google.com/?q=' + encodeURIComponent(e.name||''));
       return '<div class="mCaseCard" onclick="mToggleCase(\'mcase_' + i + '\')">'
         + '<div class="mCaseCardHeader">'
-        + '<div class="mCaseNum">' + escHtml(e.num || String(i+1).padStart(2,'0')) + '</div>'
+        + '<div class="mCaseNum">' + String(i+1).padStart(2,'0') + '</div>'
         + '<div style="flex:1">'
         + '<div class="mCaseTitle">' + escHtml(e.name||'') + '</div>'
         + '<div class="mCaseAddr">' + escHtml(e.addr||'') + '</div>'
@@ -3405,11 +3422,12 @@ function mRenderCasos() {
         + '</div>'
         + '</div>'
         + '</div>'
-        + '<div class="mCaseBody" id="mcase_' + i + '">'
+        + '<div class="mCaseBody" id="mcase_' + i + '" data-entry-id="' + escHtml(e.id) + '">'
+        + '<img class="mCasePhoto" data-mphoto-id="' + escHtml(e.id) + '" alt=""' + (e.photoB64 ? ' src="' + e.photoB64 + '" style="display:block"' : '') + '>'
         + (eData.transl ? '<div class="mCaseTransl">→ ' + escHtml(eData.transl) + '</div>' : '')
         + '<div class="mCaseDesc">' + escHtml(eData.desc||'') + '</div>'
         + '<div class="mCaseComment">' + escHtml(eData.comment||'') + '</div>'
-        + '<a class="mCaseMapLink" href="' + escHtml(googleUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation();incrementVisit(\'' + e.id + '\')">📍 Veure al mapa ↗</a>'
+        + '<a class="mCaseMapLink" href="' + escHtml(googleUrl) + '" target="_blank" rel="noopener" onclick="mObreGoogle(event,\'' + e.id + '\',this.href)">' + escHtml(t('mVeureGoogle')) + '</a>'
         + '</div>'
         + '</div>';
     }
@@ -3435,6 +3453,29 @@ function mToggleCase(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.classList.toggle('open');
+  if (el.classList.contains('open')) mCarregaFotoCas(el.dataset.entryId);
+}
+// Obre Google Maps des d'un cas del mòbil (compta la visita)
+function mObreGoogle(ev, id, url) {
+  ev.stopPropagation();
+  ev.preventDefault();
+  incrementVisit(id);
+  const w = window.open(url, '_blank', 'noopener');
+  if (!w) location.href = url; // si el navegador bloqueja la pestanya nova, l'obrim aquí mateix
+}
+async function mCarregaFotoCas(entryId) {
+  if (!entryId) return;
+  const img = document.querySelector('[data-mphoto-id="' + entryId + '"]');
+  if (!img || img.getAttribute('src')) return;
+  const e = publishedEntries.find(x => x.id === entryId);
+  let foto = e && e.photoB64;
+  if (!foto) {
+    try {
+      const { data } = await sb.from('entries').select('id,photoB64').eq('id', entryId).single();
+      if (data && data.photoB64) { foto = data.photoB64; if (e) e.photoB64 = foto; }
+    } catch (err) {}
+  }
+  if (foto) { img.src = foto; img.alt = 'Foto de ' + ((e && e.name) || ''); img.style.display = 'block'; }
 }
 
 function mRenderDict() {
@@ -3443,11 +3484,11 @@ function mRenderDict() {
   const q = (document.getElementById('mDictQ') ? document.getElementById('mDictQ').value : '').toLowerCase().trim();
   let rows = DICT.length > 0 ? DICT : [];
   if (q) rows = rows.filter(function(r) {
-    return (r.eng||'').toLowerCase().includes(q) ||
-           (r.ca||'').toLowerCase().includes(q) ||
-           (r.es||'').toLowerCase().includes(q) ||
-           (r.en||'').toLowerCase().includes(q);
+    return [r.en, r.eng, r.ca, r.es, r.comment, r.comment_es, r.comment_en]
+      .some(function(x) { return x && String(x).toLowerCase().includes(q); });
   });
+  // Ordre alfabètic per la paraula en anglès
+  rows = rows.slice().sort(function(a, b) { return (a.en || '').localeCompare(b.en || '', 'en', { sensitivity: 'base' }); });
   if (!rows.length) {
     container.innerHTML = '<div style="padding:30px;text-align:center;font-family:\'DM Mono\',monospace;font-size:12px;color:var(--muted)">Cap entrada al diccionari</div>';
     return;
@@ -3487,8 +3528,8 @@ function mStepNext(step) {
     if (!mfName || !mfName.value.trim()) { showToast('⚠ Cal indicar el nom del negoci'); return; }
   }
   if (step === 2) {
-    const mfProv = document.getElementById('mfProv');
-    if (!mfProv || !mfProv.value) { showToast('⚠ Cal seleccionar la província'); return; }
+    const mfAddr = document.getElementById('mfAddr');
+    if (!mfAddr || !mfAddr.value.trim()) { showToast('⚠ Cal indicar l\'adreça'); return; }
   }
   if (step === 4) return;
   mGoToStep(step + 1);
@@ -3524,9 +3565,9 @@ function mBuildSummary() {
   const catVal = mfCat ? mfCat.value : '';
   const cat = catVal ? tipusNom(catVal) : '—';
   const mfProv = document.getElementById('mfProv');
-  const prov = mfProv && mfProv.selectedOptions[0] ? mfProv.selectedOptions[0].text : '—';
+  const prov = mfProv && mfProv.value && mfProv.selectedOptions[0] ? mfProv.selectedOptions[0].text : '';
   const mfMuni = document.getElementById('mfMuni');
-  const muni = mfMuni && mfMuni.selectedOptions[0] ? mfMuni.selectedOptions[0].text : '—';
+  const muni = mfMuni && mfMuni.value && mfMuni.selectedOptions[0] ? mfMuni.selectedOptions[0].text : '';
   const mfAddr = document.getElementById('mfAddr');
   const addr = mfAddr ? mfAddr.value : '';
   const hasPhoto = mPendingPhotoB64 ? '✓ Foto adjunta' : '(sense foto)';
@@ -3534,7 +3575,7 @@ function mBuildSummary() {
   const box = document.getElementById('mSummaryBox');
   if (box) box.innerHTML = '<strong>Negoci</strong>' + escHtml(name) + '<br>'
     + '<strong>Tipus</strong>' + cat + '<br>'
-    + '<strong>Ubicació</strong>' + prov + ' · ' + muni + (addr ? ' · ' + escHtml(addr) : '') + '<br>'
+    + '<strong>Ubicació</strong>' + escHtml([addr, muni, prov].filter(Boolean).join(' · ') || '—') + '<br>'
     + '<strong>Foto</strong>' + hasPhoto + '<br>'
     + '<strong>GPS</strong>' + hasGps;
 }
@@ -3548,27 +3589,36 @@ async function mSubmitCase() {
   const desc = mfDesc ? mfDesc.value.trim() : '';
   const mfAddr = document.getElementById('mfAddr');
   const addr = mfAddr ? mfAddr.value.trim() : '';
-  const mfProv = document.getElementById('mfProv');
-  const prov = mfProv && mfProv.selectedOptions[0] ? mfProv.selectedOptions[0].text : '';
-  const mfMuni = document.getElementById('mfMuni');
-  const muni = mfMuni && mfMuni.selectedOptions[0] ? mfMuni.selectedOptions[0].text : '';
   const mfEmail = document.getElementById('mfEmail');
   const email = mfEmail ? mfEmail.value.trim() : '';
 
   const btn = document.getElementById('mSubmitBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Enviant…'; }
 
+  if (!name || !addr) {
+    const msgEl0 = document.getElementById('mFormMsg');
+    if (msgEl0) { msgEl0.style.display='block'; msgEl0.style.background='#feeaea'; msgEl0.style.color='#cc2200'; msgEl0.textContent = 'Cal el nom del negoci i l\'adreça.'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Enviar cas →'; }
+    return;
+  }
+  // Mateixos camps que el formulari d'escriptori (la taula «entries» no accepta camps desconeguts)
   const payload = {
-    name: name, category: cat, addr: [addr, muni, prov].filter(Boolean).join(', '),
-    prov_text: prov, muni_text: muni,
+    id: 'user-' + Date.now(),
+    status: 'pending', name: name, addr: addr,
+    provincia: '', municipi: '',
+    category: cat,
+    tonteriaIndex: null,
+    descOriginal: desc,
+    email: email || '',
+    photoB64: mPendingPhotoB64 || null,
     ca: { desc: desc, transl: '', comment: '' },
     es: { desc: '', transl: '', comment: '' },
     en: { desc: '', transl: '', comment: '' },
-    tonteriaIndex: 3, status: 'pending',
-    email: email || null,
-    photo: mPendingPhotoB64 || null,
+    tag: cat ? (tipusNom(cat, 'ca') || cat) : '',
+    mapUrl: 'https://maps.google.com/?q=' + encodeURIComponent(name + ' ' + addr),
     lat: mPendingLat || null, lng: mPendingLng || null,
-    submitted_via: 'mobile'
+    createdAt: Date.now(),
+    num: '??'
   };
 
   try {
@@ -3576,6 +3626,7 @@ async function mSubmitCase() {
     const error = result.error;
     const msgEl = document.getElementById('mFormMsg');
     if (error) {
+      console.warn('[enviar cas mòbil]', error);
       if (msgEl) { msgEl.style.display='block'; msgEl.style.background='#feeaea'; msgEl.style.color='#cc2200'; msgEl.textContent = 'Error en enviar. Torna-ho a intentar.'; }
     } else {
       if (msgEl) { msgEl.style.display='block'; msgEl.style.background='#eafff0'; msgEl.style.color='#2d6a3f'; msgEl.textContent = '✓ Cas rebut! El revisarem aviat.'; }
