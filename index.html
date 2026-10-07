@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v89 build:20261007-1730 · accés d'administrador amb compte de Supabase (correu + contrasenya); la contrasenya ja no és al codi -->
+<!-- v90 build:20261007-1745 · les visites es compten amb la funció segura suma_visita de Supabase -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1534,14 +1534,25 @@ async function seedIfEmpty() {
   }
 }
 
+// Suma 1 visita a Supabase amb la funció segura «suma_visita» i actualitza el comptador amb el total real
+function desaVisita(id) {
+  sb.rpc('suma_visita', { p_id: String(id) }).then(({ data, error }) => {
+    if (error) { console.warn('No s\'ha desat la visita', error); return; }
+    if (typeof data === 'number') {
+      visitCounts[id] = data;
+      const badge = document.getElementById('vb-' + id);
+      if (badge) badge.textContent = visitCountText(data);
+    }
+  });
+}
+
 async function incrementVisit(id, url) {
   // Comptabilitzar la visita
   const cur = visitCounts[id] || 0;
   visitCounts[id] = cur + 1;
   const badge = document.getElementById('vb-' + id);
   if (badge) badge.textContent = visitCountText(cur + 1);
-  sb.from('visits').upsert({ id, count: cur + 1 })
-    .then(({ error }) => { if (error) console.warn('No s\'ha desat la visita', error); });
+  desaVisita(id);
   // Obrir la web del negoci
   if (url) window.open(url, '_blank', 'noopener');
 }
@@ -1589,8 +1600,7 @@ function openDetailModal(entryId) {
   visitCounts[e.id] = cur + 1;
   const badge = document.getElementById('vb-' + e.id);
   if (badge) badge.textContent = visitCountText(cur + 1);
-  sb.from('visits').upsert({ id: e.id, count: cur + 1 })
-    .then(({ error }) => { if (error) console.warn('No s\'ha desat la visita', error); });
+  desaVisita(e.id);
 
   const eData = e[lang] || e.ca || {};
   const ti = (typeof e.tonteriaIndex === 'number') ? e.tonteriaIndex : 3;
