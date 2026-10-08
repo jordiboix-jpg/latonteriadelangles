@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v93 build:20261008-1204 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
+<!-- v93 build:20261008-1509 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1477,17 +1477,16 @@ function applyFilter(entries) {
 }
 
 // ── SHARE ──────────────────────────────────────────────────────────────────
+var SITE_NAME = "La Tonteria de l" + "’" + "Angl" + "ès";
+var SITE_URL = "https://latonteriadelangles.com";
 function _shareText(name, mapUrl) {
-  const url = mapUrl || location.href;
-  return `"${name}" és a La Tonteria de l'Anglès 😂\nUn directori de noms ridículs d'establiments catalans. 👉 https://latonteriadelangles.com\n${url}`;
+  var url = mapUrl || location.href;
+  return '"' + name + '" es a ' + SITE_NAME + ' - Un directori de noms absurds. ' + SITE_URL + ' ' + url;
 }
 function shareWA(name, mapUrl) {
-  const txt = encodeURIComponent(_shareText(name, mapUrl));
-  // Mòbil: intenta obrir l'app de WhatsApp; si falla, obre wa.me web
+  var txt = encodeURIComponent(_shareText(name, mapUrl));
   if (/Mobi|Android/i.test(navigator.userAgent)) {
-    const a = document.createElement('a');
-    a.href = 'whatsapp://send?text=' + txt;
-    a.click();
+    location.href = 'whatsapp://send?text=' + txt;
   } else {
     window.open('https://web.whatsapp.com/send?text=' + txt, '_blank');
   }
@@ -1496,11 +1495,12 @@ function shareTW(name, mapUrl) {
   window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(_shareText(name, mapUrl)), '_blank');
 }
 function shareFB(name, mapUrl) {
-  const url = mapUrl || location.href;
+  var url = mapUrl || location.href;
   window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), '_blank');
 }
 function shareMS(name, mapUrl) {
-  window.open('https://mastodon.social/share?text=' + encodeURIComponent(`"${name}" — La Tonteria de l'Anglès\n${mapUrl||location.href}`), '_blank');
+  var txt = '"' + name + '" - ' + SITE_NAME + ' ' + (mapUrl || location.href);
+  window.open('https://mastodon.social/share?text=' + encodeURIComponent(txt), '_blank');
 }
 function copyLink(name, mapUrl) {
   navigator.clipboard.writeText(mapUrl || location.href).then(() => showToast(t('copied'))).catch(() => showToast(mapUrl || location.href));
