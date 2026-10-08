@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v93 build:20261008-1645 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
+<!-- v98 build:20261008-2120 · carCols usa offsetWidth real del carousel (no window.innerWidth) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1497,7 +1497,6 @@ function applyFilter(entries) {
 // ── SHARE ──────────────────────────────────────────────────────────────────
 var SITE_NAME = "La Tonteria de l" + "’" + "Angl" + "ès";
 var SITE_URL = "https://latonteriadelangles.com";
-var SHARE_URL = "https://latonteriadelangles.com?v=2";
 function _shareText(name, url) {
   var shareUrl = url || SITE_URL;
   return '"' + name + '" es a ' + SITE_NAME + ' - Un directori de noms absurds. ' + shareUrl;
@@ -1533,7 +1532,7 @@ function shareByEid(btn) {
   const e = pool.find(function(x){ return x.id === eid; });
   const name = e ? (e.name || '') : '';
   // Sempre compartim la URL del lloc, no Google Maps
-  const shareUrl = SHARE_URL;
+  const shareUrl = SITE_URL + '?cas=' + encodeURIComponent(eid);
   if (net === 'wa') shareWA(name, shareUrl);
   else if (net === 'tw') shareTW(name, shareUrl);
   else if (net === 'fb') shareFB(name, shareUrl);
@@ -1573,6 +1572,7 @@ async function loadPublished(retries = 3) {
   updateStats();
   mUpdateStats();
   if (isMobile()) mRenderCasos();
+  if (!isMobile()) obrirCasPerUrl(); // desktop: les dades ja estan al DOM
   // Carregar fotos en segon pla, una a una per evitar timeout
   loadPhotosOneByOne();
 }
@@ -1584,10 +1584,13 @@ async function loadPhotosOneByOne() {
       const { data } = await sb.from('entries').select('id,photoB64').eq('id', entry.id).single();
       if (!data || !data.photoB64) continue;
       entry.photoB64 = data.photoB64;
-      const img = document.querySelector(`[data-photo-id="${entry.id}"]`);
-      if (img) { img.src = data.photoB64; img.style.display = 'block'; }
-      const mimg = document.querySelector(`[data-mphoto-id="${entry.id}"]`);
-      if (mimg && !mimg.getAttribute('src')) { mimg.src = data.photoB64; mimg.style.display = 'block'; }
+      // Actualitzem tots els elements de foto (desktop + mòbil), fins i tot si el DOM s'ha regenerat
+      document.querySelectorAll(`[data-photo-id="${entry.id}"]`).forEach(function(img) {
+        img.src = data.photoB64; img.style.display = 'block';
+      });
+      document.querySelectorAll(`[data-mphoto-id="${entry.id}"]`).forEach(function(mimg) {
+        mimg.src = data.photoB64; mimg.style.display = 'block';
+      });
     } catch(e) { /* continuar amb la següent */ }
   }
 }
@@ -2336,9 +2339,19 @@ function renderEnunciatBlock(e, isAdmin) {
 
 // ── CAROUSEL STATE ─────────────────────────────────────────────────────────
 let carPage = 0;
+let _carTargetId = null; // id de l'entry a mostrar (per recalcular al resize)
 function carCols() {
-  if (window.innerWidth <= 640) return 1;
-  if (window.innerWidth <= 900) return 2;
+  // Llegir el nombre real de columnes de la primera card del grid
+  const grid = document.getElementById('entriesGrid');
+  const card = grid && grid.querySelector('.entry');
+  const outer = document.querySelector('.carousel-track-outer');
+  if (card && outer && card.offsetWidth > 0 && outer.offsetWidth > 0) {
+    return Math.round(outer.offsetWidth / card.offsetWidth);
+  }
+  // Fallback per amplada
+  const w = (outer && outer.offsetWidth > 0) ? outer.offsetWidth : window.innerWidth;
+  if (w <= 640) return 1;
+  if (w <= 900) return 2;
   return 3;
 }
 function carTotalPages(n) { return Math.max(1, Math.ceil(n / carCols())); }
@@ -2360,7 +2373,9 @@ function applyCarousel(n) {
   const cols     = carCols();
   const pages    = carTotalPages(n);
   const visibleW = outer.offsetWidth;
-  const itemW    = visibleW / cols;
+  // Usar l'amplada real de la primera card per calcular el desplaçament
+  const firstCard = grid.querySelector('.entry');
+  const itemW = firstCard ? firstCard.offsetWidth : visibleW / cols;
   const shiftPx  = carPage * cols * itemW;
   grid.style.transform = `translateX(-${shiftPx}px)`;
   if (dots) {
@@ -2373,9 +2388,14 @@ function applyCarousel(n) {
   if (next) next.style.display = pages > 1 ? 'flex' : 'none';
   if (nav)  nav.style.display  = pages > 1 ? 'flex' : 'none';
 }
-function carJump(p) { carPage = p; applyCarousel(applyFilter(publishedEntries).length); }
+function carJump(p) { _carTargetId = null; carPage = p; applyCarousel(applyFilter(publishedEntries).length); }
 window.addEventListener('resize', () => {
   const filtered = applyFilter(publishedEntries);
+  // Si tenim un target, recalcular la pàgina amb les cols actuals
+  if (_carTargetId) {
+    const idx = filtered.findIndex(e => e.id === _carTargetId);
+    if (idx >= 0) carPage = Math.floor(idx / carCols());
+  }
   const pages = carTotalPages(filtered.length);
   if (carPage >= pages) carPage = pages - 1;
   applyCarousel(filtered.length);
@@ -3420,22 +3440,41 @@ function scrollToEntry(id) {
   if (adminView !== 'public') switchAdminTab('public');
   if (activeFilter !== 'all') setFilter('all');
   if (casSearchQ) { casSearchQ = ''; const cs = document.getElementById('casSearch'); if(cs) cs.value=''; }
-  // Trobar l'índex de la targeta dins dels filtrats per calcular la pàgina del carrusel
-  const filtered = applyFilter(publishedEntries);
-  const idx = filtered.findIndex(e => e.id === id);
-  if (idx >= 0) {
-    const page = Math.floor(idx / carCols());
-    carPage = page;
-    applyCarousel(filtered.length);
-  }
-  // Esperar un frame perquè el carrusel es mogui, llavors animar
-  requestAnimationFrame(() => {
+
+  let _aplicarIntents = 0;
+  function _aplicar() {
+    _aplicarIntents++;
+    if (_aplicarIntents > 200) return; // màxim ~3s de reintents
+    const wrap = document.querySelector('.carousel-wrap');
+    // En mòbil el carousel és display:none — no reintentar
+    if (!wrap || getComputedStyle(wrap).display === 'none') return;
+    // Trobar la card directament i calcular la seva posició real al grid
     const card = document.querySelector(`[data-entry-id="${id}"]`);
-    if (!card) return;
-    card.scrollIntoView({behavior:'smooth', block:'nearest'});
-    card.classList.add('entry-highlight');
-    setTimeout(() => card.classList.remove('entry-highlight'), 2200);
-  });
+    if (!card) {
+      requestAnimationFrame(_aplicar);
+      return;
+    }
+    const outer = document.querySelector('.carousel-track-outer');
+    const grid = document.getElementById('entriesGrid');
+    if (!outer || !grid || outer.offsetWidth === 0) {
+      requestAnimationFrame(_aplicar);
+      return;
+    }
+    const visibleW = outer.offsetWidth;
+    // offsetLeft de la card dins el grid = posició exacta
+    const cardLeft = card.offsetLeft;
+    // Pàgina = quina "pantalla" conté aquesta card
+    const page = Math.floor(cardLeft / visibleW);
+    _carTargetId = id;
+    carPage = page;
+    const filtered = applyFilter(publishedEntries);
+    applyCarousel(filtered.length);
+    requestAnimationFrame(() => {
+      card.classList.add('entry-highlight');
+      setTimeout(() => card.classList.remove('entry-highlight'), 2200);
+    });
+  }
+  requestAnimationFrame(_aplicar);
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
@@ -3502,6 +3541,11 @@ window.addEventListener('resize', () => {
 });
 function mSplashReady() {
   _mSplashReady = true;
+  // Si l'URL té ?cas=, saltem la splash automàticament (usuari ve d'un link compartit)
+  if (new URLSearchParams(location.search).get('cas')) {
+    mSplashEnter();
+    return;
+  }
   const statusEl = document.getElementById('mSplashStatus');
   const btnEl = document.getElementById('mSplashBtn');
   if (statusEl) statusEl.textContent = 'Llest! ' + publishedEntries.length + ' casos carregats.';
@@ -3520,6 +3564,7 @@ function mInit() {
   mHideNetlifyBadge();
   mUpdateStats();
   mRenderCasos();
+  obrirCasPerUrl(); // mòbil: obre el cas de ?cas= un cop el DOM és llest
   mRenderDict();
   // Update dark btn
   const btn = document.getElementById('mDarkBtn');
@@ -3712,6 +3757,47 @@ function mRenderCasos() {
       + '</div>'
       + '</div>';
   }).join('');
+}
+
+// Obre automàticament el cas indicat a ?cas=ID quan es carrega la pàgina
+function obrirCasPerUrl() {
+  const params = new URLSearchParams(location.search);
+  const eid = params.get('cas');
+  if (!eid) return;
+
+  function _intentar(intentsRestants) {
+    if (isMobile()) {
+      const body = document.querySelector('.mCaseBody[data-entry-id="' + eid + '"]');
+      if (!body) {
+        // DOM encara no llest, reintenta fins a 10 vegades cada 200ms
+        if (intentsRestants > 0) setTimeout(function() { _intentar(intentsRestants - 1); }, 200);
+        return;
+      }
+      if (!body.classList.contains('open')) {
+        body.classList.add('open');
+        mCarregaFotoCas(eid);
+      }
+      setTimeout(function() {
+        (body.closest('.mCaseCard') || body).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    } else {
+      // Desktop: esperem que renderPublic hagi pintat el DOM i el layout estigui calculat
+      const card = document.querySelector('[data-entry-id="' + eid + '"]');
+      if (!card) {
+        if (intentsRestants > 0) setTimeout(function() { _intentar(intentsRestants - 1); }, 200);
+        return;
+      }
+      // Doble rAF per assegurar que el browser ha calculat offsetWidth del carousel
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          scrollToEntry(eid);
+        });
+      });
+    }
+  }
+
+  // Primer intent després de 500ms (deixem temps a renderPublic i al layout)
+  setTimeout(function() { _intentar(10); }, 500);
 }
 
 function mToggleCase(id) {
