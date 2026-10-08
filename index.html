@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v93 build:20261008-1509 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
+<!-- v93 build:20261008-1630 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1943,7 +1943,7 @@ function trackCall(event) {
 // ── RENDER ──────────────────────────────────────────────────────────────────
 function t(key) { return T[lang][key] || T.ca[key] || key; }
 function entryLangData(e) { return e[lang] || e.ca || {}; }
-function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 function renderTonteriaIndex(score, entryId, adminMode) {
   const s = (typeof score === 'number' && score >= 0 && score <= 5) ? score : null;
