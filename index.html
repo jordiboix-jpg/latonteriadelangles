@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v93 build:20261008-1635 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
+<!-- v93 build:20261008-1645 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1497,6 +1497,7 @@ function applyFilter(entries) {
 // ── SHARE ──────────────────────────────────────────────────────────────────
 var SITE_NAME = "La Tonteria de l" + "’" + "Angl" + "ès";
 var SITE_URL = "https://latonteriadelangles.com";
+var SHARE_URL = "https://latonteriadelangles.com?v=2";
 function _shareText(name, url) {
   var shareUrl = url || SITE_URL;
   return '"' + name + '" es a ' + SITE_NAME + ' - Un directori de noms absurds. ' + shareUrl;
@@ -1532,7 +1533,7 @@ function shareByEid(btn) {
   const e = pool.find(function(x){ return x.id === eid; });
   const name = e ? (e.name || '') : '';
   // Sempre compartim la URL del lloc, no Google Maps
-  const shareUrl = SITE_URL;
+  const shareUrl = SHARE_URL;
   if (net === 'wa') shareWA(name, shareUrl);
   else if (net === 'tw') shareTW(name, shareUrl);
   else if (net === 'fb') shareFB(name, shareUrl);
