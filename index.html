@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v92 build:20261007-1930 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
+<!-- v93 build:20261008-1700 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -106,6 +106,8 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 #tipusModal .tm-msg{font-family:'DM Mono',monospace;font-size:11px;margin-top:10px;color:var(--muted)}
 .filter-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-right:4px}
 .cas-search{font-family:'DM Mono',monospace;font-size:11px;padding:5px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);width:220px;transition:border-color .15s}
+.filter-btn-submit{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;padding:6px 14px;background:var(--red,#c0392b);color:#fff;border:none;cursor:pointer;border-radius:2px;white-space:nowrap;flex-shrink:0;transition:background .15s}
+.filter-btn-submit:hover{background:#9b2e08}
 .cas-search:focus{border-color:var(--rust);outline:none}
 @media(max-width:640px){.cas-search{width:100%;flex:1 1 100%}}
 .filter-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:5px 11px;cursor:pointer;transition:all .15s;border-radius:2px}
@@ -232,6 +234,7 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .share-btn.wa:hover{background:#25d366;border-color:#25d366;color:#fff}
 .share-btn.tw:hover{background:#000;border-color:#000;color:#fff}
 .share-btn.ms:hover{background:#6364ff;border-color:#6364ff;color:#fff}
+.share-btn.fb:hover{background:#1877f2}
 .share-btn.cp:hover{background:var(--rust);border-color:var(--rust);color:#fff}
 
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;padding:10px 20px;border-radius:3px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:200}
@@ -244,7 +247,7 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .dm-back-btn{background:none;border:none;cursor:pointer;font-size:20px;padding:4px 8px 4px 0;color:var(--ink);line-height:1;flex-shrink:0}
 .dm-header-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dm-header-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);flex-shrink:0}
-.dm-body{flex:1;overflow-y:auto;padding-bottom:90px}
+.dm-body{flex:1;overflow-y:auto;padding-bottom:0}
 .dm-hero{width:100%;height:auto;aspect-ratio:2/1;background:linear-gradient(135deg,var(--cream) 0%,var(--rule) 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0}
 .dm-hero-placeholder{font-size:64px;opacity:.3}
 .dm-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:none}
@@ -306,6 +309,15 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .dm-transl-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--green);letter-spacing:.05em}
 .dm-maps-link{display:block;margin:14px 16px 6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:8px 12px;border:var(--border);border-radius:3px;text-align:center}
 .dm-maps-link:hover{color:var(--rust);border-color:var(--rust)}
+.dm-share-block{margin:0 0 10px;padding:10px 0 8px;border-bottom:1px solid var(--rule)}
+.dm-share-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.dm-share-subtext{font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:8px}
+.dm-share-row{display:flex;gap:8px;flex-wrap:wrap}
+.dm-share-btn{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.04em;padding:10px 14px;border:none;cursor:pointer;border-radius:3px;flex:1;min-width:80px;transition:opacity .15s;color:#fff}
+.dm-share-btn.wa{background:#25d366}
+.dm-share-btn.tw{background:#000}
+.dm-share-btn.fb{background:#1877f2}
+.dm-share-btn:active{opacity:.75}
 .dm-cta-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px;background:var(--paper);border-top:2px solid var(--rust);z-index:20}
 .dm-call-btn{display:block;width:100%;padding:16px;background:var(--rust);color:#fff;border:none;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;border-radius:3px;text-align:center;font-weight:700;text-decoration:none}
 .dm-call-btn:hover{background:#9b2e08}
@@ -503,13 +515,14 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .mTab.active{display:flex;flex-direction:column}
 
   /* ── TAB: CASOS ── */
-  #mCasosSearch{background:var(--paper);padding:10px 14px;border-bottom:var(--border);flex-shrink:0;position:sticky;top:0;z-index:10}
-  #mCasosQ{width:100%;font-family:'DM Mono',monospace;font-size:13px;padding:8px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:2px}
+  #mCasosSearch{background:var(--paper);padding:8px 14px;border-bottom:var(--border);flex-shrink:0;position:sticky;top:0;z-index:10}
+  #mCasosSearchRow{display:flex;align-items:center;gap:6px}
+  #mBtnTots{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em;white-space:nowrap;background:var(--rust);border:1px solid var(--rust);color:var(--paper);padding:6px 10px;cursor:pointer;border-radius:12px;flex-shrink:0;transition:all .15s}
+  #mBtnTots.inactive{background:transparent;border-color:var(--rule);color:var(--muted)}
+  #mCasosQ{flex:1;min-width:0;font-family:'DM Mono',monospace;font-size:13px;padding:6px 8px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:2px}
   #mCasosQ:focus{outline:none;border-color:var(--rust)}
-  #mCatFilter{display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
-  #mCatFilter::-webkit-scrollbar{display:none}
-  .mCatBtn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em;white-space:nowrap;background:transparent;border:1px solid var(--rule);color:var(--muted);padding:4px 10px;cursor:pointer;border-radius:12px;flex-shrink:0;transition:all .15s}
-  .mCatBtn.active{background:var(--rust);border-color:var(--rust);color:var(--paper)}
+  #mCatSelect{font-family:'DM Mono',monospace;font-size:11px;padding:6px 4px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:2px;flex-shrink:0;max-width:110px;cursor:pointer}
+  #mCatSelect:focus{outline:none;border-color:var(--rust)}
   #mCasosList{flex:1;overflow-y:auto}
 
   /* Mobile case card */
@@ -529,6 +542,12 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .mCaseComment{font-style:italic;color:var(--muted);font-size:13px;padding-left:10px;border-left:3px solid var(--rule)}
   .mCaseTransl{font-family:'DM Mono',monospace;font-size:11px;color:var(--rust);margin-bottom:6px}
   .mCaseMapLink{display:inline-block;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--rust);text-decoration:none;border:1px solid var(--rust);padding:4px 10px;border-radius:2px}
+  .mCaseShareRow{display:flex;gap:6px;margin-top:10px}
+  .mCaseShareBtn{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;padding:8px 10px;border:none;cursor:pointer;border-radius:3px;flex:1;color:#fff;transition:opacity .15s}
+  .mCaseShareBtn:active{opacity:.75}
+  .mCaseShareBtn.wa{background:#25d366}
+  .mCaseShareBtn.tw{background:#000}
+  .mCaseShareBtn.fb{background:#1877f2}
 
   /* ── TAB: DICCIONARI ── */
   #mDictSearch{background:var(--paper);padding:10px 14px;border-bottom:var(--border);flex-shrink:0;position:sticky;top:0;z-index:10}
@@ -692,6 +711,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
       <select class="filter-sel" id="fMuni" onchange="setFiltreSel()" aria-label="Municipi"></select>
       <div class="filter-sep"></div>
       <input class="cas-search" id="casSearch" type="text" placeholder="🔍 Cercar cas o municipi…" oninput="casSearchUpdate()">
+      <button class="filter-btn-submit" onclick="document.getElementById('submitSection').scrollIntoView({behavior:'smooth'})">¿Coneixes un altre cas?</button>
     </div>
     <div class="carousel-wrap" id="carouselWrap">
       <button class="carousel-arrow-side left" id="carPrev" onclick="carouselMove(-1)" disabled aria-label="Anterior"><span class="carousel-arrow-inner">‹</span></button>
@@ -814,7 +834,7 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
     <div style="max-width:660px;margin:22px auto;font-size:15px;color:var(--muted);line-height:1.8;text-align:left" id="whyBody"></div>
   </div>
 
-  <div class="submit-section">
+  <div class="submit-section" id="submitSection">
     <h2 id="submitH">Coneixes un altre cas?</h2>
     <p id="submitDesc">Si has vist una fleca «The Bakery» o qualsevol altre absurd lingüístic a Catalunya, envia'l aquí.</p>
     <div class="form-grid">
@@ -925,8 +945,13 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
     <!-- TAB: Casos -->
     <div id="mTabCasos" class="mTab active">
       <div id="mCasosSearch">
-        <input type="text" id="mCasosQ" placeholder="🔍 Cerca en català, castellà o anglès" oninput="mRenderCasos()">
-        <div id="mCatFilter"></div>
+        <div id="mCasosSearchRow">
+          <button id="mBtnTots" onclick="mSetCat(null,'all')">Tots</button>
+          <input type="text" id="mCasosQ" placeholder="🔍 Cerca…" oninput="mRenderCasos()">
+          <select id="mCatSelect" onchange="mSetCatFromSelect(this)">
+            <option value="all">Tots</option>
+          </select>
+        </div>
       </div>
       <div id="mCasosList"></div>
     </div>
@@ -1241,11 +1266,17 @@ function omplirTipusUI() {
     mf.value = v;
   }
   // Xips del mòbil
-  const chips = document.getElementById('mCatFilter');
-  if (chips) {
+  const sel = document.getElementById('mCatSelect');
+  if (sel) {
     const actiu = (typeof mActiveCat !== 'undefined' && mActiveCat) || 'all';
-    chips.innerHTML = '<button class="mCatBtn' + (actiu === 'all' ? ' active' : '') + '" data-cat="all" onclick="mSetCat(this,\'all\')">' + escHtml(t('filterAll') || 'Tots') + '</button>' +
-      TIPUS.filter(x => x.key !== 'altre').map(x => '<button class="mCatBtn' + (actiu === x.key ? ' active' : '') + '" data-cat="' + escHtml(x.key) + '" onclick="mSetCat(this,\'' + escHtml(x.key) + '\')">' + escHtml((x.icon || '') + ' ' + tipusNom(x.key).split(' / ')[0]) + '</button>').join('');
+    sel.innerHTML = '<option value="all">' + escHtml(t('filterAll') || 'Tots') + '</option>' +
+      TIPUS.filter(x => x.key !== 'altre').map(x => '<option value="' + escHtml(x.key) + '">' + escHtml((x.icon || '') + ' ' + tipusNom(x.key).split(' / ')[0]) + '</option>').join('');
+    sel.value = actiu;
+    const totsBtn = document.getElementById('mBtnTots');
+    if (totsBtn) {
+      if (actiu === 'all') totsBtn.classList.remove('inactive');
+      else totsBtn.classList.add('inactive');
+    }
   }
   omplirFiltreSelects();
 }
@@ -1452,17 +1483,47 @@ function applyFilter(entries) {
 }
 
 // ── SHARE ──────────────────────────────────────────────────────────────────
+var SITE_NAME = "La Tonteria de l" + "’" + "Angl" + "ès";
+var SITE_URL = "https://latonteriadelangles.com";
+function _shareText(name, mapUrl) {
+  var url = mapUrl || location.href;
+  return '"' + name + '" es a ' + SITE_NAME + ' - Un directori de noms absurds. ' + SITE_URL + ' ' + url;
+}
 function shareWA(name, mapUrl) {
-  window.open('https://wa.me/?text=' + encodeURIComponent(`"${name}" — La Tonteria de l'Anglès\n${mapUrl||location.href}`), '_blank');
+  var txt = encodeURIComponent(_shareText(name, mapUrl));
+  if (/Mobi|Android/i.test(navigator.userAgent)) {
+    location.href = 'whatsapp://send?text=' + txt;
+  } else {
+    window.open('https://web.whatsapp.com/send?text=' + txt, '_blank');
+  }
 }
 function shareTW(name, mapUrl) {
-  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(`"${name}" — La Tonteria de l'Anglès\n${mapUrl||location.href}`), '_blank');
+  window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(_shareText(name, mapUrl)), '_blank');
+}
+function shareFB(name, mapUrl) {
+  var url = mapUrl || location.href;
+  window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), '_blank');
 }
 function shareMS(name, mapUrl) {
-  window.open('https://mastodon.social/share?text=' + encodeURIComponent(`"${name}" — La Tonteria de l'Anglès\n${mapUrl||location.href}`), '_blank');
+  var txt = '"' + name + '" - ' + SITE_NAME + ' ' + (mapUrl || location.href);
+  window.open('https://mastodon.social/share?text=' + encodeURIComponent(txt), '_blank');
 }
 function copyLink(name, mapUrl) {
   navigator.clipboard.writeText(mapUrl || location.href).then(() => showToast(t('copied'))).catch(() => showToast(mapUrl || location.href));
+}
+
+// shareByEid: share via data-eid/data-snet attributes (avoids inline JS string escaping issues)
+function shareByEid(btn) {
+  const eid = btn.getAttribute('data-eid');
+  const net = btn.getAttribute('data-snet');
+  const pool = (typeof publishedEntries !== 'undefined' ? publishedEntries : []).concat(typeof pendingEntries !== 'undefined' ? pendingEntries : []);
+  const e = pool.find(function(x){ return x.id === eid; });
+  const name = e ? (e.name || '') : '';
+  const mapUrl = e ? (e.mapUrl || ('https://maps.google.com/?q=' + encodeURIComponent(name + (e.addr ? ', ' + e.addr : '')))) : location.href;
+  if (net === 'wa') shareWA(name, mapUrl);
+  else if (net === 'tw') shareTW(name, mapUrl);
+  else if (net === 'fb') shareFB(name, mapUrl);
+  else if (net === 'cp') copyLink(name, mapUrl);
 }
 
 // ── SUPABASE HELPERS ───────────────────────────────────────────────────────
@@ -1583,10 +1644,7 @@ function visitCountText(n) {
 // ── DETAIL MODAL ─────────────────────────────────────────────────────────────
 let _dmEntry = null;
 
-const CAT_ICONS = {
-  cafeteria:'☕', restaurant:'🍳', barberia:'✂️', botiga:'🛍',
-  beaute:'💅', negoci:'🏢', vehicle:'🚗', altre:'🏪'
-};
+const CAT_ICONS = {cafeteria:'☕', restaurant:'🍽️', barberia:'💈', botiga:'🛒', beaute:'✨', negoci:'💼', vehicle:'🔧', altre:'🏪'};
 const TI_COLORS = ['#4caf50','#a8c61b','#f0a500','#e07000','#d03020','#8b0000'];
 const TI_CALL_TEXTS = {
   ca: ['Millor no trucar (per si de cas)', 'Pots provar, però porta sort', 'Normal, si no t\'avorreix', 'Pensa-t\'ho bé, de debò', 'Al·lèrgia a l\'anglès confirmada', 'Cas clínic. Truca si t\'atreveixes 🚨'],
@@ -1852,6 +1910,15 @@ function _dmBackdropListener(e) {
   if (e.target === document.getElementById('detailModal')) closeDetailModal();
 }
 
+function dmShare(net) {
+  const e = _dmEntry;
+  if (!e) return;
+  const mapUrl = e.mapUrl || ('https://maps.google.com/?q=' + encodeURIComponent((e.name||'')+(e.addr?', '+e.addr:'')));
+  if (net === 'wa') shareWA(e.name, mapUrl);
+  else if (net === 'tw') shareTW(e.name, mapUrl);
+  else if (net === 'fb') shareFB(e.name, mapUrl);
+}
+
 function closeDetailModal() {
   const modal = document.getElementById('detailModal');
   modal.classList.remove('open');
@@ -1896,7 +1963,7 @@ function trackCall(event) {
 // ── RENDER ──────────────────────────────────────────────────────────────────
 function t(key) { return T[lang][key] || T.ca[key] || key; }
 function entryLangData(e) { return e[lang] || e.ca || {}; }
-function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 function renderTonteriaIndex(score, entryId, adminMode) {
   const s = (typeof score === 'number' && score >= 0 && score <= 5) ? score : null;
@@ -2144,10 +2211,10 @@ function renderCard(e, showAdminActions) {
   const visits = visitCounts[e.id] || 0;
   const visitHtml = `<div class="visit-badge" id="vb-${e.id}">${visitCountText(visits)}</div>`;
   const shareHtml = `<div class="share-row">
-    <button class="share-btn wa" onclick="shareWA('${nameEsc}','${mapUrlEsc}');event.stopPropagation()">${t('shareWA')}</button>
-    <button class="share-btn tw" onclick="shareTW('${nameEsc}','${mapUrlEsc}');event.stopPropagation()">${t('shareTW')}</button>
-    <button class="share-btn ms" onclick="shareMS('${nameEsc}','${mapUrlEsc}');event.stopPropagation()">${t('shareMS')}</button>
-    <button class="share-btn cp" onclick="copyLink('${nameEsc}','${mapUrlEsc}');event.stopPropagation()">${t('shareCopy')}</button>
+    <button class="share-btn wa" data-eid="${escHtml(e.id)}" data-snet="wa" onclick="event.stopPropagation();shareByEid(this)">WhatsApp</button>
+    <button class="share-btn tw" data-eid="${escHtml(e.id)}" data-snet="tw" onclick="event.stopPropagation();shareByEid(this)">X</button>
+    <button class="share-btn fb" data-eid="${escHtml(e.id)}" data-snet="fb" onclick="event.stopPropagation();shareByEid(this)">Facebook</button>
+    <button class="share-btn cp" data-eid="${escHtml(e.id)}" data-snet="cp" onclick="event.stopPropagation();shareByEid(this)">${t('shareCopy')}</button>
   </div>`;
   let adminHtml = '';
   if (showAdminActions && isAdmin) {
@@ -3544,8 +3611,22 @@ function mInitMobileMap() {
 
 function mSetCat(btn, cat) {
   mActiveCat = cat;
-  document.querySelectorAll('.mCatBtn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  const totsBtn = document.getElementById('mBtnTots');
+  if (totsBtn) {
+    if (cat === 'all') totsBtn.classList.remove('inactive');
+    else totsBtn.classList.add('inactive');
+  }
+  const sel = document.getElementById('mCatSelect');
+  if (sel) sel.value = cat;
+  mRenderCasos();
+}
+function mSetCatFromSelect(sel) {
+  mActiveCat = sel.value;
+  const totsBtn = document.getElementById('mBtnTots');
+  if (totsBtn) {
+    if (sel.value === 'all') totsBtn.classList.remove('inactive');
+    else totsBtn.classList.add('inactive');
+  }
   mRenderCasos();
 }
 
@@ -3593,6 +3674,11 @@ function mRenderCasos() {
         + '<div class="mCaseDesc">' + escHtml(eData.desc||'') + '</div>'
         + '<div class="mCaseComment">' + escHtml(eData.comment||'') + '</div>'
         + '<a class="mCaseMapLink" href="' + escHtml(googleUrl) + '" target="_blank" rel="noopener" onclick="mObreGoogle(event,\'' + e.id + '\',this.href)">' + escHtml(t('mVeureGoogle')) + '</a>'
+        + '<div class="mCaseShareRow">'
+        + '<button class="mCaseShareBtn wa" data-eid="' + escHtml(e.id) + '" data-snet="wa" onclick="event.stopPropagation();shareByEid(this)">WhatsApp</button>'
+        + '<button class="mCaseShareBtn tw" data-eid="' + escHtml(e.id) + '" data-snet="tw" onclick="event.stopPropagation();shareByEid(this)">X</button>'
+        + '<button class="mCaseShareBtn fb" data-eid="' + escHtml(e.id) + '" data-snet="fb" onclick="event.stopPropagation();shareByEid(this)">Facebook</button>'
+        + '</div>'
         + '</div>'
         + '</div>';
     }
@@ -4110,6 +4196,15 @@ if ('serviceWorker' in navigator) {
       <a class="dm-maps-link" id="dmMapsLink" href="#" target="_blank" onclick="event.stopPropagation()">🗺 Verificar a Google Maps ↗</a>
     </div>
     <div class="dm-cta-bar">
+      <div class="dm-share-block">
+        <div class="dm-share-label">📣 Comparteix aquest cas</div>
+        <div class="dm-share-subtext">Publicat a <a href="https://latonteriadelangles.com" target="_blank" style="color:var(--rust);text-decoration:none">latonteriadelangles.com</a> — el directori de noms absurds.</div>
+        <div class="dm-share-row" id="dmShareRow">
+          <button class="dm-share-btn wa" onclick="dmShare('wa')">WhatsApp</button>
+          <button class="dm-share-btn tw" onclick="dmShare('tw')">X</button>
+          <button class="dm-share-btn fb" onclick="dmShare('fb')">Facebook</button>
+        </div>
+      </div>
       <a class="dm-call-btn" id="dmCallBtn" href="#" onclick="trackCall(event)">📞 TRUCA'LS (si t'atreveixes)</a>
       <div class="dm-call-disclaimer" id="dmCallDisclaimer">Ets responsable de la teva pròpia valentia</div>
     </div>
