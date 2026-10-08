@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v93 build:20261008-1650 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
+<!-- v93 build:20261008-1700 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -542,6 +542,12 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .mCaseComment{font-style:italic;color:var(--muted);font-size:13px;padding-left:10px;border-left:3px solid var(--rule)}
   .mCaseTransl{font-family:'DM Mono',monospace;font-size:11px;color:var(--rust);margin-bottom:6px}
   .mCaseMapLink{display:inline-block;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--rust);text-decoration:none;border:1px solid var(--rust);padding:4px 10px;border-radius:2px}
+  .mCaseShareRow{display:flex;gap:6px;margin-top:10px}
+  .mCaseShareBtn{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;padding:8px 10px;border:none;cursor:pointer;border-radius:3px;flex:1;color:#fff;transition:opacity .15s}
+  .mCaseShareBtn:active{opacity:.75}
+  .mCaseShareBtn.wa{background:#25d366}
+  .mCaseShareBtn.tw{background:#000}
+  .mCaseShareBtn.fb{background:#1877f2}
 
   /* ── TAB: DICCIONARI ── */
   #mDictSearch{background:var(--paper);padding:10px 14px;border-bottom:var(--border);flex-shrink:0;position:sticky;top:0;z-index:10}
@@ -3668,6 +3674,11 @@ function mRenderCasos() {
         + '<div class="mCaseDesc">' + escHtml(eData.desc||'') + '</div>'
         + '<div class="mCaseComment">' + escHtml(eData.comment||'') + '</div>'
         + '<a class="mCaseMapLink" href="' + escHtml(googleUrl) + '" target="_blank" rel="noopener" onclick="mObreGoogle(event,\'' + e.id + '\',this.href)">' + escHtml(t('mVeureGoogle')) + '</a>'
+        + '<div class="mCaseShareRow">'
+        + '<button class="mCaseShareBtn wa" data-eid="' + escHtml(e.id) + '" data-snet="wa" onclick="event.stopPropagation();shareByEid(this)">WhatsApp</button>'
+        + '<button class="mCaseShareBtn tw" data-eid="' + escHtml(e.id) + '" data-snet="tw" onclick="event.stopPropagation();shareByEid(this)">X</button>'
+        + '<button class="mCaseShareBtn fb" data-eid="' + escHtml(e.id) + '" data-snet="fb" onclick="event.stopPropagation();shareByEid(this)">Facebook</button>'
+        + '</div>'
         + '</div>'
         + '</div>';
     }
