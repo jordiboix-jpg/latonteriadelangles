@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v93 build:20261008-1630 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
+<!-- v93 build:20261008-1650 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -1506,6 +1506,20 @@ function copyLink(name, mapUrl) {
   navigator.clipboard.writeText(mapUrl || location.href).then(() => showToast(t('copied'))).catch(() => showToast(mapUrl || location.href));
 }
 
+// shareByEid: share via data-eid/data-snet attributes (avoids inline JS string escaping issues)
+function shareByEid(btn) {
+  const eid = btn.getAttribute('data-eid');
+  const net = btn.getAttribute('data-snet');
+  const pool = (typeof publishedEntries !== 'undefined' ? publishedEntries : []).concat(typeof pendingEntries !== 'undefined' ? pendingEntries : []);
+  const e = pool.find(function(x){ return x.id === eid; });
+  const name = e ? (e.name || '') : '';
+  const mapUrl = e ? (e.mapUrl || ('https://maps.google.com/?q=' + encodeURIComponent(name + (e.addr ? ', ' + e.addr : '')))) : location.href;
+  if (net === 'wa') shareWA(name, mapUrl);
+  else if (net === 'tw') shareTW(name, mapUrl);
+  else if (net === 'fb') shareFB(name, mapUrl);
+  else if (net === 'cp') copyLink(name, mapUrl);
+}
+
 // ── SUPABASE HELPERS ───────────────────────────────────────────────────────
 async function loadPublished(retries = 3) {
   const { data, error } = await sb.from('entries').select('id,status,name,addr,municipi,provincia,category,tonteriaIndex,lat,lng,mapUrl,tag,num,createdAt,ca,es,en,descOriginal').eq('status', 'published');
@@ -2191,10 +2205,10 @@ function renderCard(e, showAdminActions) {
   const visits = visitCounts[e.id] || 0;
   const visitHtml = `<div class="visit-badge" id="vb-${e.id}">${visitCountText(visits)}</div>`;
   const shareHtml = `<div class="share-row">
-    <button class="share-btn wa" onclick="event.stopPropagation();shareWA('${nameEsc}','${mapUrlEsc}')">WhatsApp</button>
-    <button class="share-btn tw" onclick="event.stopPropagation();shareTW('${nameEsc}','${mapUrlEsc}')">X</button>
-    <button class="share-btn fb" onclick="event.stopPropagation();shareFB('${nameEsc}','${mapUrlEsc}')">Facebook</button>
-    <button class="share-btn cp" onclick="event.stopPropagation();copyLink('${nameEsc}','${mapUrlEsc}')">${t('shareCopy')}</button>
+    <button class="share-btn wa" data-eid="${escHtml(e.id)}" data-snet="wa" onclick="event.stopPropagation();shareByEid(this)">WhatsApp</button>
+    <button class="share-btn tw" data-eid="${escHtml(e.id)}" data-snet="tw" onclick="event.stopPropagation();shareByEid(this)">X</button>
+    <button class="share-btn fb" data-eid="${escHtml(e.id)}" data-snet="fb" onclick="event.stopPropagation();shareByEid(this)">Facebook</button>
+    <button class="share-btn cp" data-eid="${escHtml(e.id)}" data-snet="cp" onclick="event.stopPropagation();shareByEid(this)">${t('shareCopy')}</button>
   </div>`;
   let adminHtml = '';
   if (showAdminActions && isAdmin) {
