@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v93 build:20261008-1700 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
+<!-- v93 build:20261008-1720 · retallador: la foto també es pot reduir fins a veure-la sencera (fons desenfocat) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -8,6 +8,18 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>La Tonteria de l'Anglès</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="La Tonteria de l'Anglès">
+<meta property="og:title" content="La Tonteria de l'Anglès — el directori de noms absurds">
+<meta property="og:description" content="Un directori de negocis catalans amb noms en anglès que no calen. Vine a riure (o plorar).">
+<meta property="og:url" content="https://latonteriadelangles.com">
+<meta property="og:image" content="https://latonteriadelangles.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="La Tonteria de l'Anglès">
+<meta name="twitter:description" content="Un directori de negocis catalans amb noms en anglès que no calen.">
+<meta name="twitter:image" content="https://latonteriadelangles.com/og-image.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#1a1209">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1519,11 +1531,12 @@ function shareByEid(btn) {
   const pool = (typeof publishedEntries !== 'undefined' ? publishedEntries : []).concat(typeof pendingEntries !== 'undefined' ? pendingEntries : []);
   const e = pool.find(function(x){ return x.id === eid; });
   const name = e ? (e.name || '') : '';
-  const mapUrl = e ? (e.mapUrl || ('https://maps.google.com/?q=' + encodeURIComponent(name + (e.addr ? ', ' + e.addr : '')))) : location.href;
-  if (net === 'wa') shareWA(name, mapUrl);
-  else if (net === 'tw') shareTW(name, mapUrl);
-  else if (net === 'fb') shareFB(name, mapUrl);
-  else if (net === 'cp') copyLink(name, mapUrl);
+  // Sempre compartim la URL del lloc, no Google Maps
+  const shareUrl = SITE_URL;
+  if (net === 'wa') shareWA(name, shareUrl);
+  else if (net === 'tw') shareTW(name, shareUrl);
+  else if (net === 'fb') shareFB(name, shareUrl);
+  else if (net === 'cp') copyLink(name, shareUrl);
 }
 
 // ── SUPABASE HELPERS ───────────────────────────────────────────────────────
