@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v105 build:20261009-1752 · layout mòbil: TRUCA'LS primer + foto 180px + tracking durada visita (modal_visits) -->
+<!-- v111 build:20261009-2030 · botó Admin "Enriquir amb Google" · dades Google cached a Supabase -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -89,6 +89,11 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .admin-badge{background:var(--gold);color:var(--ink);padding:2px 8px;font-size:10px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px}
 .admin-tab{background:transparent;border:1px solid #4a3a28;color:#a09070;padding:5px 12px;cursor:pointer;font-family:inherit;font-size:11px;letter-spacing:.1em;transition:all .15s}
 .admin-tab.active,.admin-tab:hover{background:var(--rust);color:var(--paper);border-color:var(--rust)}
+.admin-enrich-bar{background:#1a120a;border-top:1px solid #3a2a18;padding:10px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-family:'DM Mono',monospace;font-size:11px}
+.admin-enrich-bar.hidden{display:none}
+.btn-enrich{background:var(--gold);color:var(--ink);border:none;padding:6px 16px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;font-weight:700}
+.btn-enrich:disabled{opacity:.5;cursor:not-allowed}
+.enrich-progress{color:#a09070;flex:1;min-width:200px}
 
 .stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);margin:40px 0}
 .stat{padding:22px 16px;border-right:var(--border);text-align:center}
@@ -237,6 +242,8 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 .enunciat-cancel-btn:hover{color:var(--ink);border-color:var(--ink)}
 .map-btn{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);text-decoration:none;border:1px solid var(--rust);padding:5px 11px;transition:all .15s;margin-top:2px}
 .map-btn:hover{background:var(--rust);color:var(--paper)}
+.investiga-btn{background:var(--rust);color:var(--paper);font-weight:700;letter-spacing:.12em}
+.investiga-btn:hover{opacity:.88}
 .entry-photo{width:100%;height:auto;aspect-ratio:2/1;object-fit:cover;object-position:center top;border-radius:2px;margin-bottom:12px;display:block}
 .visit-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:4px 0 10px}
 
@@ -280,6 +287,8 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 #retallador .rt-botons button{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:10px 16px;border-radius:3px;cursor:pointer;border:1px solid var(--rule);background:var(--cream);color:var(--ink)}
 #retallador .rt-botons .rt-desa{background:var(--rust);color:#fff;border-color:var(--rust)}
 .dm-google-block .dm-g-label a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.dm-g-phone-link{cursor:pointer;transition:opacity .15s}
+.dm-g-phone-link:hover{opacity:.75}
 .dm-g-mes{display:block;width:100%;margin-top:12px;padding:10px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:var(--rust);border:1px solid var(--rust);border-radius:3px;cursor:pointer}
 .dm-g-mes:hover{background:var(--rust);color:#fff}
 .dm-g-fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
@@ -353,6 +362,8 @@ body:has(#detailModal.open) #pwaBanner{display:none}
   .dm-inner{display:contents}
   /* v105: foto més curta en mòbil */
   .dm-hero{aspect-ratio:unset;height:180px}
+  /* v106: a mòbil, la fitxa és per trucar — amaguem text editorial ja llegit */
+  /* dm-tonteria-box, dm-transl-block, dm-desc-block: visible in fitxa */
   /* v105: botó TRUCA'LS prominent a dalt */
   .dm-cta-top{display:flex;flex-direction:column;align-items:stretch;padding:10px 16px 8px;background:var(--paper);border-bottom:2px solid var(--rust);position:sticky;top:56px;z-index:15}
   .dm-call-btn-top{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;background:var(--rust);color:#fff;font-family:'DM Mono',monospace;font-size:15px;font-weight:700;letter-spacing:.08em;text-decoration:none;border-radius:3px;text-align:center}
@@ -567,12 +578,15 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   .mCaseComment{font-style:italic;color:var(--muted);font-size:13px;padding-left:10px;border-left:3px solid var(--rule)}
   .mCaseTransl{font-family:'DM Mono',monospace;font-size:11px;color:var(--rust);margin-bottom:6px}
   .mCaseMapLink{display:inline-block;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--rust);text-decoration:none;border:1px solid var(--rust);padding:4px 10px;border-radius:2px}
-  .mCaseShareRow{display:flex;gap:6px;margin-top:10px}
-  .mCaseShareBtn{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;padding:8px 10px;border:none;cursor:pointer;border-radius:3px;flex:1;color:#fff;transition:opacity .15s}
+  .mCaseShareRow{display:flex;gap:6px;margin-top:10px;align-items:center}
+  .mCaseShareBtn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;cursor:pointer;border-radius:6px;color:#fff;transition:opacity .15s;flex-shrink:0;padding:0}
   .mCaseShareBtn:active{opacity:.75}
   .mCaseShareBtn.wa{background:#25d366}
   .mCaseShareBtn.tw{background:#000}
   .mCaseShareBtn.fb{background:#1877f2}
+  .mCaseShareBtn svg{width:20px;height:20px;fill:#fff}
+  .mCaseInvestigaBtn{margin-left:auto;display:flex;align-items:center;gap:6px;padding:0 14px;height:40px;background:var(--rust);color:#fff;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:none;cursor:pointer;border-radius:6px;white-space:nowrap;transition:opacity .15s}
+  .mCaseInvestigaBtn:active{opacity:.8}
 
   /* ── TAB: DICCIONARI ── */
   #mDictSearch{background:var(--paper);padding:10px 14px;border-bottom:var(--border);flex-shrink:0;position:sticky;top:0;z-index:10}
@@ -693,6 +707,10 @@ footer p{font-size:13px;color:#7a6a55;margin-top:6px;font-style:italic;max-width
   <button class="admin-tab" onclick="obreTipusAdmin()">🏷 Tipus de negoci</button>
   <button class="admin-tab" onclick="geocodeAll()" title="Geocodifica automàticament tots els casos publicats sense coordenades via Nominatim (OpenStreetMap). Pot trigar uns minuts.">🌍 Geocodificar tots</button>
   <button class="admin-tab" onclick="adminLogout()" style="margin-left:auto">Tancar sessió</button>
+</div>
+<div class="admin-enrich-bar hidden" id="adminEnrichBar">
+  <button class="btn-enrich" id="btnEnrich" onclick="enriquirAmbGoogle()">🔍 Enriquir amb Google</button>
+  <span class="enrich-progress" id="enrichProgress">Enriqueix els casos que no tenen dades de Google guardades.</span>
 </div>
 
 <div class="container">
@@ -1219,7 +1237,7 @@ Object.assign(T.ca, {
   mVeureGoogle: '📍 Veure a Google ↗',
   mCercaPh: '🔍 Cerca en català, castellà o anglès',
   fSelCat: 'Tipus de negoci', fSelProv: 'Província', fSelMuni: 'Municipi',
-  mapBtnSite: '🗺 Veure al mapa', gmapsBtn: 'Obrir Google Maps ↗', noMapLoc: 'Aquest cas encara no té ubicació al mapa',
+  mapBtnSite: '🗺 Veure al mapa', gmapsBtn: 'Obrir Google Maps ↗', noMapLoc: 'Aquest cas encara no té ubicació al mapa', investigaBtn: '🔍 Investiga\'ls',
   tiPromoK: 'Nota de la redacció',
   tiPromo: 'Darrere de tot aquest esforç per destacar l\'anglès en lloc del català, hi trobareu negocis que fan de la qualitat, la modernitat i l\'excel·lència en el servei al client un senyal d\'identitat. I un personal molt «guai»… Truqueu a qualsevol d\'ells i ho descobrireu!'
 });
@@ -1228,7 +1246,7 @@ Object.assign(T.es, {
   mVeureGoogle: '📍 Ver en Google ↗',
   mCercaPh: '🔍 Busca en catalán, castellano o inglés',
   fSelCat: 'Tipo de negocio', fSelProv: 'Provincia', fSelMuni: 'Municipio',
-  mapBtnSite: '🗺 Ver en el mapa', gmapsBtn: 'Abrir Google Maps ↗', noMapLoc: 'Este caso todavía no tiene ubicación en el mapa',
+  mapBtnSite: '🗺 Ver en el mapa', gmapsBtn: 'Abrir Google Maps ↗', noMapLoc: 'Este caso todavía no tiene ubicación en el mapa', investigaBtn: '🔍 Investígalos',
   tiPromoK: 'Nota de la redacción',
   tiPromo: 'Detrás de todo este esfuerzo por destacar el inglés en lugar del catalán, encontraréis negocios que hacen de la calidad, la modernidad y la excelencia en el servicio al cliente su seña de identidad. Y un personal muy «cool»… ¡Llamad a cualquiera de ellos y lo descubriréis!'
 });
@@ -1237,7 +1255,7 @@ Object.assign(T.en, {
   mVeureGoogle: '📍 View on Google ↗',
   mCercaPh: '🔍 Search in Catalan, Spanish or English',
   fSelCat: 'Type of business', fSelProv: 'Province', fSelMuni: 'Town',
-  mapBtnSite: '🗺 Show on map', gmapsBtn: 'Open Google Maps ↗', noMapLoc: 'This case has no location on the map yet',
+  mapBtnSite: '🗺 Show on map', gmapsBtn: 'Open Google Maps ↗', noMapLoc: 'This case has no location on the map yet', investigaBtn: '🔍 Investigate them',
   tiPromoK: 'Editor\'s note',
   tiPromo: 'Behind all this effort to put English ahead of Catalan, you\'ll find businesses that have made quality, modernity and excellent customer service their trademark. And very «cool» staff… Call any of them and see for yourself!'
 });
@@ -1554,7 +1572,7 @@ function shareByEid(btn) {
 
 // ── SUPABASE HELPERS ───────────────────────────────────────────────────────
 async function loadPublished(retries = 3) {
-  const { data, error } = await sb.from('entries').select('id,status,name,addr,municipi,provincia,category,tonteriaIndex,lat,lng,mapUrl,tag,num,createdAt,ca,es,en,descOriginal').eq('status', 'published');
+  const { data, error } = await sb.from('entries').select('id,status,name,addr,municipi,provincia,category,tonteriaIndex,lat,lng,mapUrl,tag,num,createdAt,ca,es,en,descOriginal,phone,place_id,website,rating,rating_count,hours').eq('status', 'published');
   if (error) {
     console.warn('loadPublished error:', error);
     if (retries > 0) {
@@ -1686,8 +1704,7 @@ const TI_CALL_TEXTS = {
 // Mentre no estigui connectada l'API de Google, la fitxa nova (amb el botó de trucada)
 // només es veu afegint ?fitxa=1 a l'adreça (també en local: http://localhost:8888/?fitxa=1).
 // Sense ?fitxa=1, la web es comporta igual que la publicada.
-// Quan estigui a punt per a tothom, canvieu la línia de sota per: const FITXA_ACTIVA = true;
-const FITXA_ACTIVA = /[?&]fitxa=1\b/.test(location.search);
+const FITXA_ACTIVA = true;
 
 function googleMapsUrlDe(e) {
   return e.name
@@ -1832,6 +1849,56 @@ const PLACES_URL = (['localhost', '127.0.0.1'].includes(location.hostname)
 const _placesCache = {};
 let _placesPeticio = 0;
 
+// ── ENRIQUIMENT MASSIU (Admin) ─────────────────────────────────────────────────
+async function enriquirAmbGoogle() {
+  const btn = document.getElementById('btnEnrich');
+  const prog = document.getElementById('enrichProgress');
+  btn.disabled = true;
+
+  // Obtenir tots els casos published que no tinguin place_id a Supabase
+  prog.textContent = 'Consultant casos sense dades de Google…';
+  let { data: tots, error: err1 } = await sb.from('entries')
+    .select('id,name,addr,municipi,phone,place_id')
+    .eq('status', 'published');
+  if (err1) { prog.textContent = '❌ Error llegint Supabase: ' + err1.message; btn.disabled = false; return; }
+
+  const sense = tots.filter(r => !r.place_id);
+  if (!sense.length) { prog.textContent = '✅ Tots els casos ja tenen dades de Google!'; btn.disabled = false; return; }
+
+  prog.textContent = `0 / ${sense.length} casos enriquits…`;
+  let ok = 0, fallats = 0;
+
+  for (const cas of sense) {
+    const q = [cas.name, cas.addr, cas.municipi].filter(Boolean).join(', ');
+    try {
+      const r = await fetch(PLACES_URL + '?lang=ca&q=' + encodeURIComponent(q));
+      const d = await r.json();
+      if (!r.ok || !d.found) { fallats++; continue; }
+
+      const update = {
+        place_id: d.placeId || null,
+        phone: d.phone || cas.phone || null,
+        website: d.website || null,
+        rating: d.rating || null,
+        rating_count: d.ratingCount || null,
+        hours: d.hours ? d.hours : null,
+        google_updated_at: new Date().toISOString()
+      };
+      const { error: errUp } = await sb.from('entries').update(update).eq('id', cas.id);
+      if (errUp) { fallats++; continue; }
+      // Actualitzem l'entrada en memòria (SEED + publishedEntries)
+      const local = publishedEntries.find(x => x.id === cas.id) || SEED.find(x => x.id === cas.id);
+      if (local) Object.assign(local, update);
+      ok++;
+    } catch (e) { fallats++; }
+    prog.textContent = `${ok + fallats} / ${sense.length} · ${ok} enriquits, ${fallats} errors…`;
+    await new Promise(res => setTimeout(res, 300)); // respectem rate limit de Google
+  }
+
+  prog.textContent = `✅ Fet: ${ok} enriquits, ${fallats} fallats de ${sense.length} totals.`;
+  btn.disabled = false;
+}
+
 async function carregaGooglePlaces(e, mapUrlInicial) {
   const bloc = document.getElementById('dmGoogleBlock');
   const callBtn = document.getElementById('dmCallBtn');
@@ -1843,9 +1910,27 @@ async function carregaGooglePlaces(e, mapUrlInicial) {
 
   bloc.style.display = '';
   if (mapsLink) mapsLink.style.display = '';
-  bloc.innerHTML = '<div class="dm-g-label">Dades de Google Maps</div><div class="dm-g-muted">Consultant Google…</div>';
 
-  let d = _placesCache[q];
+  // Si el cas ja té dades enriquides guardades, les fem servir directament sense cridar Google
+  let d = null;
+  if (e.place_id) {
+    d = {
+      found: true,
+      placeId: e.place_id,
+      phone: e.phone || null,
+      website: e.website || null,
+      rating: e.rating || null,
+      ratingCount: e.rating_count || null,
+      hours: e.hours || null,
+      openNow: null // no podem saber si és obert ara sense cridar l'API
+    };
+    _placesCache[q] = d;
+  }
+
+  if (!d) {
+    bloc.innerHTML = '<div class="dm-g-label" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Informació del lloc</div><div class="dm-g-muted">Consultant Google…</div>';
+    d = _placesCache[q];
+  }
   if (!d) {
     try {
       const r = await fetch(PLACES_URL + '?lang=' + encodeURIComponent(lang) + '&q=' + encodeURIComponent(q));
@@ -1855,14 +1940,14 @@ async function carregaGooglePlaces(e, mapUrlInicial) {
     } catch (err) {
       console.warn('[places]', err);
       if (peticio !== _placesPeticio) return;
-      bloc.innerHTML = '<div class="dm-g-label">Dades de Google Maps</div><div class="dm-g-muted">No s\'han pogut carregar les dades ara mateix.</div>';
+      bloc.innerHTML = '<div class="dm-g-label" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Informació del lloc</div><div class="dm-g-muted">No s\'han pogut carregar les dades ara mateix.</div>';
       return;
     }
   }
   if (peticio !== _placesPeticio) return; // l'usuari ja ha obert una altra fitxa
 
   if (!d.found) {
-    bloc.innerHTML = '<div class="dm-g-label">Dades de Google Maps</div><div class="dm-g-muted">Google no troba aquest establiment.</div>';
+    bloc.innerHTML = '<div class="dm-g-label" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Informació del lloc</div><div class="dm-g-muted">Google no troba aquest establiment.</div>';
     return;
   }
 
@@ -1874,23 +1959,31 @@ async function carregaGooglePlaces(e, mapUrlInicial) {
   if (d.phone) files.push('<div class="dm-g-row"><span>📞</span><a href="tel:' + escHtml((d.phoneIntl || d.phone).replace(/\s/g,'')) + '">' + escHtml(d.phone) + '</a></div>');
   if (d.rating) files.push('<div class="dm-g-row"><span>⭐</span><span>' + d.rating.toFixed(1).replace('.', ',') + ' <span class="dm-g-muted">(' + d.ratingCount + ' ressenyes)</span></span></div>');
   if (d.website) files.push('<div class="dm-g-row"><span>🌐</span><a href="' + escHtml(d.website) + '" target="_blank" rel="noopener">' + escHtml(d.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')) + '</a></div>');
-  if (d.hours && d.hours.length) files.push('<details><summary>Horari</summary><ul>' + d.hours.map(h => '<li>' + escHtml(h) + '</li>').join('') + '</ul></details>');
-  const titol = d.mapsUrl
-    ? '<div class="dm-g-label"><a href="' + escHtml(d.mapsUrl) + '" target="_blank" rel="noopener">Dades de Google Maps ↗</a></div>'
-    : '<div class="dm-g-label">Dades de Google Maps</div>';
+  if (d.hours && d.hours.length) files.push('<div class="dm-g-row dm-g-hours"><span>📅</span><div><div style="font-weight:600;margin-bottom:4px">Horari</div><ul style="list-style:none;padding:0;margin:0;font-size:11px;line-height:1.8">' + d.hours.map(h => '<li>' + escHtml(h) + '</li>').join('') + '</ul></div></div>');
+  // Número de telèfon clicable (trackeja + obre Maps, igual que el botó TRUCA'LS)
+  const phoneRow = d.phone
+    ? '<div class="dm-g-row"><span>📞</span><span class="dm-g-phone-link" onclick="trackCall(event,\'phone_number\')" style="cursor:pointer;color:var(--rust);font-weight:600;text-decoration:underline dotted;text-underline-offset:3px">' + escHtml(d.phone) + '</span></div>'
+    : '';
+  // Substituïm la fila de telèfon genèrica (si n'hi havia) per la clicable
+  const filesNoPhone = files.filter(f => !f.includes('📞'));
+  const titol = '<div class="dm-g-label" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Informació del lloc</div>';
   const botoMes = d.placeId ? '<button class="dm-g-mes" id="dmGMes" onclick="carregaFotosOpinions(\'' + escHtml(d.placeId) + '\')">📷 Veure fotos i opinions</button><div id="dmGExtra"></div>' : '';
-  bloc.innerHTML = titol + (files.join('') || '<div class="dm-g-muted">Google no té dades de contacte d\'aquest establiment.</div>') + botoMes;
+  bloc.innerHTML = titol + phoneRow + (filesNoPhone.join('') || '<div class="dm-g-muted">Google no té dades de contacte d\'aquest establiment.</div>') + botoMes;
 
   // Les dades ja vénen de Google Maps: amaguem el botó «Verificar a Google Maps»
   if (mapsLink) { if (d.mapsUrl) mapsLink.href = d.mapsUrl; mapsLink.style.display = 'none'; }
 
-  // Botó de trucada amb el telèfon real
+  // Actualitzem dataset.phone per al tracking (telèfon real de Google)
+  // Però href sempre serà Maps (no truquem directament — tot passa per trackCall)
   if (d.phone && callBtn) {
-    callBtn.href = 'tel:' + (d.phoneIntl || d.phone).replace(/\s/g, '');
-    callBtn.removeAttribute('target');
     callBtn.dataset.phone = d.phone;
-  } else if (callBtn && d.mapsUrl) {
-    callBtn.href = d.mapsUrl;
+  }
+  // Actualitzem el telèfon visible al botó top
+  const callBtnTopPhoneEl = document.getElementById('dmCallBtnTopPhone');
+  if (callBtnTopPhoneEl && d.phone) {
+    callBtnTopPhoneEl.textContent = '· ' + d.phone;
+    const callBtnTopEl = document.getElementById('dmCallBtnTop');
+    if (callBtnTopEl) callBtnTopEl.dataset.phone = d.phone;
   }
 }
 
@@ -1998,11 +2091,13 @@ function closeDetailModal() {
   _dmEntry = null;
 }
 
-function trackCall(event) {
+function trackCall(event, origen) {
+  // origen: 'btn_top' (botó TRUCA'LS de dalt) | 'phone_number' (número clicat) | undefined (botó inferior)
   const btn = document.getElementById('dmCallBtn');
   const entryId = btn.dataset.entryId;
   const phone = btn.dataset.phone;
   const e = _dmEntry;
+  const origenStr = origen || 'btn_bottom';
 
   // GA4 event (si disponible)
   if (typeof gtag !== 'undefined') {
@@ -2010,7 +2105,8 @@ function trackCall(event) {
       entry_id: entryId,
       entry_name: e ? e.name : '',
       has_phone: !!phone,
-      tonteria_index: e ? e.tonteriaIndex : null
+      tonteria_index: e ? e.tonteriaIndex : null,
+      origen: origenStr
     });
   }
 
@@ -2021,18 +2117,19 @@ function trackCall(event) {
       entry_id: entryId,
       ts: new Date().toISOString(),
       has_phone: !!phone,
-      seg_fins_call: segsFinsCall
+      seg_fins_call: segsFinsCall,
+      origen: origenStr
     }).then(({ error }) => { if (error) console.warn('No s\'ha desat la trucada', error); });
   }
 
-  // Si no té telèfon, obrir Maps en nova pestanya
-  if (!phone) {
-    event.preventDefault();
-    const href = btn.href;
-    window.open(href, '_blank', 'noopener');
-    showToast('📞 Sense telèfon directe — obrim Maps!');
-  }
-  // Si té tel:, el navegador ho obre sol (no prevenim per defecte)
+  // Sempre obrim Google Maps (en nova pestanya) — no truquem directament
+  event.preventDefault();
+  const mapsUrl = _dmEntry
+    ? (_dmEntry.name ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(_dmEntry.name + (_dmEntry.addr ? ', ' + _dmEntry.addr : '')) : (_dmEntry.mapUrl || ''))
+    : '';
+  const dest = mapsUrl || btn.href;
+  if (dest && dest !== '#') window.open(dest, '_blank', 'noopener');
+  else showToast('📞 Sense ubicació — busqueu-los a Maps!');
 }
 
 // ── RENDER ──────────────────────────────────────────────────────────────────
@@ -2315,7 +2412,7 @@ function renderCard(e, showAdminActions) {
   }
   const googleMapsUrl = e.name ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.name+(e.addr?', '+e.addr:''))}` : (e.mapUrl||'');
   const gmClick = googleMapsUrl.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  return `<article class="entry" data-entry-id="${e.id}" ${(isAdmin||!FITXA_ACTIVA)?'style="cursor:default"':`onclick="openDetailModal('${e.id}')" title="Veure fitxa de ${nameEsc}"`}>
+  return `<article class="entry" data-entry-id="${e.id}" style="cursor:default">
     ${photoHtml}
     <div class="entry-num">${e.num||'??'}</div>
     <span class="${tagClass}">${displayTag}</span>
@@ -2331,7 +2428,7 @@ function renderCard(e, showAdminActions) {
     ${e.name&&!isAdmin?`<div class="entry-actions">
       <button class="map-btn" onclick="veureAlMapa('${e.id}');event.stopPropagation()">${t('mapBtnSite')}</button>
       <button class="map-btn" onclick="incrementVisit('${e.id}','${gmClick}');event.stopPropagation()">${t('gmapsBtn')}</button>
-      ${FITXA_ACTIVA ? `<button class="map-btn" onclick="openDetailModal('${e.id}');event.stopPropagation()">📋 Veure fitxa + trucada</button>` : ''}
+      ${FITXA_ACTIVA ? `<button class="map-btn investiga-btn" onclick="openDetailModal('${e.id}');event.stopPropagation()">${t('investigaBtn')}</button>` : ''}
     </div>`:''}
     ${shareHtml}
     ${adminHtml}
@@ -3125,6 +3222,7 @@ function entraComAdmin() {
   isAdmin = true;
   document.getElementById('loginModal').classList.add('hidden');
   document.getElementById('adminBar').classList.remove('hidden');
+  document.getElementById('adminEnrichBar').classList.remove('hidden');
   document.getElementById('adminLoginBtn').style.display = 'none';
   loadPending();
   loadDictProposals();
@@ -3135,6 +3233,7 @@ async function adminLogout() {
   try { await sb.auth.signOut(); } catch (e) {}
   isAdmin = false;
   document.getElementById('adminBar').classList.add('hidden');
+  document.getElementById('adminEnrichBar').classList.add('hidden');
   document.getElementById('adminLoginBtn').style.display = '';
   switchAdminTab('public');
   location.reload();
@@ -3792,15 +3891,16 @@ function mRenderCasos() {
         + '<div class="mCaseComment">' + escHtml(eData.comment||'') + '</div>'
         + '<a class="mCaseMapLink" href="' + escHtml(googleUrl) + '" target="_blank" rel="noopener" onclick="mObreGoogle(event,\'' + e.id + '\',this.href)">' + escHtml(t('mVeureGoogle')) + '</a>'
         + '<div class="mCaseShareRow">'
-        + '<button class="mCaseShareBtn wa" data-eid="' + escHtml(e.id) + '" data-snet="wa" onclick="event.stopPropagation();shareByEid(this)">WhatsApp</button>'
-        + '<button class="mCaseShareBtn tw" data-eid="' + escHtml(e.id) + '" data-snet="tw" onclick="event.stopPropagation();shareByEid(this)">X</button>'
-        + '<button class="mCaseShareBtn fb" data-eid="' + escHtml(e.id) + '" data-snet="fb" onclick="event.stopPropagation();shareByEid(this)">Facebook</button>'
+        + '<button class="mCaseShareBtn wa" data-eid="' + escHtml(e.id) + '" data-snet="wa" onclick="event.stopPropagation();shareByEid(this)" title="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.118 1.528 5.845L0 24l6.335-1.508A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.37l-.36-.213-3.722.885.916-3.618-.234-.373A9.818 9.818 0 0112 2.182c5.425 0 9.818 4.393 9.818 9.818 0 5.426-4.393 9.818-9.818 9.818z"/></svg></button>'
+        + '<button class="mCaseShareBtn tw" data-eid="' + escHtml(e.id) + '" data-snet="tw" onclick="event.stopPropagation();shareByEid(this)" title="X"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.906-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button>'
+        + '<button class="mCaseShareBtn fb" data-eid="' + escHtml(e.id) + '" data-snet="fb" onclick="event.stopPropagation();shareByEid(this)" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></button>'
         + '</div>'
         + '</div>'
         + '</div>';
     }
-    // Versió local (localhost o ?fitxa=1): obre la fitxa nova
-    return '<div class="mCaseCard" onclick="openDetailModal(\'' + e.id + '\')">'
+    // Versió amb FITXA_ACTIVA: expandeix primer (info humorística + botó Investiga'ls)
+    const bodyId = 'mcase_fitxa_' + i;
+    return '<div class="mCaseCard" onclick="mToggleCase(\'' + bodyId + '\')">'
       + '<div class="mCaseCardHeader">'
       + '<div class="mCaseNum">' + escHtml(e.num || String(i+1).padStart(2,'0')) + '</div>'
       + '<div style="flex:1">'
@@ -3812,6 +3912,19 @@ function mRenderCasos() {
       + '</div>'
       + '</div>'
       + '<div style="font-size:16px;color:var(--muted);padding-left:8px">›</div>'
+      + '</div>'
+      + '</div>'
+      + '<div class="mCaseBody" id="' + bodyId + '" data-entry-id="' + escHtml(e.id) + '">'
+      + '<img class="mCasePhoto" data-mphoto-id="' + escHtml(e.id) + '" alt=""' + (e.photoB64 ? ' src="' + e.photoB64 + '" style="display:block"' : '') + '>'
+      + (eData.transl ? '<div class="mCaseTransl">→ ' + escHtml(eData.transl) + '</div>' : '')
+      + '<div class="mCaseDesc">' + escHtml(eData.desc||'') + '</div>'
+      + '<div class="mCaseComment">' + escHtml(eData.comment||'') + '</div>'
+      + '<div class="mCaseShareRow">'
+      + '<button class="mCaseShareBtn wa" data-eid="' + escHtml(e.id) + '" data-snet="wa" onclick="event.stopPropagation();shareByEid(this)" title="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.118 1.528 5.845L0 24l6.335-1.508A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.37l-.36-.213-3.722.885.916-3.618-.234-.373A9.818 9.818 0 0112 2.182c5.425 0 9.818 4.393 9.818 9.818 0 5.426-4.393 9.818-9.818 9.818z"/></svg></button>'
+      + '<button class="mCaseShareBtn tw" data-eid="' + escHtml(e.id) + '" data-snet="tw" onclick="event.stopPropagation();shareByEid(this)" title="X"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.906-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button>'
+      + '<button class="mCaseShareBtn fb" data-eid="' + escHtml(e.id) + '" data-snet="fb" onclick="event.stopPropagation();shareByEid(this)" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></button>'
+      + '<button class="mCaseInvestigaBtn" onclick="openDetailModal(\'' + escHtml(e.id) + '\');event.stopPropagation()">🔍 INVESTIGA</button>'
+      + '</div>'
       + '</div>'
       + '</div>';
   }).join('');
@@ -3861,8 +3974,24 @@ function obrirCasPerUrl() {
 function mToggleCase(id) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.classList.toggle('open');
-  if (el.classList.contains('open')) mCarregaFotoCas(el.dataset.entryId);
+  const jaObert = el.classList.contains('open');
+  // Tancar tots els casos oberts (un sol cas a l'hora)
+  document.querySelectorAll('.mCaseBody.open').forEach(function(b) {
+    if (b.id !== id) b.classList.remove('open');
+  });
+  // Togglejar el cas actual
+  if (jaObert) {
+    el.classList.remove('open');
+  } else {
+    el.classList.add('open');
+    mCarregaFotoCas(el.dataset.entryId);
+    // Centrar el cas a la pantalla
+    setTimeout(function() {
+      const card = el.closest('.mCaseCard') || el.previousElementSibling;
+      const target = card || el;
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+  }
 }
 // Obre Google Maps des d'un cas del mòbil (compta la visita)
 function mObreGoogle(ev, id, url) {
@@ -4326,7 +4455,7 @@ if ('serviceWorker' in navigator) {
     </div>
     <!-- v105: botó TRUCA'LS visible sense scroll en mòbil -->
     <div class="dm-cta-top" id="dmCtaTop">
-      <a class="dm-call-btn-top" id="dmCallBtnTop" href="#" onclick="trackCall(event)">📞 TRUCA'LS <span id="dmCallBtnTopPhone" style="font-size:12px;opacity:.85"></span></a>
+      <a class="dm-call-btn-top" id="dmCallBtnTop" href="#" onclick="trackCall(event,'btn_top')">📞 TRUCA'LS <span id="dmCallBtnTopPhone" style="font-size:12px;opacity:.85"></span></a>
       <div class="dm-call-disclaimer-top" id="dmCallDisclaimerTop">Ets responsable de la teva pròpia valentia</div>
     </div>
 
@@ -4369,7 +4498,7 @@ if ('serviceWorker' in navigator) {
           <button class="dm-share-btn fb" onclick="dmShare('fb')">Facebook</button>
         </div>
       </div>
-      <a class="dm-call-btn" id="dmCallBtn" href="#" onclick="trackCall(event)">📞 TRUCA'LS (si t'atreveixes)</a>
+      <a class="dm-call-btn" id="dmCallBtn" href="#" onclick="trackCall(event,'btn_bottom')">📞 TRUCA'LS (si t'atreveixes)</a>
       <div class="dm-call-disclaimer" id="dmCallDisclaimer">Ets responsable de la teva pròpia valentia</div>
     </div>
   </div>
