@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v98 build:20261008-2120 · carCols usa offsetWidth real del carousel (no window.innerWidth) -->
+<!-- v105 build:20261009-1752 · layout mòbil: TRUCA'LS primer + foto 180px + tracking durada visita (modal_visits) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -351,6 +351,19 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 }
 @media(max-width:767px){
   .dm-inner{display:contents}
+  /* v105: foto més curta en mòbil */
+  .dm-hero{aspect-ratio:unset;height:180px}
+  /* v105: botó TRUCA'LS prominent a dalt */
+  .dm-cta-top{display:flex;flex-direction:column;align-items:stretch;padding:10px 16px 8px;background:var(--paper);border-bottom:2px solid var(--rust);position:sticky;top:56px;z-index:15}
+  .dm-call-btn-top{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;background:var(--rust);color:#fff;font-family:'DM Mono',monospace;font-size:15px;font-weight:700;letter-spacing:.08em;text-decoration:none;border-radius:3px;text-align:center}
+  .dm-call-btn-top:hover{opacity:.9}
+  .dm-call-disclaimer-top{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-top:5px;letter-spacing:.05em}
+  /* v105: amaga la barra inferior original en mòbil */
+  .dm-cta-bar{display:none}
+}
+@media(min-width:768px){
+  /* En desktop, amaga el bloc top (és redundant) */
+  .dm-cta-top{display:none}
 }
 
 .tonteria-index{margin:12px 0 14px;padding:10px 13px;background:rgba(0,0,0,.04);border:1px solid var(--rule)}
@@ -1757,27 +1770,48 @@ function openDetailModal(entryId) {
   const mapUrl = e.mapUrl || ('https://maps.google.com/?q=' + encodeURIComponent((e.name||'')+(e.addr?', '+e.addr:'')));
   mapsLink.href = mapUrl;
 
-  // CTA: botó trucada
+  // CTA: botó trucada (barra inferior desktop + botó top mòbil)
   const callBtn = document.getElementById('dmCallBtn');
-  // Per ara fem servir un número fictici; v73 tindrà el camp phone real
+  const callBtnTop = document.getElementById('dmCallBtnTop');
+  const callBtnTopPhone = document.getElementById('dmCallBtnTopPhone');
   const phone = e.phone || null;
   if (phone) {
-    callBtn.href = 'tel:' + phone.replace(/\s/g,'');
+    const telHref = 'tel:' + phone.replace(/\s/g,'');
+    callBtn.href = telHref;
     callBtn.dataset.entryId = e.id;
     callBtn.dataset.phone = phone;
+    if (callBtnTop) {
+      callBtnTop.href = telHref;
+      callBtnTop.dataset.entryId = e.id;
+      callBtnTop.dataset.phone = phone;
+      if (callBtnTopPhone) callBtnTopPhone.textContent = '· ' + phone;
+    }
   } else {
     // Sense telèfon: obrim Google Maps com a fallback
     callBtn.href = mapUrl;
     callBtn.target = '_blank';
     callBtn.dataset.entryId = e.id;
     callBtn.dataset.phone = '';
+    if (callBtnTop) {
+      callBtnTop.href = mapUrl;
+      callBtnTop.target = '_blank';
+      callBtnTop.dataset.entryId = e.id;
+      callBtnTop.dataset.phone = '';
+      if (callBtnTopPhone) callBtnTopPhone.textContent = '→ Maps';
+    }
   }
   // Disclaimer humorístic segons nivell de tonteria
   const disclaimer = callTexts[Math.min(ti, 5)];
   document.getElementById('dmCallDisclaimer').textContent = disclaimer;
+  const disclaimerTop = document.getElementById('dmCallDisclaimerTop');
+  if (disclaimerTop) disclaimerTop.textContent = disclaimer;
 
   // Dades de Google Places (telèfon, horari, valoració, web)
   carregaGooglePlaces(e, mapUrl);
+
+  // v105: guardar timestamp d'obertura per calcular durada de visita
+  window._dmOpenTs = Date.now();
+  window._dmEntryIdVisita = e.id;
 
   // Mostrar modal
   const modal = document.getElementById('detailModal');
@@ -1937,6 +1971,25 @@ function dmShare(net) {
 }
 
 function closeDetailModal() {
+  // v105: calcular i desar durada de visita
+  if (window._dmOpenTs && window._dmEntryIdVisita) {
+    const duradaMs = Date.now() - window._dmOpenTs;
+    const duradaSeg = Math.round(duradaMs / 1000);
+    const entryId = window._dmEntryIdVisita;
+    window._dmOpenTs = null;
+    window._dmEntryIdVisita = null;
+    // Desar a Supabase (fire-and-forget, mínim 2 seg per filtrar tancaments accidentals)
+    if (duradaSeg >= 2) {
+      sb.from('modal_visits').insert({
+        entry_id: entryId,
+        duracio_seg: duradaSeg,
+        ts: new Date().toISOString()
+      }).then(({ error }) => {
+        if (error) console.warn('[visita] No desat:', error.message);
+      });
+    }
+  }
+
   const modal = document.getElementById('detailModal');
   modal.classList.remove('open');
   document.body.style.overflow = '';
@@ -1963,8 +2016,13 @@ function trackCall(event) {
 
   // Desar a Supabase per seguiment intern
   if (entryId) {
-    sb.from('call_clicks').insert({ entry_id: entryId, ts: new Date().toISOString(), has_phone: !!phone })
-      .then(({ error }) => { if (error) console.warn('No s\'ha desat la trucada', error); });
+    const segsFinsCall = window._dmOpenTs ? Math.round((Date.now() - window._dmOpenTs) / 1000) : null;
+    sb.from('call_clicks').insert({
+      entry_id: entryId,
+      ts: new Date().toISOString(),
+      has_phone: !!phone,
+      seg_fins_call: segsFinsCall
+    }).then(({ error }) => { if (error) console.warn('No s\'ha desat la trucada', error); });
   }
 
   // Si no té telèfon, obrir Maps en nova pestanya
@@ -4266,6 +4324,12 @@ if ('serviceWorker' in navigator) {
       <span class="dm-header-name" id="dmHeaderName"></span>
       <span class="dm-header-num" id="dmHeaderNum"></span>
     </div>
+    <!-- v105: botó TRUCA'LS visible sense scroll en mòbil -->
+    <div class="dm-cta-top" id="dmCtaTop">
+      <a class="dm-call-btn-top" id="dmCallBtnTop" href="#" onclick="trackCall(event)">📞 TRUCA'LS <span id="dmCallBtnTopPhone" style="font-size:12px;opacity:.85"></span></a>
+      <div class="dm-call-disclaimer-top" id="dmCallDisclaimerTop">Ets responsable de la teva pròpia valentia</div>
+    </div>
+
     <div class="dm-body" id="dmBody">
       <div class="dm-hero" id="dmHero">
         <img class="dm-hero-img" id="dmHeroImg" alt="">
