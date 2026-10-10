@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v111 build:20261009-2030 · botó Admin "Enriquir amb Google" · dades Google cached a Supabase -->
+<!-- v112 build:20261010-0700 · geocodeEntry via Netlify Function proxy (fixes CORS Nominatim) -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -3266,12 +3266,12 @@ async function geocodeEntry(entry) {
   if (!name && !addr) return null;
   const q = [name, addr, muni, 'Catalunya'].filter(Boolean).join(', ');
   try {
-    const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
-    const resp = await fetch(url, { headers: { 'Accept-Language': 'ca,es', 'User-Agent': 'LaTonteriadAngles/1.0' } });
+    const url = '/.netlify/functions/geocode?q=' + encodeURIComponent(q);
+    const resp = await fetch(url);
     if (!resp.ok) return null;
-    const data = await resp.json();
-    if (!data || !data.length) return null;
-    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    const d = await resp.json();
+    if (!d.found) return null;
+    return { lat: d.lat, lng: d.lng };
   } catch(e) { console.warn('geocodeEntry error:', e); return null; }
 }
 
