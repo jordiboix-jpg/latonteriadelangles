@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v113 build:20261010-0730 · geocodeEntry query simplificada (addr+municipi) per millor hit rate Nominatim -->
+<!-- v115 build:20261010-0800 · geocodeEntry amb segon intent (nom+municipi) si adreça no trobada -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -3260,19 +3260,34 @@ function switchAdminTab(tab) {
 // ── ADMIN ACTIONS ──────────────────────────────────────────────────────────
 // ── GEOCODIFICACIÓ (Nominatim / OpenStreetMap) ──────────────────────────────
 async function geocodeEntry(entry) {
+  const name = (entry.name || '').trim();
   const addr = (entry.addr || '').trim();
   const muni = (entry.municipi || 'Barcelona').trim();
-  if (!addr) return null;
-  // Query simplificada: només addr + municipi — el nom complet i el pis confonen Nominatim
-  const addrNet = addr.replace(/,?\s*\d{5}\s*\w*/,'').replace(/\s+\d+[ªº].*$/,'').trim();
-  const q = [addrNet, muni, 'Catalunya'].filter(Boolean).join(', ');
+  if (!addr && !name) return null;
+
+  // Neteja adreça: treure codi postal, pis/planta/local/bajos
+  const addrNet = addr
+    .replace(/,?\s*\d{5}(?:\s+\w+)?/g, '')
+    .replace(/,?\s*\d+[ªº][^,]*/g, '')
+    .replace(/,?\s*(?:Loc|Local|Bajos|Planta|Piso|Ent|Bxs|Bj|Baixos)\b[^,]*/gi, '')
+    .replace(/[…\.]{2,}/g, '')
+    .replace(/,\s*,/g, ',').replace(/,\s*$/,'').trim();
+
+  const queries = [
+    addrNet ? [addrNet, muni, 'Catalunya'].join(', ') : null,  // 1r intent: adreça
+    name    ? [name, muni, 'Catalunya'].join(', ') : null,      // 2n intent: nom negoci
+    muni !== 'Barcelona' ? [name, muni].join(', ') : null,      // 3r intent: nom + municipi (sense Catalunya)
+  ].filter(Boolean);
+
   try {
-    const url = '/.netlify/functions/geocode?q=' + encodeURIComponent(q);
-    const resp = await fetch(url);
-    if (!resp.ok) return null;
-    const d = await resp.json();
-    if (!d.found) return null;
-    return { lat: d.lat, lng: d.lng };
+    for (const q of queries) {
+      const resp = await fetch('/.netlify/functions/geocode?q=' + encodeURIComponent(q));
+      if (!resp.ok) continue;
+      const d = await resp.json();
+      if (d.found) return { lat: d.lat, lng: d.lng };
+      await new Promise(r => setTimeout(r, 300)); // pausa entre intents
+    }
+    return null;
   } catch(e) { console.warn('geocodeEntry error:', e); return null; }
 }
 
