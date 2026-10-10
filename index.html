@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v116 build:20261010-0830 · fotos Google: carrusel horitzontal + lightbox fullscreen al mòbil -->
+<!-- v118 build:20261010-0855 · fotos: marca d'aigua ⊕ a la cantonada inferior dreta per indicar que són clicables -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -294,7 +294,8 @@ body:has(#detailModal.open) #pwaBanner{display:none}
 /* Carrusel de fotos Google — scroll lateral amb snap */
 .dm-g-fotos{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
 .dm-g-fotos::-webkit-scrollbar{display:none}
-.dm-g-fotos figure{margin:0;flex:0 0 auto;scroll-snap-align:start}
+.dm-g-fotos figure{margin:0;flex:0 0 auto;scroll-snap-align:start;position:relative}
+.dm-g-fotos figure::after{content:'+';position:absolute;bottom:6px;right:6px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:14px;line-height:20px;text-align:center;pointer-events:none;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
 .dm-g-fotos img{width:160px;height:120px;object-fit:cover;border-radius:4px;display:block;cursor:pointer;transition:opacity .15s}
 .dm-g-fotos img:active{opacity:.8}
 .dm-g-fotos figcaption{font-size:9px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
@@ -4304,15 +4305,34 @@ function mCaptureGPS() {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      // Desregistrar SW antics per forçar actualització neta
-      const regs = await navigator.serviceWorker.getRegistrations();
-      for (const reg of regs) {
-        const sw = reg.active || reg.waiting || reg.installing;
-        const isOld = sw && sw.scriptURL && !sw.scriptURL.includes('sw.js');
-        // Forçar update sempre — el navegador comprovarà si sw.js ha canviat
-        reg.update();
+      // Quan el SW nou pren el control (controllerchange), recarreguem per servir
+      // el index.html fresc del caché nou en comptes del vell. Això és el que
+      // fa que el PWA obert des de la icona carregui sempre l'última versió.
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) { refreshing = true; window.location.reload(); }
+      });
+
+      const reg = await navigator.serviceWorker.register('/sw.js');
+
+      // Si ja hi ha un SW nou esperant (waiting), demanem-li que prengui el
+      // control immediatament sense esperar que l'usuari tanqui totes les pestanyes.
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
       }
-      await navigator.serviceWorker.register('/sw.js');
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        if (newSW) {
+          newSW.addEventListener('statechange', () => {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              newSW.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        }
+      });
+
+      // Forçar comprovació d'actualització cada cop que es carrega la pàgina
+      reg.update();
     } catch(e) {}
   });
 }
