@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v112 build:20261010-0700 · geocodeEntry via Netlify Function proxy (fixes CORS Nominatim) -->
+<!-- v113 build:20261010-0730 · geocodeEntry query simplificada (addr+municipi) per millor hit rate Nominatim -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
@@ -3260,11 +3260,12 @@ function switchAdminTab(tab) {
 // ── ADMIN ACTIONS ──────────────────────────────────────────────────────────
 // ── GEOCODIFICACIÓ (Nominatim / OpenStreetMap) ──────────────────────────────
 async function geocodeEntry(entry) {
-  const name = (entry.name || '').trim();
   const addr = (entry.addr || '').trim();
   const muni = (entry.municipi || 'Barcelona').trim();
-  if (!name && !addr) return null;
-  const q = [name, addr, muni, 'Catalunya'].filter(Boolean).join(', ');
+  if (!addr) return null;
+  // Query simplificada: només addr + municipi — el nom complet i el pis confonen Nominatim
+  const addrNet = addr.replace(/,?\s*\d{5}\s*\w*/,'').replace(/\s+\d+[ªº].*$/,'').trim();
+  const q = [addrNet, muni, 'Catalunya'].filter(Boolean).join(', ');
   try {
     const url = '/.netlify/functions/geocode?q=' + encodeURIComponent(q);
     const resp = await fetch(url);
